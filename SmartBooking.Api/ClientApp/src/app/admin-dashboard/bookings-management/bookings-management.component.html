@@ -1,0 +1,152 @@
+<mat-card class="section-card">
+  <mat-card-header>
+    <mat-card-title>All Bookings Management</mat-card-title>
+    <div class="spacer"></div>
+    <button mat-raised-button color="primary" (click)="refreshData()">
+      <mat-icon>refresh</mat-icon>
+      Refresh
+    </button>
+  </mat-card-header>
+
+  <mat-card-content>
+    <!-- Filters Section -->
+    <div class="filters-section" [formGroup]="filterForm">
+      <mat-card class="filters-card">
+        <mat-card-content>
+          <div class="filters-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Start Date</mat-label>
+              <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+              <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+              <mat-datepicker #startPicker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>End Date</mat-label>
+              <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+              <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+              <mat-datepicker #endPicker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Resource Type</mat-label>
+              <mat-select formControlName="resourceType">
+                <mat-option value="">All Types</mat-option>
+                <mat-option value="room">Meeting Rooms</mat-option>
+                <mat-option value="desk">Desks</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>User</mat-label>
+              <mat-select formControlName="user">
+                <mat-option value="">All Users</mat-option>
+                <mat-option value="john.doe">John Doe</mat-option>
+                <mat-option value="sarah.mitchell">Sarah Mitchell</mat-option>
+                <mat-option value="mike.johnson">Mike Johnson</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Status</mat-label>
+              <mat-select formControlName="status">
+                <mat-option value="">All Statuses</mat-option>
+                <mat-option value="upcoming">Upcoming</mat-option>
+                <mat-option value="happening">Happening Now</mat-option>
+                <mat-option value="finished">Finished</mat-option>
+                <mat-option value="cancelled">Cancelled</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <div class="filter-actions">
+              <button mat-raised-button color="primary" (click)="applyBookingsFilter()">
+                Apply Filters
+              </button>
+              <button mat-button (click)="clearFilters()">
+                Clear
+              </button>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Bookings Table -->
+    <div class="table-container">
+      <table mat-table [dataSource]="bookingsDataSource" matSort class="bookings-table">
+
+        <!-- Resource Name Column -->
+        <ng-container matColumnDef="resourceName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Resource</th>
+          <td mat-cell *matCellDef="let booking">{{booking.resourceName}}</td>
+        </ng-container>
+
+        <!-- Resource Type Column -->
+        <ng-container matColumnDef="resourceType">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+          <td mat-cell *matCellDef="let booking">
+            <mat-chip [color]="booking.resourceType === 'room' ? 'primary' : 'accent'" selected>
+              <mat-icon matChipAvatar>{{booking.resourceType === 'room' ? 'meeting_room' : 'desk_chair'}}</mat-icon>
+              {{booking.resourceType === 'room' ? 'Room' : 'Desk'}}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <!-- User Column -->
+        <ng-container matColumnDef="userName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>User</th>
+          <td mat-cell *matCellDef="let booking">{{booking.userName}}</td>
+        </ng-container>
+
+        <!-- Start Time Column -->
+        <ng-container matColumnDef="startTime">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Start Time</th>
+          <td mat-cell *matCellDef="let booking">{{booking.startTime | date:'short'}}</td>
+        </ng-container>
+
+        <!-- End Time Column -->
+        <ng-container matColumnDef="endTime">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>End Time</th>
+          <td mat-cell *matCellDef="let booking">{{booking.endTime | date:'short'}}</td>
+        </ng-container>
+
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+          <td mat-cell *matCellDef="let booking">
+            <mat-chip [ngClass]="getStatusClass(booking.status)" selected>
+              {{booking.status | titlecase}}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let booking">
+            <button mat-icon-button (click)="viewBooking(booking)" matTooltip="View Details">
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button mat-icon-button (click)="editBooking(booking)" matTooltip="Edit Booking"
+                    [disabled]="booking.status === 'finished' || booking.status === 'cancelled'">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button (click)="cancelBooking(booking)" matTooltip="Cancel Booking"
+                    [disabled]="booking.status === 'finished' || booking.status === 'cancelled'"
+                    color="warn">
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="bookingsDisplayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: bookingsDisplayedColumns;"></tr>
+      </table>
+
+      <mat-paginator [pageSizeOptions]="[10, 25, 50, 100]"
+                     showFirstLastButtons
+                     aria-label="Select page of bookings">
+      </mat-paginator>
+    </div>
+  </mat-card-content>
+</mat-card>

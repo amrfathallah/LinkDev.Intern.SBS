@@ -1,0 +1,57 @@
+.dialog-content {
+  min-width: 400px;
+  padding: 20px 0;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.dialog-actions {
+  padding: 16px 0 8px;
+  gap: 8px;
+}
+
+.dialog-actions button {
+  margin-left: 8px;
+}
+
+.checkbox-container {
+  margin: 16px 0;
+}
+
+.mat-dialog-content {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+/* Form Field Styling */
+.mat-form-field {
+  font-size: 14px;
+}
+
+.mat-form-field .mat-form-field-label {
+  color: #666;
+}
+
+.mat-form-field.mat-focused .mat-form-field-label {
+  color: #1976d2;
+}
+
+/* Button Styling */
+.dialog-actions button {
+  min-width: 80px;
+  font-weight: 500;
+}
+
+/* Checkbox Styling */
+.checkbox-container .mat-checkbox {
+  font-size: 14px;
+}
+
+/* Error Message Styling */
+.mat-error {
+  font-size: 12px;
+  margin-top: 4px;
+}

@@ -1,0 +1,77 @@
+/* Dashboard Tabs Header */
+.dashboard-tabs-header {
+  background: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 16px 24px;
+  margin-bottom: 24px;
+}
+
+.tabs-container {
+  display: flex;
+  gap: 8px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.tab-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  background: white;
+  border: 1px solid #e0e0e0;
+}
+
+.tab-button:hover {
+  background: #f0f0f0;
+  border-color: #1976d2;
+}
+
+.tab-button.active {
+  background: #1976d2;
+  color: white;
+  border-color: #1976d2;
+  box-shadow: 0 2px 4px rgba(25, 118, 210, 0.3);
+}
+
+.tab-button.active mat-icon {
+  color: white;
+}
+
+/* Main Content */
+.dashboard-content {
+  padding: 0 24px 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  background-color: #f5f5f5;
+  min-height: calc(100vh - 120px);
+}
+
+.view-section {
+  width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-tabs-header {
+    padding: 16px;
+  }
+
+  .tabs-container {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .dashboard-content {
+    padding: 0 16px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tab-button span {
+    display: none;
+  }
+}
