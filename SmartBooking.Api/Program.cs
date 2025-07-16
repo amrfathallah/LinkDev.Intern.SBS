@@ -1,16 +1,32 @@
-var builder = WebApplication.CreateBuilder(args);
+using Microsoft.AspNetCore.Builder;
+using SBS.Infrastructure;
+using SmartBooking.Api.Extensions;
+
+var webApplicationBuilder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllersWithViews();
+webApplicationBuilder.Services.AddControllersWithViews();
 
-var app = builder.Build();
 
+webApplicationBuilder.Services.AddEndpointsApiExplorer().AddSwaggerGen();
+
+webApplicationBuilder.Services.AddInfrastructureServices(webApplicationBuilder.Configuration);
+
+var app = webApplicationBuilder.Build();
+
+
+
+#region Configure Kestrel Middlewares
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+
+	app.UseSwagger();
+	app.UseSwaggerUI();
+
+	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+	app.UseHsts();
 }
 
 app.UseHttpsRedirection();
@@ -22,6 +38,18 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller}/{action=Index}/{id?}");
 
-app.MapFallbackToFile("index.html");;
+app.MapFallbackToFile("index.html");
 
+app.MapControllers();
+
+
+#region Update Database Initialization
+
+await app.InitializeDbAsync();
+
+#endregion
+
+
+#endregion
 app.Run();
+
