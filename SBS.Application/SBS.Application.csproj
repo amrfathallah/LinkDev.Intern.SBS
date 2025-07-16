@@ -7,9 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="DTOs\" />
+    <Folder Include="DTOs\Auth\" />
+    <Folder Include="Interfaces\IServices\" />
     <Folder Include="Mapping\" />
-    <Folder Include="Services\" />
+    <Folder Include="Services\Auth\" />
   </ItemGroup>
 
 </Project>
