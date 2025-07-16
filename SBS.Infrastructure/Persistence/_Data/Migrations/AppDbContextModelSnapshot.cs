@@ -266,7 +266,7 @@ namespace SBS.Infrastructure.Persistence._Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Bookings");
+                    b.ToTable("Bookings", (string)null);
                 });
 
             modelBuilder.Entity("SBS.Domain.Entities.BookingSlot", b =>
@@ -290,7 +290,7 @@ namespace SBS.Infrastructure.Persistence._Data.Migrations
 
                     b.HasIndex("SlotId");
 
-                    b.ToTable("BookingSlots");
+                    b.ToTable("BookingSlots", (string)null);
                 });
 
             modelBuilder.Entity("SBS.Domain.Entities.BookingStatus", b =>
@@ -311,7 +311,7 @@ namespace SBS.Infrastructure.Persistence._Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BookingStatuses");
+                    b.ToTable("BookingStatuses", (string)null);
 
                     b.HasData(
                         new
@@ -380,7 +380,7 @@ namespace SBS.Infrastructure.Persistence._Data.Migrations
 
                     b.HasIndex("TypeId");
 
-                    b.ToTable("Resources");
+                    b.ToTable("Resources", (string)null);
                 });
 
             modelBuilder.Entity("SBS.Domain.Entities.ResourceType", b =>
@@ -401,7 +401,7 @@ namespace SBS.Infrastructure.Persistence._Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ResourceTypes");
+                    b.ToTable("ResourceTypes", (string)null);
 
                     b.HasData(
                         new
@@ -453,7 +453,7 @@ namespace SBS.Infrastructure.Persistence._Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Slots");
+                    b.ToTable("Slots", (string)null);
 
                     b.HasData(
                         new

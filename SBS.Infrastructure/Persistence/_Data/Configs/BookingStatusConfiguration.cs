@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SBS.Infrastructure.Persistence._Data.Configs._Base;
+using SBS.Domain.Enums;
 
 namespace SBS.Infrastructure.Persistence._Data.Configs
 {
@@ -19,9 +20,9 @@ namespace SBS.Infrastructure.Persistence._Data.Configs
 				.HasMaxLength(50);
 
 			builder.HasData(
-					new BookingStatus { Id = 1, Name = "Upcoming" },
-					new BookingStatus { Id = 2, Name = "Happening" },
-					new BookingStatus { Id = 3, Name = "Finished" });
+					new BookingStatus { Id = (int)BookingStatusEnum.Upcoming, Name = "Upcoming" },
+					new BookingStatus { Id = (int)BookingStatusEnum.Happening, Name = "Happening" },
+					new BookingStatus { Id = (int)BookingStatusEnum.Finished, Name = "Finished" });
 		}
 	}
 }
