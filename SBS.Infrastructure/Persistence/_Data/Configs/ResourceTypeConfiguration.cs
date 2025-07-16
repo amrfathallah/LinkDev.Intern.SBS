@@ -17,6 +17,10 @@ namespace SBS.Infrastructure.Persistence._Data.Configs
 			builder.Property(rt => rt.Name)
 				.IsRequired()
 				.HasMaxLength(50);
+
+			builder.HasData(
+		   new ResourceType { Id = 1, Name = "MeetingRoom" },
+		   new ResourceType { Id = 2, Name = "Desk" });
 		}
 	}
 }

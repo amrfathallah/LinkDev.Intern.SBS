@@ -17,6 +17,11 @@ namespace SBS.Infrastructure.Persistence._Data.Configs
 			builder.Property(bs => bs.Name)
 				.IsRequired()
 				.HasMaxLength(50);
+
+			builder.HasData(
+					new BookingStatus { Id = 1, Name = "Upcoming" },
+					new BookingStatus { Id = 2, Name = "Happening" },
+					new BookingStatus { Id = 3, Name = "Finished" });
 		}
 	}
 }

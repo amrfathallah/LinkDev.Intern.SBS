@@ -19,6 +19,9 @@ namespace SBS.Infrastructure.Persistence._Data
 		public DbSet<BookingStatus> BookingStatuses { get; set; }
 		public DbSet<Slot> Slots { get; set; }
 
+		public DbSet<ResourceType> ResourceTypes { get; set; }
+
+
 
 
 		public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
@@ -29,7 +32,7 @@ namespace SBS.Infrastructure.Persistence._Data
 			base.OnModelCreating(modelBuilder);
 			modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
-			var x = new Booking();
+		
 		}
 
 	}

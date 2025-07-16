@@ -8,7 +8,7 @@ namespace SmartBooking.Api.Extensions
 		{
 			using var scope = app.Services.CreateAsyncScope();
 			var serviceProvider = scope.ServiceProvider;
-			var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+			var dbInitializer = serviceProvider.GetRequiredService<IDbInitializer>();
 
 			var loggingFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
 
