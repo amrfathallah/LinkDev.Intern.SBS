@@ -1,22 +1,29 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using SBS.Application.Interfaces.IServices;
+using SBS.Application.Mapping;
+using SBS.Application.Services;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
-using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using SBS.Application.Interfaces.IServices;
+using IResourceService = SBS.Application.Interfaces.IServices.IResourceService;
 
 namespace SBS.Application
 {
     public static class DependencyInjection
 	{
-		public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
+		public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
 		{
-			services.AddScoped<IBookingService, IBookingService>();
+			//services.AddScoped<IBookingService, IBookingService>();
+            services.AddScoped<IResourceService, ResourceService>();
 
-			return services;
+			//services.AddAutoMapper(typeof(MappingProfile).Assembly); 
+			services.AddAutoMapper(Mapper => Mapper.AddProfile(new MappingProfile()));
+
+            return services;
 		}
 	}
 }
