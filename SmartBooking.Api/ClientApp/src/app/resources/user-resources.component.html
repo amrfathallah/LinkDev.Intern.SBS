@@ -1,7 +1,6 @@
 <div class="resources-container">
   <div class="header-section">
-    <h1 class="page-title">Available Resources</h1>
-    <p class="page-subtitle">Book meeting rooms and desk spaces for your work needs</p>
+    <h1 class="page-title">Resources</h1>
   </div>
 
   <!-- Search and Filter Section -->
@@ -15,7 +14,7 @@
         </mat-form-field>
 
         <div class="type-filters">
-          <mat-button-toggle-group [(value)]="selectedType" (change)="filterByType($event.value)">
+          <mat-button-toggle-group [(value)]="selectedType" (change)="filterByType($event.value)" class="filter-buttons">
             <mat-button-toggle value="all">
               <mat-icon>all_inclusive</mat-icon>
               All Resources
@@ -72,7 +71,6 @@
         <!-- Description -->
         <p class="resource-description">{{resource.description}}</p>
 
-        <!-- Status and Utilization -->
         <div class="resource-status">
           <div class="status-item">
             <span class="status-label">Next Available:</span>
