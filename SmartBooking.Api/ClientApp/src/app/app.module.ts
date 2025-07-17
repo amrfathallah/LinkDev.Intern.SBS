@@ -27,6 +27,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -40,6 +42,7 @@ import { BookingsManagementComponent } from './admin-dashboard/bookings-manageme
 import { ResourcesManagementComponent } from './admin-dashboard/resources-management/resources-management.component';
 import { ReportsManagementComponent } from './admin-dashboard/reports-management/reports-management.component';
 import { ConfirmationDialogComponent, ResourceDialogComponent } from './admin-dashboard/shared';
+import { UserResourcesComponent } from './resources/user-resources.component';
 
 
 @NgModule({
@@ -54,7 +57,8 @@ import { ConfirmationDialogComponent, ResourceDialogComponent } from './admin-da
     ResourcesManagementComponent,
     ReportsManagementComponent,
     ConfirmationDialogComponent,
-    ResourceDialogComponent
+    ResourceDialogComponent,
+    UserResourcesComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -65,6 +69,7 @@ import { ConfirmationDialogComponent, ResourceDialogComponent } from './admin-da
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'counter', component: CounterComponent },
       { path: 'fetch-data', component: FetchDataComponent },
+      { path: 'resources', component: UserResourcesComponent },
       { path: 'admin-dashboard', component: AdminDashboardComponent }
     ]),
     BrowserAnimationsModule,
@@ -90,6 +95,8 @@ import { ConfirmationDialogComponent, ResourceDialogComponent } from './admin-da
     MatNativeDateModule,
     MatSnackBarModule,
     MatTooltipModule,
+    MatButtonToggleModule,
+    MatProgressBarModule,
     ReactiveFormsModule
   ],
   providers: [],

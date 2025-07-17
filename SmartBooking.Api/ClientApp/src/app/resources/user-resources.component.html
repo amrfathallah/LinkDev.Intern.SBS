@@ -1,0 +1,101 @@
+<div class="resources-container">
+  <div class="header-section">
+    <h1 class="page-title">Available Resources</h1>
+    <p class="page-subtitle">Book meeting rooms and desk spaces for your work needs</p>
+  </div>
+
+  <!-- Search and Filter Section -->
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <div class="filters-row">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search resources...</mat-label>
+          <input matInput (input)="onSearchChange($any($event.target).value)" placeholder="Search by name or location">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <div class="type-filters">
+          <mat-button-toggle-group [(value)]="selectedType" (change)="filterByType($event.value)">
+            <mat-button-toggle value="all">
+              <mat-icon>all_inclusive</mat-icon>
+              All Resources
+            </mat-button-toggle>
+            <mat-button-toggle value="room">
+              <mat-icon>meeting_room</mat-icon>
+              Meeting Rooms
+            </mat-button-toggle>
+            <mat-button-toggle value="desk">
+              <mat-icon>desk_chair</mat-icon>
+              Desks
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Resources Grid -->
+  <div class="resources-grid">
+    <mat-card *ngFor="let resource of filteredResources" class="resource-card"
+              [class.room-card]="resource.type === 'room'"
+              [class.desk-card]="resource.type === 'desk'">
+
+      <!-- Resource Image/Icon -->
+      <div class="resource-image">
+        <mat-icon class="resource-type-icon" [color]="resource.type === 'room' ? 'primary' : 'accent'">
+          {{getResourceIcon(resource.type)}}
+        </mat-icon>
+      </div>
+
+      <mat-card-content>
+        <!-- Resource Header -->
+        <div class="resource-header" style="padding-top: 10px;">
+          <h3 class="resource-name">{{resource.name}}</h3>
+          <mat-chip [color]="resource.type === 'room' ? 'primary' : 'accent'" selected class="type-chip">
+            {{resource.type === 'room' ? 'Meeting Room' : 'Desk'}}
+          </mat-chip>
+        </div>
+
+        <!-- Resource Details -->
+        <div class="resource-details">
+          <div class="detail-item">
+            <mat-icon>location_on</mat-icon>
+            <span>{{resource.location}}</span>
+          </div>
+
+          <div class="detail-item">
+            <mat-icon>people</mat-icon>
+            <span>Capacity: {{resource.capacity}} {{resource.capacity === 1 ? 'person' : 'people'}}</span>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <p class="resource-description">{{resource.description}}</p>
+
+        <!-- Status and Utilization -->
+        <div class="resource-status">
+          <div class="status-item">
+            <span class="status-label">Next Available:</span>
+            <mat-chip [color]="getStatusColor(resource)" selected class="status-chip">
+              {{resource.nextBooking || 'Available Now'}}
+            </mat-chip>
+          </div>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions class="card-actions">
+        <button mat-raised-button color="primary" (click)="bookResource(resource)" class="book-button">
+          <mat-icon>event_available</mat-icon>
+          Book Now
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="filteredResources.length === 0" class="empty-state">
+    <mat-icon class="empty-icon">search_off</mat-icon>
+    <h3>No resources found</h3>
+    <p>Try adjusting your search criteria or filter options.</p>
+  </div>
+</div>

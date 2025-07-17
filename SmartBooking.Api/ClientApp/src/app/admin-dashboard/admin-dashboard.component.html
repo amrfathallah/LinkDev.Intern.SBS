@@ -10,6 +10,14 @@
       Manage Resources
     </button>
     <button mat-flat-button
+            [color]="currentView === 'bookings' ? 'primary' : ''"
+            (click)="switchView('bookings')"
+            class="tab-button"
+            [class.active]="currentView === 'bookings'">
+      <mat-icon>meeting_room</mat-icon>
+      Bookings
+    </button>
+    <button mat-flat-button
             [color]="currentView === 'reports' ? 'primary' : ''"
             (click)="switchView('reports')"
             class="tab-button"
@@ -22,7 +30,10 @@
 
 <!-- Main Content -->
 <div class="dashboard-content">
-
+  <!-- Manage Bookings View -->
+  <div *ngIf="currentView === 'bookings'" class="view-section">
+    <app-bookings-management></app-bookings-management>
+  </div>
   <!-- Manage Resources View -->
   <div *ngIf="currentView === 'resources'" class="view-section">
     <app-resources-management></app-resources-management>

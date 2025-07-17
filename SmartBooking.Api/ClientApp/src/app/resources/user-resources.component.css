@@ -1,0 +1,279 @@
+.resources-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header-section {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.page-title {
+  font-size: 2.5rem;
+  font-weight: 300;
+  margin: 0 0 8px 0;
+  color: #333;
+}
+
+.page-subtitle {
+  font-size: 1.1rem;
+  color: #666;
+  margin: 0;
+}
+
+.filters-card {
+  margin-bottom: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filters-row {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-field {
+  flex: 1;
+  min-width: 300px;
+}
+
+.type-filters {
+  flex-shrink: 0;
+}
+
+.mat-button-toggle-group {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.mat-button-toggle {
+  border-radius: 8px !important;
+}
+
+.resources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.resource-card {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  position: relative;
+}
+
+.resource-card .mat-card-content {
+  padding: 24px !important;
+}
+
+.resource-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.room-card {
+  border-left: 4px solid #3f51b5;
+}
+
+.desk-card {
+  border-left: 4px solid #ff4081;
+}
+
+.resource-image {
+  height: 120px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.resource-type-icon {
+  font-size: 48px;
+  height: 48px;
+  width: 48px;
+  opacity: 0.8;
+}
+
+.resource-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.resource-name {
+  font-size: 1.4rem;
+  font-weight: 500;
+  margin: 0;
+  color: #333;
+  flex: 1;
+}
+
+.type-chip {
+  margin-left: 12px;
+  font-size: 0.75rem;
+}
+
+.resource-details {
+  margin-bottom: 20px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.detail-item mat-icon {
+  font-size: 18px;
+  height: 18px;
+  width: 18px;
+  color: #999;
+  margin-top: 1px;
+}
+
+.resource-description {
+  color: #777;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin: 0 0 20px 0;
+}
+
+.resource-status {
+  margin-bottom: 0;
+}
+
+.status-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.status-label {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.status-chip {
+  font-size: 0.75rem;
+}
+
+.utilization-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.utilization-label {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+  min-width: 80px;
+}
+
+.utilization-bar {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.utilization-text {
+  font-size: 0.8rem;
+  color: #666;
+  min-width: 30px;
+  text-align: right;
+}
+
+.card-actions {
+  padding: 20px 24px;
+  background-color: #fafafa;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.book-button {
+  width: 100%;
+  height: 40px;
+  font-weight: 500;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 64px 32px;
+  color: #666;
+}
+
+.empty-icon {
+  font-size: 64px;
+  height: 64px;
+  width: 64px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  margin: 0 0 8px 0;
+  font-weight: 400;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .resources-container {
+    padding: 16px;
+  }
+
+  .page-title {
+    font-size: 2rem;
+  }
+
+  .filters-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-field {
+    min-width: auto;
+  }
+
+  .type-filters {
+    align-self: center;
+  }
+
+  .resources-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .resource-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .type-chip {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 480px) {  .card-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

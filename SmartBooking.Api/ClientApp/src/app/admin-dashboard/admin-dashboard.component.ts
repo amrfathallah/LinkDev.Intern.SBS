@@ -6,9 +6,9 @@ import { Component } from '@angular/core';
   styleUrls: ['./admin-dashboard.component.css']
 })
 export class AdminDashboardComponent {
-  currentView: 'resources' | 'reports' = 'resources';
+  currentView: 'resources' | 'reports' | 'bookings' = 'resources';
 
-  switchView(view: 'resources' | 'reports') {
+  switchView(view: 'resources' | 'reports' | 'bookings') {
     this.currentView = view;
   }
 }
