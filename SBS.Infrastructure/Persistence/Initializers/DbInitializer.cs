@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SBS.Infrastructure.Persistence.Initializers
 {
-	public class DbInitializer(AppDbContext _dbContext) : IDbInitializer
+	public abstract class DbInitializer(AppDbContext _dbContext) : IDbInitializer
 	{
 		public async Task InitializeDbAsync()
 		{
@@ -20,5 +20,7 @@ namespace SBS.Infrastructure.Persistence.Initializers
 				await _dbContext.Database.MigrateAsync(); // Update the database to the latest migration
 			}
 		}
+
+		public abstract Task SeedAsync();
 	}
 }

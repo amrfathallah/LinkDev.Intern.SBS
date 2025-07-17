@@ -1,5 +1,11 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
+using SBS.Application;
+using SBS.Application.Interfaces.Common;
+using SBS.Domain.Entities;
 using SBS.Infrastructure;
+using SBS.Infrastructure.CurrentUserService;
+using SBS.Infrastructure.Persistence._Data;
 using SmartBooking.Api.Extensions;
 
 var webApplicationBuilder = WebApplication.CreateBuilder(args);
@@ -11,13 +17,27 @@ webApplicationBuilder.Services.AddControllersWithViews();
 
 webApplicationBuilder.Services.AddEndpointsApiExplorer().AddSwaggerGen();
 
+webApplicationBuilder.Services.AddHttpContextAccessor().AddScoped(typeof(ICurrentUserService), typeof(CurrentUserService));
+
+
+
+// Add Identity services
+
+webApplicationBuilder.Services
+	.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
+	.AddEntityFrameworkStores<AppDbContext>()
+	.AddDefaultTokenProviders();
+
+
+
 webApplicationBuilder.Services.AddInfrastructureServices(webApplicationBuilder.Configuration);
+webApplicationBuilder.Services.AddApplicationServices();
 
 var app = webApplicationBuilder.Build();
 
 
 
-#region Configure Kestrel Middlewares
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -43,13 +63,10 @@ app.MapFallbackToFile("index.html");
 app.MapControllers();
 
 
-#region Update Database Initialization
 
+//Update Database Initialization
 await app.InitializeDbAsync();
 
-#endregion
 
-
-#endregion
 app.Run();
 

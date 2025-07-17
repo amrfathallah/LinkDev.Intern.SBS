@@ -9,5 +9,7 @@ namespace SBS.Application.Interfaces.Initializers
 	public interface IDbInitializer
 	{
 		Task InitializeDbAsync();
+
+		Task SeedAsync();
 	}
 }
