@@ -12,9 +12,7 @@ export interface Resource {
   type: 'room' | 'desk';
   location: string;
   capacity: number;
-  equipment: string[];
   active: boolean;
-  utilizationRate: number;
   nextBooking?: string;
 }
 
@@ -62,14 +60,12 @@ export class ResourcesManagementComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Update the resource in the data source
         const currentData = this.resourcesDataSource.data;
         const index = currentData.findIndex(r => r.id === result.id);
         if (index !== -1) {
           currentData[index] = { ...result };
           this.resourcesDataSource.data = [...currentData];
 
-          // Show success message
           this.snackBar.open(`Resource "${result.name}" has been updated`, 'Close', {
             duration: 3000,
             horizontalPosition: 'right',
@@ -96,13 +92,10 @@ export class ResourcesManagementComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Toggle the resource status
         resource.active = !resource.active;
 
-        // Update the data source to trigger change detection
         this.resourcesDataSource.data = [...this.resourcesDataSource.data];
 
-        // Show success message
         const statusText = resource.active ? 'activated' : 'deactivated';
         this.snackBar.open(`Resource "${resource.name}" has been ${statusText}`, 'Close', {
           duration: 3000,
@@ -126,12 +119,10 @@ export class ResourcesManagementComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Remove the resource from the data source
         const currentData = this.resourcesDataSource.data;
         const updatedData = currentData.filter(r => r.id !== resource.id);
         this.resourcesDataSource.data = updatedData;
 
-        // Show success message
         this.snackBar.open(`Resource "${resource.name}" has been deleted`, 'Close', {
           duration: 3000,
           horizontalPosition: 'right',
@@ -143,7 +134,6 @@ export class ResourcesManagementComponent implements OnInit {
 
   viewResource(resource: Resource) {
     console.log('View resource:', resource);
-    // Implement view resource dialog
   }
 
   addResource() {
@@ -156,7 +146,6 @@ export class ResourcesManagementComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Generate a new ID for the resource
         const currentData = this.resourcesDataSource.data;
         const maxId = Math.max(...currentData.map(r => r.id), 0);
         const newResource: Resource = {
@@ -164,10 +153,8 @@ export class ResourcesManagementComponent implements OnInit {
           id: maxId + 1
         };
 
-        // Add the new resource to the data source
         this.resourcesDataSource.data = [...currentData, newResource];
 
-        // Show success message
         this.snackBar.open(`Resource "${newResource.name}" has been created`, 'Close', {
           duration: 3000,
           horizontalPosition: 'right',
@@ -178,7 +165,6 @@ export class ResourcesManagementComponent implements OnInit {
   }
 
   private loadResourcesData() {
-    // Mock data - replace with actual API call
     const mockResources: Resource[] = [
       {
         id: 1,
@@ -186,9 +172,7 @@ export class ResourcesManagementComponent implements OnInit {
         type: 'room',
         location: 'Floor 1, Wing A',
         capacity: 10,
-        equipment: ['Projector', 'Whiteboard', 'Video Conference'],
         active: true,
-        utilizationRate: 78,
         nextBooking: '9:00 AM - John Doe'
       },
       {
@@ -197,9 +181,7 @@ export class ResourcesManagementComponent implements OnInit {
         type: 'room',
         location: 'Floor 2, Wing B',
         capacity: 6,
-        equipment: ['TV Screen', 'Conference Phone'],
         active: true,
-        utilizationRate: 65,
         nextBooking: '2:00 PM - Team Meeting'
       },
       {
@@ -208,9 +190,7 @@ export class ResourcesManagementComponent implements OnInit {
         type: 'desk',
         location: 'Floor 3, Section C',
         capacity: 1,
-        equipment: ['Monitor', 'Dock Station'],
         active: true,
-        utilizationRate: 45
       },
       {
         id: 4,
@@ -218,9 +198,7 @@ export class ResourcesManagementComponent implements OnInit {
         type: 'room',
         location: 'Floor 1, Wing C',
         capacity: 20,
-        equipment: ['Large Screen', 'Audio System', 'Video Conference'],
         active: false,
-        utilizationRate: 0,
         nextBooking: 'Under Maintenance'
       }
     ];
