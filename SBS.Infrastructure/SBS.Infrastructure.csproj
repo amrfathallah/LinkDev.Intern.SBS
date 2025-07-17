@@ -7,9 +7,31 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Data\" />
-    <Folder Include="Migrations\" />
-    <Folder Include="Repositories\" />
+    <Compile Remove="Data\**" />
+    <Compile Remove="Migrations\**" />
+    <EmbeddedResource Remove="Data\**" />
+    <EmbeddedResource Remove="Migrations\**" />
+    <None Remove="Data\**" />
+    <None Remove="Migrations\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Persistence\_Data\Migrations\" />
+    <Folder Include="Persistence\_Data\Seeds\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.18" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.18" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.18">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SBS.Application\SBS.Application.csproj" />
+    <ProjectReference Include="..\SBS.Domain\SBS.Domain.csproj" />
   </ItemGroup>
 
 </Project>
