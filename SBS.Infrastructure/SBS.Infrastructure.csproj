@@ -9,13 +9,10 @@
   <ItemGroup>
     <Compile Remove="Data\**" />
     <Compile Remove="Migrations\**" />
-    <Compile Remove="Repositories\**" />
     <EmbeddedResource Remove="Data\**" />
     <EmbeddedResource Remove="Migrations\**" />
-    <EmbeddedResource Remove="Repositories\**" />
     <None Remove="Data\**" />
     <None Remove="Migrations\**" />
-    <None Remove="Repositories\**" />
   </ItemGroup>
 
   <ItemGroup>
