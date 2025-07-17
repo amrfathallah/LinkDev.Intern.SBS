@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using SBS.Application.DTOs.Auth;
 using SBS.Application.Exceptions;
 using SBS.Application.Interfaces.IServices;
@@ -102,5 +103,15 @@ namespace SBS.Application.Services.Auth
 			};
 		}
 
+		public Task LogoutAsync(HttpResponse response)
+		{
+			// Clear the authentication cookie
+			// response.Cookies.Delete("YourAuthCookieName");
+
+			// Optionally, you can also sign out the user
+			//await _signInManager.SignOutAsync();
+
+			return Task.CompletedTask;
+		}
 	}
 }

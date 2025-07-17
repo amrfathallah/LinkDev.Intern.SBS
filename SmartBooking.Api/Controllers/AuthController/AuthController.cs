@@ -27,6 +27,14 @@ namespace SmartBooking.Api.Controllers.AuthController
 			return Ok(response);
 		}
 
+		[HttpPost("logout")] // POST: /api/auth/logout
+		[Authorize]
+		public async Task<ActionResult> Logout()
+		{
+			await _authService.LogoutAsync(Response);
+			return Ok(new { Message = "Logged out successfully." });
+		}
+
 
 		[HttpGet("me")] // GET: /api/auth/me
 		[Authorize]

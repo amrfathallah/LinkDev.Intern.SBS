@@ -1,4 +1,5 @@
-﻿using SBS.Application.DTOs.Auth;
+﻿using Microsoft.AspNetCore.Http;
+using SBS.Application.DTOs.Auth;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,8 @@ namespace SBS.Application.Interfaces.IServices
 		Task<AuthResponseDto> LoginAsync(LoginRequestDto request);
 
 		Task<AuthResponseDto> GetCurrentUser(ClaimsPrincipal claimsPrincipal);
-		
+
+		Task LogoutAsync(HttpResponse response);
+
 	}
 }
