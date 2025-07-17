@@ -1,0 +1,36 @@
+<!-- Dashboard Header with Tabs Only -->
+<div class="dashboard-tabs-header">
+  <div class="tabs-container">
+    <button mat-flat-button
+            [color]="currentView === 'resources' ? 'primary' : ''"
+            (click)="switchView('resources')"
+            class="tab-button"
+            [class.active]="currentView === 'resources'">
+      <mat-icon>meeting_room</mat-icon>
+      Manage Resources
+    </button>
+    <button mat-flat-button
+            [color]="currentView === 'reports' ? 'primary' : ''"
+            (click)="switchView('reports')"
+            class="tab-button"
+            [class.active]="currentView === 'reports'">
+      <mat-icon>assessment</mat-icon>
+      Reports
+    </button>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="dashboard-content">
+
+  <!-- Manage Resources View -->
+  <div *ngIf="currentView === 'resources'" class="view-section">
+    <app-resources-management></app-resources-management>
+  </div>
+
+  <!-- Reports View -->
+  <div *ngIf="currentView === 'reports'" class="view-section">
+    <app-reports-management></app-reports-management>
+  </div>
+
+</div>
