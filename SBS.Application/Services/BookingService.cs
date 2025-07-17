@@ -2,12 +2,12 @@
 using SBS.Application.Interfaces.IServices;
 using SBS.Domain.Entities;
 using SBS.Domain.Enums;
-using SBS.Application.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SBS.Application.DTOs.BookingDto;
 
 namespace SBS.Application.Services
 {

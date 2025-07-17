@@ -11,4 +11,12 @@
     <Folder Include="Services\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="15.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SBS.Domain\SBS.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

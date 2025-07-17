@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SBS.Application.DTOs.ResourceDto.ResourceDto
+namespace SBS.Application.DTOs.ResourceDto
 {
     public class CreateResourceDto
     {
