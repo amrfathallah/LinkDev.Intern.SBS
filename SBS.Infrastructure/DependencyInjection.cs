@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SBS.Application.Interfaces;
 using SBS.Application.Interfaces.Initializers;
 using SBS.Infrastructure.Persistence._Data;
 using SBS.Infrastructure.Persistence.Initializers;

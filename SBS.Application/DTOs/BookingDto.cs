@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace SBS.Application.DTOs
 {
-	public record BookingDto(Guid id, int ResourceId, DateOnly Date, List<int> SlotsIds);
+	public record BookingDto(Guid id, Guid ResourceId, DateOnly Date, List<int> SlotsIds);
 }

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using SBS.Infrastructure;
+using SBS.Application;
 using SmartBooking.Api.Extensions;
 
 var webApplicationBuilder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,8 @@ webApplicationBuilder.Services.AddControllersWithViews();
 webApplicationBuilder.Services.AddEndpointsApiExplorer().AddSwaggerGen();
 
 webApplicationBuilder.Services.AddInfrastructureServices(webApplicationBuilder.Configuration);
+webApplicationBuilder.Services.AddApplicationDependencies(webApplicationBuilder.Configuration);
+
 
 var app = webApplicationBuilder.Build();
 

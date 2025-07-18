@@ -10,6 +10,6 @@ namespace SBS.Application.Interfaces.IRepositories
 	public interface IRepository<T> where T : class
 	{
 		Task<List<T>> GetAllAsync();
-		Task UpdateAsync(T instance);
+		Task DeleteAsync(T instance);
 	}
 }

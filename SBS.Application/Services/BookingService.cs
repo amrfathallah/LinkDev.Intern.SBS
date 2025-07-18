@@ -14,21 +14,26 @@ namespace SBS.Application.Services
 	internal class BookingService : IBookingService
 	{
 		private readonly IUnitOfWork _unitOfWork;
+		private readonly IBookingConflictValidator _conflictValidator;
 
-		public BookingService(IUnitOfWork unitOfWork)
+		public BookingService(IUnitOfWork unitOfWork, IBookingConflictValidator bookingConflictValidator)
 		{
 			_unitOfWork = unitOfWork;
+			_conflictValidator = bookingConflictValidator;
 		}
 
 		public async Task<bool> BookAsync(BookingRequestDto requestDto, Guid userId, string createdBy)
 		{
 			await _unitOfWork.BeginTransactionAsync();
 
-			//Make Conflict Logic
+			if (await _conflictValidator.HasConflictAsync(requestDto.ResourceId, requestDto.Date, requestDto.SlotsIds))
+			{
+				return false;
+			}
 
 			var booking = new Booking
 			{
-				UserId = userId, //Check
+				UserId = userId,
 				ResourceId = requestDto.ResourceId,
 				Date = requestDto.Date,
 				StatusId = (int)BookingStatusEnum.Upcoming,

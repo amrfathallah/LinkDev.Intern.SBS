@@ -24,10 +24,10 @@ namespace SBS.Infrastructure.Repositories
 			return await _appDbContext.Set<T>().ToListAsync();
 		}
 
-		public virtual Task UpdateAsync(T instance)
+		public virtual Task DeleteAsync(T instance)
 		{
-			//To do (Make Update Product DTO)
-			return null;
+			_appDbContext.Set<T>().Remove(instance);
+			return Task.CompletedTask;
 		}
 
 
