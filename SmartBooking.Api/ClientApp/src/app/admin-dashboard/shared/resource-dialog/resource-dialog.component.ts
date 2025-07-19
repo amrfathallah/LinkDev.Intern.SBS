@@ -1,17 +1,17 @@
+import { getTestBed } from '@angular/core/testing';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
+
 export interface Resource {
   id: number;
   name: string;
-  type: 'room' | 'desk';
-  location: string;
+  type: number;
   capacity: number;
-  equipment: string[];
+  openAt: string;
+  closeAt: string;
   active: boolean;
-  utilizationRate: number;
-  nextBooking?: string;
 }
 
 export interface ResourceDialogData {
@@ -45,22 +45,18 @@ export class ResourceDialogComponent implements OnInit {
     return this.fb.group({
       name: ['', [Validators.required]],
       type: ['', [Validators.required]],
-      location: ['', [Validators.required]],
       capacity: [1, [Validators.required, Validators.min(1)]],
-      equipmentText: [''],
+      openAt: ['09:00', Validators.required],
+      closeAt: ['17:00', Validators.required],
       active: [true]
     });
   }
 
   private populateForm(resource: Resource): void {
-    const equipmentText = resource.equipment.join(', ');
-
     this.resourceForm.patchValue({
       name: resource.name,
       type: resource.type,
-      location: resource.location,
       capacity: resource.capacity,
-      equipmentText: equipmentText,
       active: resource.active
     });
   }
@@ -69,27 +65,20 @@ export class ResourceDialogComponent implements OnInit {
     if (this.resourceForm.valid) {
       const formValue = this.resourceForm.value;
 
-      // Convert equipment text to array
-      const equipment = formValue.equipmentText
-        ? formValue.equipmentText.split(',').map((item: string) => item.trim()).filter((item: string) => item)
-        : [];
 
       const resourceData: Partial<Resource> = {
         name: formValue.name,
-        type: formValue.type,
-        location: formValue.location,
+        type: formValue.type === 'desk' ? 2 : 1,
         capacity: formValue.capacity,
-        equipment: equipment,
+        openAt: (formValue.openAt) + ":00",
+        closeAt:(formValue.closeAt) + ":00",
         active: formValue.active,
-        utilizationRate: this.data.isEdit ? this.data.resource!.utilizationRate : 0
       };
 
       // Include ID for edit operations
       if (this.data.isEdit && this.data.resource) {
         resourceData.id = this.data.resource.id;
-        resourceData.nextBooking = this.data.resource.nextBooking;
       }
-
       this.dialogRef.close(resourceData);
     }
   }

@@ -5,16 +5,16 @@ import { MatSort } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmationDialogComponent, ResourceDialogComponent } from '../shared';
-
+import { AdminService } from '../../services/admin-service';
+import { CreateResourceDto } from 'src/app/models/resource/create-resource.dto';
 export interface Resource {
-  id: number;
+  id: string; // Changed from number to string to match API
   name: string;
-  type: 'room' | 'desk';
-  location: string;
+  type: number;
   capacity: number;
   active: boolean;
-  nextBooking?: string;
 }
+
 
 @Component({
   selector: 'app-resources-management',
@@ -29,7 +29,9 @@ export class ResourcesManagementComponent implements OnInit {
   resourcesDataSource = new MatTableDataSource<Resource>();
   resourceType: 'all' | 'room' | 'desk' = 'all';
 
-  constructor(public dialog: MatDialog, private snackBar: MatSnackBar) {}
+  constructor(public dialog: MatDialog,
+              private snackBar: MatSnackBar,
+              private adminService: AdminService) {}
 
   ngOnInit() {
     this.loadResourcesData();
@@ -138,7 +140,7 @@ export class ResourcesManagementComponent implements OnInit {
 
   addResource() {
     const dialogRef = this.dialog.open(ResourceDialogComponent, {
-      width: '500px',
+      maxWidth: '500px',
       data: {
         isEdit: false
       }
@@ -147,61 +149,65 @@ export class ResourcesManagementComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         const currentData = this.resourcesDataSource.data;
-        const maxId = Math.max(...currentData.map(r => r.id), 0);
-        const newResource: Resource = {
-          ...result,
-          id: maxId + 1
+        const createResourceDto : CreateResourceDto = {
+          name: result.name,
+          typeId: result.type,
+          capacity: result.capacity,
+          openAt: result.openAt,
+          closeAt: result.closeAt
         };
+        this.adminService.createResource(createResourceDto).subscribe({
+          next: (createdResource: any) => {
+            const newResource: Resource = {
+              id: createdResource.id,
+              name: createdResource.name,
+              type: createdResource.typeId,
+              capacity: createdResource.capacity,
+              active: createdResource.isActive
+            }
 
-        this.resourcesDataSource.data = [...currentData, newResource];
+            this.resourcesDataSource.data = [...currentData, newResource];
 
-        this.snackBar.open(`Resource "${newResource.name}" has been created`, 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
+            this.snackBar.open(`Resource "${newResource.name}" has been created`, 'Close', {
+              duration: 3000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top'
+            });
+          },
+          error: (error) => {
+            console.error('Error creating resource:', error);
+            this.snackBar.open('Error creating resource', 'Close', {
+              duration: 3000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top'
+            });
+          }
         });
       }
     });
   }
 
   private loadResourcesData() {
-    const mockResources: Resource[] = [
-      {
-        id: 1,
-        name: 'Conference Room A',
-        type: 'room',
-        location: 'Floor 1, Wing A',
-        capacity: 10,
-        active: true,
-        nextBooking: '9:00 AM - John Doe'
+    this.adminService.getResources().subscribe({
+      next: (resources) => {
+        // Map the API response to your local Resource interface
+        const mappedResources: Resource[] = resources.map(r => ({
+          id: r.id,
+          name: r.name,
+          type: r.typeId,
+          capacity: r.capacity,
+          active: r.isActive,
+        }));
+        this.resourcesDataSource.data = mappedResources;
       },
-      {
-        id: 2,
-        name: 'Meeting Room B',
-        type: 'room',
-        location: 'Floor 2, Wing B',
-        capacity: 6,
-        active: true,
-        nextBooking: '2:00 PM - Team Meeting'
-      },
-      {
-        id: 3,
-        name: 'Desk 12',
-        type: 'desk',
-        location: 'Floor 3, Section C',
-        capacity: 1,
-        active: true,
-      },
-      {
-        id: 4,
-        name: 'Conference Room C',
-        type: 'room',
-        location: 'Floor 1, Wing C',
-        capacity: 20,
-        active: false,
-        nextBooking: 'Under Maintenance'
+      error: (error) => {
+        console.error('Error loading resources:', error);
+        this.snackBar.open('Error loading resources', 'Close', {
+          duration: 3000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top'
+        });
       }
-    ];
-    this.resourcesDataSource.data = mockResources;
+    });
   }
 }
