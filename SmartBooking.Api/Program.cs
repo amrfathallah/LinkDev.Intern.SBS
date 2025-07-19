@@ -11,6 +11,19 @@ var webApplicationBuilder = WebApplication.CreateBuilder(args);
 
 webApplicationBuilder.Services.AddControllersWithViews();
 
+webApplicationBuilder.Services.AddCors(options =>
+{
+    options.AddPolicy("Origins", policy =>
+    {
+        policy.WithOrigins(
+                "https://localhost:44417", // Development
+                "https://smart-office-eqbvh2eddnf5fyee.westeurope-01.azurewebsites.net" // Production
+              )
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
 
 webApplicationBuilder.Services.AddEndpointsApiExplorer().AddSwaggerGen();
 
@@ -41,6 +54,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
+app.UseCors("Origins");
 
 app.MapControllerRoute(
     name: "default",
