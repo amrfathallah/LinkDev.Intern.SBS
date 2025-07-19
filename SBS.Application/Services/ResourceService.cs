@@ -35,35 +35,63 @@ namespace SBS.Application.Services
         public async Task<ResourceDto> AddAsync(CreateResourceDto dto)
         {
             await _unitOfWork.BeginTransactionAsync();
-            var resource = _mapper.Map<Resource>(dto);
-            resource.IsActive = true;
-            await _unitOfWork.Resources.AddAsync(resource);
-            await _unitOfWork.CommitAsync();
-            return _mapper.Map<ResourceDto>(resource);
+            try
+            {
+                var resource = _mapper.Map<Resource>(dto);
+                resource.IsActive = true;
+                await _unitOfWork.Resources.AddAsync(resource);
+                await _unitOfWork.CommitAsync();
+                await _unitOfWork.CommitTransactionAsync();
+                return _mapper.Map<ResourceDto>(resource);
+            }
+            catch
+            {
+                await _unitOfWork.RollBackTransactionAsync();
+                throw;
+            }
         }
 
         public async Task<ResourceDto?> UpdateAsync(Guid id, UpdateResourceDto dto)
         {
-             await _unitOfWork.BeginTransactionAsync();
-            var resource = await _unitOfWork.Resources.GetByIdAsync(id);
-            if (resource == null) return null;
-            resource.Name = dto.Name;
-            resource.Capacity = dto.Capacity;
-            resource.OpenAt = dto.OpenAt;
-            resource.CloseAt = dto.CloseAt;
-            await _unitOfWork.Resources.UpdateAsync(resource);
-            await _unitOfWork.CommitAsync();
-            return _mapper.Map<ResourceDto>(resource);
+            await _unitOfWork.BeginTransactionAsync();
+            try
+            {
+                var resource = await _unitOfWork.Resources.GetByIdAsync(id);
+                if (resource == null) return null;
+                resource.Name = dto.Name;
+                resource.Capacity = dto.Capacity;
+                resource.OpenAt = dto.OpenAt;
+                resource.CloseAt = dto.CloseAt;
+                await _unitOfWork.Resources.UpdateAsync(resource);
+                await _unitOfWork.CommitAsync();
+                await _unitOfWork.CommitTransactionAsync();
+                return _mapper.Map<ResourceDto>(resource);
+            }
+            catch
+            {
+                await _unitOfWork.RollBackTransactionAsync();
+                throw;
+            }
         }
 
         public async Task<bool> SetActiveStatusAsync(Guid id, bool isActive)
         {
-            var resource = await _unitOfWork.Resources.GetByIdAsync(id);
-            if (resource == null) return false;
-            resource.IsActive = isActive;
-            await _unitOfWork.Resources.UpdateAsync(resource);
-            await _unitOfWork.CommitAsync();
-            return true;
+            await _unitOfWork.BeginTransactionAsync();
+            try
+            {
+                var resource = await _unitOfWork.Resources.GetByIdAsync(id);
+                if (resource == null) return false;
+                resource.IsActive = isActive;
+                await _unitOfWork.Resources.UpdateAsync(resource);
+                await _unitOfWork.CommitAsync();
+                await _unitOfWork.CommitTransactionAsync();
+                return true;
+            }
+            catch
+            {
+                await _unitOfWork.RollBackTransactionAsync();
+                throw;
+            }
         }
     }
 } 
