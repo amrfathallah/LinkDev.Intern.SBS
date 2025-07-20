@@ -18,9 +18,7 @@ namespace SBS.Application
 		{
 			services.AddScoped<IBookingService, BookingService>();
 
-			//To be done
-			/*services.AddScoped<IUnitOfWork, UnitOfWork>();
-			services.AddScoped<IBookingConflictValidator, BookingConflictValidator>();*/
+			
 
 
 			return services;

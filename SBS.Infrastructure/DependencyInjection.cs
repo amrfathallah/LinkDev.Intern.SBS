@@ -28,9 +28,12 @@ namespace SBS.Infrastructure
 
 			#region Register IDbInitializer
 			// Register the IDbInitializer implementation
-			services.AddScoped<IDbInitializer, DbInitializer>(); 
+			services.AddScoped<IDbInitializer, DbInitializer>();
 
 			#endregion
+
+			services.AddScoped<IUnitOfWork, UnitOfWork>();
+			services.AddScoped<IBookingConflictValidator, BookingConflictValidator>();
 
 			return services;
 		}

@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SBS.Application.Interfaces.IRepositories;
-using SBS.Application.Interfaces.IServices;
+﻿using SBS.Application.Interfaces.IRepositories;
 using SBS.Domain.Entities;
 using SBS.Infrastructure.Persistence._Data;
 using System;
@@ -11,16 +9,13 @@ using System.Threading.Tasks;
 
 namespace SBS.Infrastructure.Repositories
 {
-    internal class BookingRepository : GenericRepository<Booking>, IBookingRepository
+	internal class ResourceRepository : GenericRepository<Resource>, IResourceRepository
 	{
 		private readonly AppDbContext _appDbContext;
 
-		public BookingRepository(AppDbContext appDbContext) : base(appDbContext)
+		public ResourceRepository(AppDbContext appDbContext) : base(appDbContext)
 		{
 			_appDbContext = appDbContext;
 		}
-
-		
-
 	}
 }

@@ -10,7 +10,7 @@ namespace SBS.Application.Interfaces.IRepositories
 	public interface IBookingSlotRepository : IRepository<BookingSlot>
 	{
 		Task AddRangeAsync(List<BookingSlot> bookingSlot);
-		Task<List<BookingSlot>?> GetAsync(Guid id);
+		Task<List<BookingSlot>?> GetRangeAsync(Guid id);
 
 	}
 }

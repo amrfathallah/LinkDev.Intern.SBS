@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace SBS.Application.Services
 {
-	internal class BookingService : IBookingService
+	public class BookingService : IBookingService
 	{
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IBookingConflictValidator _conflictValidator;
@@ -26,11 +26,32 @@ namespace SBS.Application.Services
 		{
 			await _unitOfWork.BeginTransactionAsync();
 
+			//Input Validation
+			if(_unitOfWork.ResourceRepository.GetAsync(requestDto.ResourceId) == null)
+			{
+				throw new Exception("Resource doesn't exist");
+			}
+
+			var slots = await _unitOfWork.SlotRepository.GetByIdsAsync(requestDto.SlotsIds);
+			if( slots.Count != requestDto.SlotsIds.Count)
+			{
+				throw new Exception("Invalid slots are selected");
+			}
+
+			if(requestDto.Date < DateOnly.FromDateTime(DateTime.Today))
+			{
+				throw new Exception("Can't book a resource in the past");
+			}
+
+
+			//Check for booking conflicts
 			if (await _conflictValidator.HasConflictAsync(requestDto.ResourceId, requestDto.Date, requestDto.SlotsIds))
 			{
 				return false;
 			}
+			
 
+			//Booking Logic
 			var booking = new Booking
 			{
 				UserId = userId,
@@ -50,6 +71,7 @@ namespace SBS.Application.Services
 				SlotId = slotId,
 				BookingId = booking.Id,
 			}).ToList();
+
 
 			await _unitOfWork.BookingSlotRepository.AddRangeAsync(bookingSlots);
 			await _unitOfWork.CommitAsync();

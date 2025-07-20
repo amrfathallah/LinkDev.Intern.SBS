@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SBS.Application.Interfaces;
 using SBS.Domain.Entities;
+using SBS.Domain.Enums;
 using SBS.Infrastructure.Persistence._Data;
 
 
@@ -22,7 +23,8 @@ namespace SBS.Infrastructure
 
 		public async Task<bool> HasConflictAsync(Guid ResourceId, DateOnly date, List<int> slotIds)
 		{
-			var existingSlots = await _appDbContext.BookingSlots.Include(slot => slot.Booking).Where(slot => slot.Booking != null && slot.Booking.ResourceId == ResourceId).ToListAsync();
+			//To be checked
+			var existingSlots = await _appDbContext.BookingSlots.Include(slot => slot.Booking).Where(slot => slot.Booking != null && slot.Booking.ResourceId == ResourceId && slot.Booking.StatusId != (int)BookingStatusEnum.Finished).ToListAsync();
 
 			var bookedSlots = await _appDbContext.Slots.Where(Slot => slotIds.Contains(Slot.Id)).ToListAsync();
 

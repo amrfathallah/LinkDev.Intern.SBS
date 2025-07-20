@@ -30,6 +30,16 @@ namespace SBS.Infrastructure.Repositories
 			return Task.CompletedTask;
 		}
 
+		public async Task AddAsync(T instance)
+		{
+			await _appDbContext.Set<T>().AddAsync(instance);
+		}
+
+		public async Task<T?> GetAsync(Guid id)
+		{
+			return await _appDbContext.Set<T>().FindAsync(id);
+		}
+
 
 
 
