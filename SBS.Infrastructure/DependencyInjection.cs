@@ -2,8 +2,11 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SBS.Application.Interfaces.Initializers;
+using SBS.Application.Interfaces.IServices;
+using SBS.Application.Services.Auth;
 using SBS.Infrastructure.Persistence._Data;
 using SBS.Infrastructure.Persistence.Initializers;
+using SBS.Infrastructure.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,11 +30,22 @@ namespace SBS.Infrastructure
 
 			#region Register IDbInitializer
 			// Register the IDbInitializer implementation
-			services.AddScoped<IDbInitializer, DbInitializer>(); 
+			services.AddScoped<IDbInitializer, DbInitializer>();
 
 			#endregion
 
-			return services;
+
+
+			#region Register Token and Refresh Token
+
+			// Adding Token Service to handle JWT-Token generation
+			services.AddScoped<ITokenService, TokenService>();
+
+			// Add RefreshTokenService to handle DB storage and validation
+			services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+            #endregion
+
+            return services;
 		}
 	}
 }
