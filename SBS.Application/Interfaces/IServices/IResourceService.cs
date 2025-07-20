@@ -12,5 +12,6 @@ namespace SBS.Application.Interfaces.IServices
         Task<ResourceDto> AddAsync(CreateResourceDto dto);
         Task<ResourceDto?> UpdateAsync(Guid id, UpdateResourceDto dto);
         Task<bool> SetActiveStatusAsync(Guid id, bool isActive);
+        Task<bool> DeleteAsync(Guid id);
     }
 } 

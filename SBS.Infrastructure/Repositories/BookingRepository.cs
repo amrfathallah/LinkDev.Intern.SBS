@@ -30,5 +30,9 @@ namespace SBS.Infrastructure.Repositories
 			return await _appDbContext.Bookings.FindAsync(id);
 		}
 
+		public async Task<bool> HasBookingsForResourceAsync(Guid resourceId)
+		{
+			return await _appDbContext.Bookings.AnyAsync(b => b.ResourceId == resourceId);
+		}
 	}
 }

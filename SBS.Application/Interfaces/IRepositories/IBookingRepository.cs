@@ -11,6 +11,6 @@ namespace SBS.Application.Interfaces.IRepositories
     {
         Task AddAsync(Booking booking);
 		Task<Booking?> GetAsync(Guid id);
-
+        Task<bool> HasBookingsForResourceAsync(Guid resourceId);
 	}
 }

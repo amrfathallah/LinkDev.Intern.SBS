@@ -64,5 +64,21 @@ namespace SmartBooking.Api.Controllers
             if (!result) return NotFound();
             return NoContent();
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var result = await _resourceService.DeleteAsync(id);
+            if (!result)
+            {
+                // Check if resource exists and has bookings
+                var resource = await _resourceService.GetByIdAsync(id);
+                if (resource == null)
+                    return NotFound();
+                else
+                    return BadRequest("Resource has bookings and cannot be deleted.");
+            }
+            return NoContent();
+        }
     }
 } 
