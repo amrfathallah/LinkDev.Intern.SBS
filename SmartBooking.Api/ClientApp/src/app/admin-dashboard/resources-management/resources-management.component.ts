@@ -9,12 +9,14 @@ import { AdminService } from '../../services/admin-service';
 import { CreateResourceDto } from 'src/app/models/resource/create-resource.dto';
 import { UpdateResourceDto } from 'src/app/models/resource/update-resource.dto';
 export interface Resource {
-  id: string; 
+  id: string;
   name: string;
   type: 'room' | 'desk';
   typeId: number;
   capacity: number;
   active: boolean;
+  openAt: string;
+  closeAt: string;
 }
 
 
@@ -27,7 +29,7 @@ export class ResourcesManagementComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  resourcesDisplayedColumns: string[] = ['name', 'type', 'capacity', 'status', 'actions'];
+  resourcesDisplayedColumns: string[] = ['name', 'type', 'capacity', 'openAt', 'closeAt', 'status', 'actions'];
   resourcesDataSource = new MatTableDataSource<Resource>();
   resourceType: 'all' | 'room' | 'desk' = 'all';
 
@@ -91,7 +93,9 @@ export class ResourcesManagementComponent implements OnInit {
               type: updatedResource.typeName.toLowerCase() === 'desk' ? 'desk' : 'room',
               typeId: updatedResource.typeId,
               capacity: updatedResource.capacity,
-              active: updatedResource.isActive
+              active: updatedResource.isActive,
+              openAt: updatedResource.openAt,
+              closeAt: updatedResource.closeAt
             };
             const index = currentData.findIndex(r => r.id === updatedResourceData.id);
             if (index !== -1) {
@@ -219,7 +223,9 @@ export class ResourcesManagementComponent implements OnInit {
               type: createdResource.typeName.toLowerCase() === 'desk' ? 'desk' : 'room',
               typeId: createdResource.typeId,
               capacity: createdResource.capacity,
-              active: createdResource.isActive
+              active: createdResource.isActive,
+              openAt: createdResource.openAt,
+              closeAt: createdResource.closeAt
             }
 
             this.resourcesDataSource.data = [...currentData, newResource];
@@ -253,6 +259,8 @@ export class ResourcesManagementComponent implements OnInit {
           typeId: r.typeId,
           capacity: r.capacity,
           active: r.isActive,
+          openAt: r.openAt,
+          closeAt: r.closeAt
         }));
         this.resourcesDataSource.data = mappedResources;
       },
