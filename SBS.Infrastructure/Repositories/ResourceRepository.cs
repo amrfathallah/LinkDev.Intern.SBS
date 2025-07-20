@@ -26,5 +26,9 @@ namespace SBS.Infrastructure.Repositories
         {
             await _appDbContext.Resources.AddAsync(resource);
         }
+        public async Task UpdateAsync(Resource resource)
+        {
+            _appDbContext.Resources.Update(resource);
+        }
     }
 } 

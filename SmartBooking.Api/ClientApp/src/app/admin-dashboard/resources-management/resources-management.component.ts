@@ -7,10 +7,12 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmationDialogComponent, ResourceDialogComponent } from '../shared';
 import { AdminService } from '../../services/admin-service';
 import { CreateResourceDto } from 'src/app/models/resource/create-resource.dto';
+import { UpdateResourceDto } from 'src/app/models/resource/update-resource.dto';
 export interface Resource {
   id: string; // Changed from number to string to match API
   name: string;
-  type: number;
+  type: 'room' | 'desk';
+  typeId: number;
   capacity: number;
   active: boolean;
 }
@@ -25,7 +27,7 @@ export class ResourcesManagementComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  resourcesDisplayedColumns: string[] = ['name', 'type', 'location', 'capacity', 'status', 'actions'];
+  resourcesDisplayedColumns: string[] = ['name', 'type', 'capacity', 'status', 'actions'];
   resourcesDataSource = new MatTableDataSource<Resource>();
   resourceType: 'all' | 'room' | 'desk' = 'all';
 
@@ -34,6 +36,14 @@ export class ResourcesManagementComponent implements OnInit {
               private adminService: AdminService) {}
 
   ngOnInit() {
+    // Set up custom filter predicate for resource type filtering
+    this.resourcesDataSource.filterPredicate = (data: Resource, filter: string) => {
+      if (filter === 'all' || filter === '') {
+        return true;
+      }
+      return data.type === filter;
+    };
+
     this.loadResourcesData();
   }
 
@@ -47,6 +57,10 @@ export class ResourcesManagementComponent implements OnInit {
     if (type === 'all') {
       this.resourcesDataSource.filter = '';
     } else {
+
+      this.resourcesDataSource.filterPredicate = (data: Resource, filter: string) => {
+        return data.type === filter;
+      };
       this.resourcesDataSource.filter = type;
     }
   }
@@ -63,17 +77,42 @@ export class ResourcesManagementComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         const currentData = this.resourcesDataSource.data;
-        const index = currentData.findIndex(r => r.id === result.id);
-        if (index !== -1) {
-          currentData[index] = { ...result };
-          this.resourcesDataSource.data = [...currentData];
-
-          this.snackBar.open(`Resource "${result.name}" has been updated`, 'Close', {
-            duration: 3000,
-            horizontalPosition: 'right',
-            verticalPosition: 'top'
-          });
-        }
+        const updateResourceDto: UpdateResourceDto = {
+          name: result.name,
+          capacity: result.capacity,
+          openAt: result.openAt,
+          closeAt: result.closeAt
+        };
+        this.adminService.updateResource(result.id, updateResourceDto).subscribe({
+          next: (updatedResource: any) => {
+            const updatedResourceData: Resource = {
+              id: updatedResource.id,
+              name: updatedResource.name,
+              type: updatedResource.typeName.toLowerCase() === 'desk' ? 'desk' : 'room',
+              typeId: updatedResource.typeId,
+              capacity: updatedResource.capacity,
+              active: updatedResource.isActive
+            };
+            const index = currentData.findIndex(r => r.id === updatedResourceData.id);
+            if (index !== -1) {
+              currentData[index] = updatedResourceData;
+              this.resourcesDataSource.data = [...currentData];
+            }
+            this.snackBar.open(`Resource "${updatedResourceData.name}" has been updated`, 'Close', {
+              duration: 3000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top'
+            });
+          },
+          error: (error) => {
+            console.error('Error updating resource:', error);
+            this.snackBar.open('Error updating resource', 'Close', {
+              duration: 3000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top'
+            });
+          }
+        });
       }
     });
   }
@@ -110,7 +149,7 @@ export class ResourcesManagementComponent implements OnInit {
 
   deleteResource(resource: Resource) {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      width: '400px',
+      maxWidth: '400px',
       data: {
         title: 'Delete Resource',
         message: `Are you sure you want to permanently delete "${resource.name}"? This action cannot be undone.`,
@@ -132,10 +171,6 @@ export class ResourcesManagementComponent implements OnInit {
         });
       }
     });
-  }
-
-  viewResource(resource: Resource) {
-    console.log('View resource:', resource);
   }
 
   addResource() {
@@ -161,7 +196,8 @@ export class ResourcesManagementComponent implements OnInit {
             const newResource: Resource = {
               id: createdResource.id,
               name: createdResource.name,
-              type: createdResource.typeId,
+              type: createdResource.typeName.toLowerCase() === 'desk' ? 'desk' : 'room',
+              typeId: createdResource.typeId,
               capacity: createdResource.capacity,
               active: createdResource.isActive
             }
@@ -190,11 +226,11 @@ export class ResourcesManagementComponent implements OnInit {
   private loadResourcesData() {
     this.adminService.getResources().subscribe({
       next: (resources) => {
-        // Map the API response to your local Resource interface
         const mappedResources: Resource[] = resources.map(r => ({
           id: r.id,
           name: r.name,
-          type: r.typeId,
+          type: r.typeId === 2 ? 'desk' : 'room',
+          typeId: r.typeId,
           capacity: r.capacity,
           active: r.isActive,
         }));

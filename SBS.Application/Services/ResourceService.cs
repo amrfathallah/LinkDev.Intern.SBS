@@ -57,11 +57,12 @@ namespace SBS.Application.Services
             try
             {
                 var resource = await _unitOfWork.Resources.GetByIdAsync(id);
-                if (resource == null) return null;
+                if (resource is null) return null;
                 resource.Name = dto.Name;
                 resource.Capacity = dto.Capacity;
                 resource.OpenAt = dto.OpenAt;
                 resource.CloseAt = dto.CloseAt;
+                resource.IsActive = dto.IsActive;
                 await _unitOfWork.Resources.UpdateAsync(resource);
                 await _unitOfWork.CommitAsync();
                 await _unitOfWork.CommitTransactionAsync();

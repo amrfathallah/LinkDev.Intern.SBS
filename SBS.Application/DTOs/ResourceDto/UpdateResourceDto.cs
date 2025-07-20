@@ -12,6 +12,7 @@ namespace SBS.Application.DTOs.ResourceDto
         public int Capacity { get; set; }
         public TimeSpan OpenAt { get; set; }
         public TimeSpan CloseAt { get; set; }
+        public bool IsActive { get; set; }
     }
 
 }

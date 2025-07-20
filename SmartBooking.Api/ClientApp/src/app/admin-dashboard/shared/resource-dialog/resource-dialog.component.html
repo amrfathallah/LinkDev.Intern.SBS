@@ -13,7 +13,7 @@
     </mat-form-field>
 
     <!-- Resource Type -->
-    <mat-form-field appearance="outline" class="full-width ">
+    <mat-form-field appearance="outline" class="full-width" *ngIf="!data.isEdit">
       <mat-label>Resource Type</mat-label>
       <mat-select formControlName="type">
         <mat-option value="room">Meeting Room</mat-option>
