@@ -20,4 +20,7 @@ export class AdminService {
   updateResource(id: string, resource: UpdateResourceDto) {
     return this._httpClient.put(`${environment.apiUrl}/api/Resource/${id}`, resource);
   }
+  deleteResource(id: string){
+    return this._httpClient.delete(`${environment.apiUrl}/api/Resource/${id}`);
+  }
 }

@@ -9,7 +9,7 @@ import { AdminService } from '../../services/admin-service';
 import { CreateResourceDto } from 'src/app/models/resource/create-resource.dto';
 import { UpdateResourceDto } from 'src/app/models/resource/update-resource.dto';
 export interface Resource {
-  id: string; // Changed from number to string to match API
+  id: string; 
   name: string;
   type: 'room' | 'desk';
   typeId: number;
@@ -160,19 +160,39 @@ export class ResourcesManagementComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        const currentData = this.resourcesDataSource.data;
-        const updatedData = currentData.filter(r => r.id !== resource.id);
-        this.resourcesDataSource.data = updatedData;
-
+        this.adminService.deleteResource(resource.id).subscribe({
+          next: () => {
+        this.removeResourceFromDataSource(resource);
         this.snackBar.open(`Resource "${resource.name}" has been deleted`, 'Close', {
           duration: 3000,
           horizontalPosition: 'right',
           verticalPosition: 'top'
         });
+          },
+          error: (error) => {
+            let errorMessage = 'Error deleting resource';
+            if (error?.status === 400) {
+              errorMessage = `Resource "${resource.name}" cannot be deleted because it has bookings.`;
+            } else if (error?.status === 404) {
+              errorMessage = `Resource "${resource.name}" not found.`;
+            }
+            console.error('Error deleting resource:', error);
+            this.snackBar.open(errorMessage, 'Close', {
+              duration: 3000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top'
+            });
+          }
+        });
       }
     });
   }
 
+  private removeResourceFromDataSource(resource: Resource) {
+    const currentData = this.resourcesDataSource.data;
+    const updatedData = currentData.filter(r => r.id !== resource.id);
+    this.resourcesDataSource.data = updatedData;
+  }
   addResource() {
     const dialogRef = this.dialog.open(ResourceDialogComponent, {
       maxWidth: '500px',
