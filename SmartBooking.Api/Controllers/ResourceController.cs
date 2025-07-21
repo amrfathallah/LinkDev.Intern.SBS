@@ -80,5 +80,14 @@ namespace SmartBooking.Api.Controllers
             }
             return NoContent();
         }
+
+        [HttpPost("booked-slots")]
+        public async Task<IActionResult> GetBookedSlots([FromBody] GetBookedSlotsRequestDto request)
+        {
+            var result = await _resourceService.GetBookedSlotsAsync(request);
+            if (result == null)
+                return NotFound();
+            return Ok(result);
+        }
     }
 } 

@@ -5,6 +5,7 @@ using SBS.Infrastructure.Persistence._Data;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace SBS.Infrastructure.Repositories
 {
@@ -29,6 +30,14 @@ namespace SBS.Infrastructure.Repositories
         public async Task UpdateAsync(Resource resource)
         {
             _appDbContext.Resources.Update(resource);
+        }
+
+        public async Task<Resource> GetResourceWithBookedSlotsAsync(Guid resourceId, DateOnly date)
+        {
+            return await _appDbContext.Resources
+                .Include(r => r.Bookings.Where(b => b.Date == date))
+                    .ThenInclude(b => b.BookingSlots)
+                .FirstOrDefaultAsync(r => r.Id == resourceId);
         }
     }
 } 

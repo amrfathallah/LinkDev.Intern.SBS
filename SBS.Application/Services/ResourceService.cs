@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 
+
+
 namespace SBS.Application.Services
 {
     public class ResourceService : IResourceService
@@ -117,6 +119,31 @@ namespace SBS.Application.Services
                 await _unitOfWork.RollBackTransactionAsync();
                 throw;
             }
+        }
+
+        public async Task<ResourceBookedSlotsDto> GetBookedSlotsAsync(GetBookedSlotsRequestDto request)
+        {
+            var dateOnly = DateOnly.FromDateTime(request.Date);
+            var resource = await _unitOfWork.Resources.GetResourceWithBookedSlotsAsync(request.ResourceId, dateOnly);
+            if (resource == null)
+                return null;
+
+            var bookedSlots = resource.Bookings
+                .SelectMany(b => b.BookingSlots)
+                .Select(bs => new BookedSlotDto
+                {
+                    SlotId = bs.SlotId,
+                    StartTime = bs.Slot.StartTime,
+                    EndTime = bs.Slot.EndTime
+                })
+                .ToList();
+
+            return new ResourceBookedSlotsDto
+            {
+                ResourceId = resource.Id,
+                ResourceName = resource.Name,
+                BookedSlots = bookedSlots
+            };
         }
     }
 } 
