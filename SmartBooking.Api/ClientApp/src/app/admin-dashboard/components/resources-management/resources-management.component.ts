@@ -4,20 +4,13 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ConfirmationDialogComponent, ResourceDialogComponent } from '../shared';
 import { AdminService } from '../../services/admin-service';
-import { CreateResourceDto } from 'src/app/models/resource/create-resource.dto';
-import { UpdateResourceDto } from 'src/app/models/resource/update-resource.dto';
-export interface Resource {
-  id: string;
-  name: string;
-  type: 'room' | 'desk';
-  typeId: number;
-  capacity: number;
-  active: boolean;
-  openAt: string;
-  closeAt: string;
-}
+import { CreateResourceDto } from 'src/app/admin-dashboard/models/Dtos/create-resource.dto';
+import { UpdateResourceDto } from 'src/app/admin-dashboard/models/Dtos/update-resource.dto';
+import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
+import { ResourceDialogComponent } from '../resource-dialog/resource-dialog.component';
+import { Resource } from '../../models/Resource.model';
+import { ResourceType } from '../../enums/ResourceType.enum';
 
 
 @Component({
@@ -31,19 +24,19 @@ export class ResourcesManagementComponent implements OnInit {
 
   resourcesDisplayedColumns: string[] = ['name', 'type', 'capacity', 'openAt', 'closeAt', 'status', 'actions'];
   resourcesDataSource = new MatTableDataSource<Resource>();
-  resourceType: 'all' | 'room' | 'desk' = 'all';
+  resourceType: ResourceType | null = null;
+  ResourceType = ResourceType;
 
   constructor(public dialog: MatDialog,
               private snackBar: MatSnackBar,
               private adminService: AdminService) {}
 
   ngOnInit() {
-    // Set up custom filter predicate for resource type filtering
     this.resourcesDataSource.filterPredicate = (data: Resource, filter: string) => {
       if (filter === 'all' || filter === '') {
         return true;
       }
-      return data.type === filter;
+      return data.typeId === (filter as unknown as ResourceType);
     };
 
     this.loadResourcesData();
@@ -54,16 +47,12 @@ export class ResourcesManagementComponent implements OnInit {
     this.resourcesDataSource.sort = this.sort;
   }
 
-  filterResourcesByType(type: 'all' | 'room' | 'desk') {
+  filterResourcesByType(type: null | ResourceType) {
     this.resourceType = type;
-    if (type === 'all') {
+    if (type === null) {
       this.resourcesDataSource.filter = '';
     } else {
-
-      this.resourcesDataSource.filterPredicate = (data: Resource, filter: string) => {
-        return data.type === filter;
-      };
-      this.resourcesDataSource.filter = type;
+      this.resourcesDataSource.filter = String(type);
     }
   }
 
@@ -83,14 +72,15 @@ export class ResourcesManagementComponent implements OnInit {
           name: result.name,
           capacity: result.capacity,
           openAt: result.openAt,
-          closeAt: result.closeAt
+          closeAt: result.closeAt,
+          isActive: result.active
         };
         this.adminService.updateResource(result.id, updateResourceDto).subscribe({
           next: (updatedResource: any) => {
             const updatedResourceData: Resource = {
               id: updatedResource.id,
               name: updatedResource.name,
-              type: updatedResource.typeName.toLowerCase() === 'desk' ? 'desk' : 'room',
+              type: updatedResource.typeName,
               typeId: updatedResource.typeId,
               capacity: updatedResource.capacity,
               active: updatedResource.isActive,
@@ -220,7 +210,7 @@ export class ResourcesManagementComponent implements OnInit {
             const newResource: Resource = {
               id: createdResource.id,
               name: createdResource.name,
-              type: createdResource.typeName.toLowerCase() === 'desk' ? 'desk' : 'room',
+              type: createdResource.typeName,
               typeId: createdResource.typeId,
               capacity: createdResource.capacity,
               active: createdResource.isActive,
@@ -255,7 +245,7 @@ export class ResourcesManagementComponent implements OnInit {
         const mappedResources: Resource[] = resources.map(r => ({
           id: r.id,
           name: r.name,
-          type: r.typeId === 2 ? 'desk' : 'room',
+          type: r.typeName,
           typeId: r.typeId,
           capacity: r.capacity,
           active: r.isActive,

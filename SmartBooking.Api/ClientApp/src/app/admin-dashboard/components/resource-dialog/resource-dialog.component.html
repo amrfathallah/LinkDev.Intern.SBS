@@ -16,8 +16,8 @@
     <mat-form-field appearance="outline" class="full-width" *ngIf="!data.isEdit">
       <mat-label>Resource Type</mat-label>
       <mat-select formControlName="type">
-        <mat-option value="room">Meeting Room</mat-option>
-        <mat-option value="desk">Desk</mat-option>
+        <mat-option [value]="ResourceType.Room">Meeting Room</mat-option>
+        <mat-option [value]="ResourceType.Desk">Desk</mat-option>
       </mat-select>
       <mat-error *ngIf="resourceForm.get('type')?.hasError('required')">
         Resource type is required
