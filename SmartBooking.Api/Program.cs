@@ -69,9 +69,7 @@ webApplicationBuilder.Services.AddScoped<ICurrentUserService, CurrentUserService
 webApplicationBuilder.Services.AddControllersWithViews();
 webApplicationBuilder.Services.AddEndpointsApiExplorer();
 webApplicationBuilder.Services.AddSwaggerGen(c =>
-
 {
-
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "SMO API", Version = "v1" });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -103,6 +101,7 @@ webApplicationBuilder.Services.AddSwaggerGen(c =>
 
 var app = webApplicationBuilder.Build();
 
+
 // Configure the HTTP request pipeline
 app.UseSwagger();
 
@@ -127,8 +126,6 @@ app.MapControllerRoute(
 app.MapControllers();
 app.MapFallbackToFile("index.html");
 
-
 // Database Initialization (via Extension Method)
 await app.InitializeDbAsync();
-
 app.Run();

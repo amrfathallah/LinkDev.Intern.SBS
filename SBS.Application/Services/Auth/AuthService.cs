@@ -15,26 +15,55 @@ namespace SBS.Application.Services.Auth
 		IRefreshTokenService _refreshTokenService) : IAuthService
 
 	{
-		public async Task<AuthResponseDto> LoginAsync(LoginRequestDto request)
+		public async Task<ApiResponse< AuthResponseDto>> LoginAsync(LoginRequestDto request)
 		{
-			var user = await _userManager.FindByEmailAsync(request.Email)
-		   ?? throw new UnAuthorizedException("Invalid email or password");
+            var user = await _userManager.FindByEmailAsync(request.Email);
+
+            if (user == null)
+                return new ApiResponse<AuthResponseDto>
+                {
+                    Success = false,
+                    Message = "Email not Found"
+                };
 
 			var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
 
-			if (result.IsNotAllowed) throw new UnAuthorizedException("Account not confirmed yet.");
+            if (result.IsNotAllowed)
+                return new ApiResponse<AuthResponseDto>
+                {
+                    Success = false,
+                    Message = "Account is not allowed"
+                };
 
-			if (result.IsLockedOut) throw new UnAuthorizedException("Account is Locked.");
 
-			if (!result.Succeeded) throw new UnAuthorizedException("Invalid Login");
+            if (result.IsLockedOut) return new ApiResponse<AuthResponseDto>
+            {
+                Success = false,
+                Message = "Account Locked"
 
-			var roles = await _userManager.GetRolesAsync(user);
-			var role = roles.FirstOrDefault() ?? throw new UnAuthorizedException("User has no role");
+            };
+
+            if (!result.Succeeded) return new ApiResponse<AuthResponseDto>
+            {
+                Success = false,
+                Message = "Invalid email or password."
+
+            };
+
+            var roles = await _userManager.GetRolesAsync(user);
+            var role = roles.FirstOrDefault();
+            if (role == null)
+                return new ApiResponse<AuthResponseDto>
+                {
+                    Success = false,
+                    Message = "User has no role assigned."
+                };
+
 
 
             //TODO: pass roles to GenerateToken method "DONE"
-            var token = await _tokenService.GenerateToken(user, role);
-			await _refreshTokenService.UpdateRefreshTokenAsync(user.Id, token.RefreshToken, token.Expire);
+            var token = await _tokenService.GenerateToken(user, role, null);
+			await _refreshTokenService.UpdateRefreshTokenAsync(user.Id, token.RefreshToken);
 
             var response=  new AuthResponseDto()
 			{
@@ -42,17 +71,24 @@ namespace SBS.Application.Services.Auth
 				RefreshToken = token.RefreshToken,
             };
 
-			return response;
+            return new ApiResponse<AuthResponseDto>
+            {
+                Success = true,
+                Message = "Login successful.",
+                Data = response
+            };
 
 		}
 
         public async Task<ApiResponse<AuthResponseDto>> RegisterAsync(RegisterRequestDto request)
         {
             var existingUser = await _userManager.FindByEmailAsync(request.Email);
-            bool registrationSuccess = existingUser == null;
-
-            if (!registrationSuccess)
-                throw new BadRequestException("This email is already in use.");
+            if (existingUser != null)
+                return new ApiResponse<AuthResponseDto>
+                {
+                    Success = false,
+                    Message = "The Email is already in use"
+                };
 
             var user = new ApplicationUser()
             {
@@ -63,27 +99,32 @@ namespace SBS.Application.Services.Auth
             };
 
             var result = await _userManager.CreateAsync(user, request.Password);
-            registrationSuccess = result.Succeeded;
 
-            if (!registrationSuccess)
-                throw new ValidationException() { Errors = result.Errors.Select(E => E.Description) };
+            if (!result.Succeeded)
+                return new ApiResponse<AuthResponseDto>
+                {
+                    Success = false,
+                    Message = "Registration failed.",
+                };
+            //throw new ValidationException() { Errors = result.Errors.Select(E => E.Description) };
 
             await _userManager.AddToRoleAsync(user, "Employee");
 
             var roles = await _userManager.GetRolesAsync(user);
-            var role = roles.FirstOrDefault() ?? throw new BadRequestException("User has no role");
-
-            var response = new ApiResponse<AuthResponseDto>
-            {
-                Success = registrationSuccess,
-                Message = registrationSuccess ? "Registration successful. Please log in." : "Registration failed.",
-                Data = new AuthResponseDto()
+            var role = roles.FirstOrDefault();
+            if (role == null)
+                return new ApiResponse<AuthResponseDto>
                 {
-                    Token = null!,
-                    RefreshToken = null!
-                }
+                    Success = false,
+                    Message = "User has no role assigned."
+                };
+
+            // If there is no error, send success response
+            return new ApiResponse<AuthResponseDto>
+            {
+                Success = true,
+                Message = "Registration successful.",
             };
-            return response;
         }
 
 		public async Task LogoutAsync(HttpResponse response)

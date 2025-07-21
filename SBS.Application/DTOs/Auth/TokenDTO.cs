@@ -10,6 +10,6 @@ namespace SBS.Application.DTOs.Auth
     {
         public String AccessToken { get; set; }            //Authenticate requests
         public String RefreshToken { get; set; }        //Get new Access Token
-        public DateTime Expire { get; set; }            //The time when the token will expire
+        //public DateTime Expire { get; set; }            //The time when the token will expire
     }
 }

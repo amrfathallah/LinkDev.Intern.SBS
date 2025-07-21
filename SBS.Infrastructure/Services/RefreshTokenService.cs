@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using SBS.Application.Interfaces.IServices;
+using SBS.Application.Settings;
 using SBS.Domain.Entities;
 using SBS.Infrastructure.Persistence._Data;
 using System;
@@ -13,8 +15,12 @@ namespace SBS.Infrastructure.Services
     public class RefreshTokenService : IRefreshTokenService
     {
         private readonly AppDbContext appDbContext;
-
-        public RefreshTokenService(AppDbContext appDb) { appDbContext = appDb; }
+        private readonly JWTSettings _jWTSettings;
+        public RefreshTokenService(IOptions<JWTSettings> options, AppDbContext appDb) 
+        { 
+            appDbContext = appDb; 
+            _jWTSettings = options.Value;
+        }
 
         public async Task<bool> IsRefreshTokenValidAsync(Guid UserId, string RefreshToken)
         {
@@ -37,21 +43,21 @@ namespace SBS.Infrastructure.Services
 
         }
 
-        public Task StoreRefreshTokenAsync(Guid UserId, string RefreshToken, DateTime ExpDate)
+        public Task StoreRefreshTokenAsync(Guid UserId, string RefreshToken)
         {
             var token = new UserRefreshToken
             {
                 UserId = UserId,
                 RefreshToken = RefreshToken,
-                ExpAt = ExpDate,
-                CreateAt = DateTime.UtcNow.AddDays(7)
+                ExpAt = DateTime.UtcNow.AddDays(_jWTSettings.RefreshTokenExpiry),
+                CreateAt = DateTime.UtcNow
             };
 
             appDbContext.UserRefreshTokens.Add(token);
             return appDbContext.SaveChangesAsync();
         }
 
-        public async Task UpdateRefreshTokenAsync(Guid UserId, string NewRefreshToken, DateTime NewExpDate)
+        public async Task UpdateRefreshTokenAsync(Guid UserId, string NewRefreshToken)
         {
             // Find the latest token for the user
             var token = await appDbContext.UserRefreshTokens
@@ -63,7 +69,7 @@ namespace SBS.Infrastructure.Services
             {
                 // Update the existing token record
                 token.RefreshToken = NewRefreshToken;
-                token.ExpAt = NewExpDate.AddDays(7);
+                token.ExpAt = DateTime.UtcNow.AddDays(_jWTSettings.RefreshTokenExpiry);
                 token.CreateAt = DateTime.UtcNow;
             }
             else
@@ -73,7 +79,7 @@ namespace SBS.Infrastructure.Services
                 {
                     UserId = UserId,
                     RefreshToken = NewRefreshToken,
-                    ExpAt = NewExpDate.AddDays(7),
+                    ExpAt = DateTime.UtcNow.AddDays(_jWTSettings.RefreshTokenExpiry),
                     CreateAt = DateTime.UtcNow
                 };
                 appDbContext.UserRefreshTokens.Add(newToken);

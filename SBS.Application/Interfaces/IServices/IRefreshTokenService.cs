@@ -8,11 +8,11 @@ namespace SBS.Application.Interfaces.IServices
 {
     public interface IRefreshTokenService
     {
-        Task StoreRefreshTokenAsync(Guid UserId, string RefreshToken, DateTime ExpDate);     // Save RefreshToken in the Database
+        Task StoreRefreshTokenAsync(Guid UserId, string RefreshToken);     // Save RefreshToken in the Database
 
         Task<bool> IsRefreshTokenValidAsync(Guid UserId, string RefreshToken); // Check the validity of the RefreshToken like (existence, is expired, is revoked)
 
-        Task UpdateRefreshTokenAsync(Guid UserId, string NewRefreshToken, DateTime NewExpDate); // Update exp. token with new one
+        Task UpdateRefreshTokenAsync(Guid UserId, string NewRefreshToken); // Update exp. token with new one
 
         Task RevokeRefreshTokenAsync(Guid UserId); // Revoke token if we found suspicious token 
     }

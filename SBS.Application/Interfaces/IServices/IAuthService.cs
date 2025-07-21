@@ -14,7 +14,7 @@ namespace SBS.Application.Interfaces.IServices
 	{
         Task<ApiResponse<AuthResponseDto>> RegisterAsync(RegisterRequestDto request);
 
-		Task<AuthResponseDto> LoginAsync(LoginRequestDto request);
+		Task<ApiResponse<AuthResponseDto>> LoginAsync(LoginRequestDto request);
 
 		Task LogoutAsync(HttpResponse response);
 

@@ -11,7 +11,7 @@ namespace SBS.Application.Interfaces.IServices
 {
     public interface ITokenService
     {
-        Task<TokenDTO> GenerateToken(ApplicationUser user, string role);                // To Generate JWT-Token for a given "AppUser".
+        Task<TokenDTO> GenerateToken(ApplicationUser user, string role, string? ValidRefreshToken);                // To Generate JWT-Token for a given "AppUser".
         string GenerateRefreshToken();                                     // For Generating a new refresh token.
 
         /*
@@ -20,6 +20,5 @@ namespace SBS.Application.Interfaces.IServices
          User login -> AccessToken / RefreshToken -> access_token expired -> interceptor detection
          */
         ClaimsPrincipal? GetUserInfoFromExpiredToken(string token);        // Get user details from an expired token, Return NULL if the given Token in unveiled.
-
     }
 }

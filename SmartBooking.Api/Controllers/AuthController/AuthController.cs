@@ -53,7 +53,7 @@ namespace SmartBooking.Api.Controllers.AuthController
         public async Task<IActionResult> Refresh(TokenDTO tokenDto)
         {
             // Step 1: Extract claims from exp. Access token
-            var principal = _tokenService.GetUserInfoFromExpiredToken(tokenDto.RefreshToken);
+            var principal = _tokenService.GetUserInfoFromExpiredToken(tokenDto.AccessToken);
             if (principal == null)
                 return Unauthorized("Invalid Access Token");
 
@@ -67,17 +67,15 @@ namespace SmartBooking.Api.Controllers.AuthController
             if (user == null)
                 return Unauthorized("User not found in the database");
 
-            // Step 4: Validate the new refresh token
+            // Step 4: Validate the refresh token
             var validRefToken = await _refreshTokenService.IsRefreshTokenValidAsync(user.Id, tokenDto.RefreshToken);
             if (!validRefToken)
                 return Unauthorized("Invalid Refresh token");
 
             // Step 5: Issue new AccessToken and RefreshToken
             var userRole = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
-            var newToken = await _tokenService.GenerateToken(user, userRole!);
+            var newToken = await _tokenService.GenerateToken(user, userRole!, tokenDto.RefreshToken);
 
-            // Step 6: Update old RefreshToken with the new one in the database
-            await _refreshTokenService.UpdateRefreshTokenAsync(user.Id, newToken.RefreshToken, newToken.Expire);
 
             return Ok(newToken);
         }

@@ -21,9 +21,9 @@ namespace SBS.Application.Services.Auth
             _userManager = userManager;
         }
 
-        public async Task<TokenDTO> GenerateToken(ApplicationUser user, string r)
+        public async Task<TokenDTO> GenerateToken(ApplicationUser user, string r, string?validRefreshToken)
         {
-            var Claims = new List<Claim> {                          //List the user information inside the token
+            var claims = new List<Claim> {                          //List the user information inside the token
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new(ClaimTypes.Email, user.Email!),
                 new(ClaimTypes.Name, user.FullName),
@@ -38,17 +38,16 @@ namespace SBS.Application.Services.Auth
             var token = new JwtSecurityToken(
                 issuer: _jWTSettings.Issuer,
                 audience: _jWTSettings.Audience,
-                claims: Claims,
-                expires: DateTime.UtcNow.AddMinutes(_jWTSettings.ExpiryMinutes),
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(_jWTSettings.AccessTokenExpiry),
                 signingCredentials: creds
             );
 
-            TokenDTO newToken = new TokenDTO
+             TokenDTO newToken = new TokenDTO
             {
                 AccessToken = new JwtSecurityTokenHandler().WriteToken(token),
-                RefreshToken = GenerateRefreshToken(),
-                Expire = token.ValidTo,
-            };
+                RefreshToken = validRefreshToken ?? GenerateRefreshToken(),
+             };
 
             return newToken;
         }
@@ -57,6 +56,9 @@ namespace SBS.Application.Services.Auth
 
         public ClaimsPrincipal? GetUserInfoFromExpiredToken(string token)
         {
+            if (string.IsNullOrWhiteSpace(token))
+                return null;
+
             var newTokenValidationParameters = new TokenValidationParameters    // Set Validation Petameters
             {
                 ValidateAudience = false,
