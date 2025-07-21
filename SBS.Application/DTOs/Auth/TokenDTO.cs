@@ -8,7 +8,7 @@ namespace SBS.Application.DTOs.Auth
 {
     public class TokenDTO
     {
-        public String GetToken { get; set; }            //Authenticate requests
+        public String AccessToken { get; set; }            //Authenticate requests
         public String RefreshToken { get; set; }        //Get new Access Token
         public DateTime Expire { get; set; }            //The time when the token will expire
     }

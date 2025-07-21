@@ -44,7 +44,7 @@ namespace SBS.Infrastructure.Services
                 UserId = UserId,
                 RefreshToken = RefreshToken,
                 ExpAt = ExpDate,
-                CreateAt = DateTime.UtcNow
+                CreateAt = DateTime.UtcNow.AddDays(7)
             };
 
             appDbContext.UserRefreshTokens.Add(token);
@@ -53,10 +53,33 @@ namespace SBS.Infrastructure.Services
 
         public async Task UpdateRefreshTokenAsync(Guid UserId, string NewRefreshToken, DateTime NewExpDate)
         {
-            // First Revoke all old tokens
-            RevokeRefreshTokenAsync(UserId);
+            // Find the latest token for the user
+            var token = await appDbContext.UserRefreshTokens
+                .Where(t => t.UserId == UserId && !t.IsRevoked)
+                .OrderByDescending(t => t.CreateAt)
+                .FirstOrDefaultAsync();
 
-            await StoreRefreshTokenAsync(UserId, NewRefreshToken, NewExpDate); 
+            if (token != null)
+            {
+                // Update the existing token record
+                token.RefreshToken = NewRefreshToken;
+                token.ExpAt = NewExpDate.AddDays(7);
+                token.CreateAt = DateTime.UtcNow;
+            }
+            else
+            {
+                // If no token exists, create a new one
+                var newToken = new UserRefreshToken
+                {
+                    UserId = UserId,
+                    RefreshToken = NewRefreshToken,
+                    ExpAt = NewExpDate.AddDays(7),
+                    CreateAt = DateTime.UtcNow
+                };
+                appDbContext.UserRefreshTokens.Add(newToken);
+            }
+
+            await appDbContext.SaveChangesAsync();
         }
     }
 }

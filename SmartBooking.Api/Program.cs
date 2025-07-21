@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using SBS.Application;
 using SBS.Application.Interfaces.Common;
 using SBS.Application.Interfaces.Initializers;
@@ -39,20 +40,25 @@ webApplicationBuilder.Services
 
 // Add Authentication with JWT
 webApplicationBuilder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(op =>
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer( op =>
     {
         op.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
-            ValidIssuer = jwtSettings.Issuer,
+            ValidIssuer = jwtSettings!.Issuer,
             ValidAudience = jwtSettings.Audience,
+            ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret))
         };
     });
-
+webApplicationBuilder.Services.AddAuthorization();
 // Register CurrentUserService
 webApplicationBuilder.Services.AddHttpContextAccessor();
 webApplicationBuilder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
@@ -62,16 +68,47 @@ webApplicationBuilder.Services.AddScoped<ICurrentUserService, CurrentUserService
 // Add Controllers and Swagger
 webApplicationBuilder.Services.AddControllersWithViews();
 webApplicationBuilder.Services.AddEndpointsApiExplorer();
-webApplicationBuilder.Services.AddSwaggerGen();
+webApplicationBuilder.Services.AddSwaggerGen(c =>
+
+{
+
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "SMO API", Version = "v1" });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type=ReferenceType.SecurityScheme,
+                    Id="Bearer"
+                }
+            },
+            new string[]{}
+        }
+    });
+});
+
 
 var app = webApplicationBuilder.Build();
 
 // Configure the HTTP request pipeline
+app.UseSwagger();
+
+app.UseSwaggerUI();
 if (!app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-
     app.UseHsts();
 }
 
@@ -87,8 +124,9 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller}/{action=Index}/{id?}");
 
-app.MapFallbackToFile("index.html");
 app.MapControllers();
+app.MapFallbackToFile("index.html");
+
 
 // Database Initialization (via Extension Method)
 await app.InitializeDbAsync();

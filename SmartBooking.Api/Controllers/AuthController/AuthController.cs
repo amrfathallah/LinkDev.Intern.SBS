@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.Data;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using SBS.Application.DTOs.Auth;
 using SBS.Application.Interfaces.IServices;
 using SBS.Domain.Entities;
-using System.Security.Claims;
 using SmartBooking.Api.Controllers._Base;
+using System.Security.Claims;
 
 namespace SmartBooking.Api.Controllers.AuthController
 {
@@ -72,7 +73,8 @@ namespace SmartBooking.Api.Controllers.AuthController
                 return Unauthorized("Invalid Refresh token");
 
             // Step 5: Issue new AccessToken and RefreshToken
-            var newToken = await _tokenService.GenerateToken(user);
+            var userRole = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+            var newToken = await _tokenService.GenerateToken(user, userRole!);
 
             // Step 6: Update old RefreshToken with the new one in the database
             await _refreshTokenService.UpdateRefreshTokenAsync(user.Id, newToken.RefreshToken, newToken.Expire);
@@ -89,11 +91,11 @@ namespace SmartBooking.Api.Controllers.AuthController
         }
 
         [HttpGet("me")] // GET: /api/auth/me
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<AuthResponseDto>> GetCurrentUser()
         {
-            var result = await _authService.GetCurrentUser(User);
-            return Ok(result);
+            //var result = await _authService.GetCurrentUser(User);
+            return Ok(User?.Identity?.Name);
         }
     }
 }

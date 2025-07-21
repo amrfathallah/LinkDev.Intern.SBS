@@ -6,16 +6,15 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using static SBS.Application.Services.Auth.AuthService;
 
 namespace SBS.Application.Interfaces.IServices
 {
 	public interface IAuthService
 	{
-		Task<AuthResponseDto> RegisterAsync(RegisterRequestDto request);
+        Task<ApiResponse<AuthResponseDto>> RegisterAsync(RegisterRequestDto request);
 
 		Task<AuthResponseDto> LoginAsync(LoginRequestDto request);
-
-		Task<AuthResponseDto> GetCurrentUser(ClaimsPrincipal claimsPrincipal);
 
 		Task LogoutAsync(HttpResponse response);
 

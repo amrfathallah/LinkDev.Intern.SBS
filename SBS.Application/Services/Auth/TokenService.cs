@@ -21,16 +21,15 @@ namespace SBS.Application.Services.Auth
             _userManager = userManager;
         }
 
-        public async Task<TokenDTO> GenerateToken(ApplicationUser user)
+        public async Task<TokenDTO> GenerateToken(ApplicationUser user, string r)
         {
             var Claims = new List<Claim> {                          //List the user information inside the token
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new(ClaimTypes.Email, user.Email),
-                new(ClaimTypes.Name, user.FullName)
+                new(ClaimTypes.Email, user.Email!),
+                new(ClaimTypes.Name, user.FullName),
+                new(ClaimTypes.Role, r),
+                new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             };
-            var Roles = await _userManager.GetRolesAsync(user);
-            foreach (var Role in Roles)
-                Claims.Add(new Claim(ClaimTypes.Role, Role));
 
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jWTSettings.Secret));
@@ -40,16 +39,15 @@ namespace SBS.Application.Services.Auth
                 issuer: _jWTSettings.Issuer,
                 audience: _jWTSettings.Audience,
                 claims: Claims,
-                expires: DateTime.UtcNow.AddMinutes(_jWTSettings.ExpirationDate.Minute),
+                expires: DateTime.UtcNow.AddMinutes(_jWTSettings.ExpiryMinutes),
                 signingCredentials: creds
             );
 
             TokenDTO newToken = new TokenDTO
             {
-                GetToken = new JwtSecurityTokenHandler().WriteToken(token),
+                AccessToken = new JwtSecurityTokenHandler().WriteToken(token),
                 RefreshToken = GenerateRefreshToken(),
-                Expire = token.ValidTo
-
+                Expire = token.ValidTo,
             };
 
             return newToken;

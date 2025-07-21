@@ -11,7 +11,7 @@ namespace SBS.Application.Interfaces.IServices
 {
     public interface ITokenService
     {
-        Task<TokenDTO> GenerateToken(ApplicationUser user);                // To Generate JWT-Token for a given "AppUser".
+        Task<TokenDTO> GenerateToken(ApplicationUser user, string role);                // To Generate JWT-Token for a given "AppUser".
         string GenerateRefreshToken();                                     // For Generating a new refresh token.
 
         /*

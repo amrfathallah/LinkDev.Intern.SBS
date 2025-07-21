@@ -42,13 +42,15 @@ namespace SBS.Infrastructure
 
 			// Add RefreshTokenService to handle DB storage and validation
 			services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+
+            services.AddScoped<IAuthService, AuthService>();
             #endregion
-			
-			//services.AddScoped<IDbInitializer, DbInitializer>(); 
+
+            //services.AddScoped<IDbInitializer, DbInitializer>(); 
 
 
-			// Register the AuditableEntitySaveChangesInterceptor
-			services.AddScoped(typeof(AuditableEntitySaveChangesInterceptor));
+            // Register the AuditableEntitySaveChangesInterceptor
+            services.AddScoped(typeof(AuditableEntitySaveChangesInterceptor));
 
 			
 

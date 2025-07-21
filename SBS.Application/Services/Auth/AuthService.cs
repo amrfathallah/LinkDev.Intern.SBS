@@ -4,18 +4,16 @@ using SBS.Application.DTOs.Auth;
 using SBS.Application.Exceptions;
 using SBS.Application.Interfaces.IServices;
 using SBS.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SBS.Application.Services.Auth
 {
 	public class AuthService(
 		UserManager<ApplicationUser> _userManager,
-		SignInManager<ApplicationUser> _signInManager) : IAuthService
+		SignInManager<ApplicationUser> _signInManager,
+		ITokenService _tokenService,
+		IRefreshTokenService _refreshTokenService) : IAuthService
+
 	{
 		public async Task<AuthResponseDto> LoginAsync(LoginRequestDto request)
 		{
@@ -23,7 +21,6 @@ namespace SBS.Application.Services.Auth
 		   ?? throw new UnAuthorizedException("Invalid email or password");
 
 			var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
-
 
 			if (result.IsNotAllowed) throw new UnAuthorizedException("Account not confirmed yet.");
 
@@ -34,84 +31,68 @@ namespace SBS.Application.Services.Auth
 			var roles = await _userManager.GetRolesAsync(user);
 			var role = roles.FirstOrDefault() ?? throw new UnAuthorizedException("User has no role");
 
-			var response=  new AuthResponseDto()
+
+            //TODO: pass roles to GenerateToken method "DONE"
+            var token = await _tokenService.GenerateToken(user, role);
+			await _refreshTokenService.UpdateRefreshTokenAsync(user.Id, token.RefreshToken, token.Expire);
+
+            var response=  new AuthResponseDto()
 			{
-				UserId = user.Id,
-				FullName = user.FullName,
-				Email = user.Email!,
-				Role = role,
-				Token = "" //await GenerateTokenAsync()
-			};
+				Token = token.AccessToken,
+				RefreshToken = token.RefreshToken,
+            };
 
 			return response;
 
 		}
 
-		public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto request)
+        public async Task<ApiResponse<AuthResponseDto>> RegisterAsync(RegisterRequestDto request)
+        {
+            var existingUser = await _userManager.FindByEmailAsync(request.Email);
+            bool registrationSuccess = existingUser == null;
+
+            if (!registrationSuccess)
+                throw new BadRequestException("This email is already in use.");
+
+            var user = new ApplicationUser()
+            {
+                FullName = request.FullName,
+                Email = request.Email,
+                UserName = request.UserName,
+                EmailConfirmed = true,
+            };
+
+            var result = await _userManager.CreateAsync(user, request.Password);
+            registrationSuccess = result.Succeeded;
+
+            if (!registrationSuccess)
+                throw new ValidationException() { Errors = result.Errors.Select(E => E.Description) };
+
+            await _userManager.AddToRoleAsync(user, "Employee");
+
+            var roles = await _userManager.GetRolesAsync(user);
+            var role = roles.FirstOrDefault() ?? throw new BadRequestException("User has no role");
+
+            var response = new ApiResponse<AuthResponseDto>
+            {
+                Success = registrationSuccess,
+                Message = registrationSuccess ? "Registration successful. Please log in." : "Registration failed.",
+                Data = new AuthResponseDto()
+                {
+                    Token = null!,
+                    RefreshToken = null!
+                }
+            };
+            return response;
+        }
+
+		public async Task LogoutAsync(HttpResponse response)
 		{
-			var existingUser = await _userManager.FindByEmailAsync(request.Email);
-			if (existingUser != null)
-				throw new BadRequestException("This email is already in use.");
+            //TODO: Revoke the refresh token "DONE"
+			var userId = response.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            await _refreshTokenService.RevokeRefreshTokenAsync(Guid.Parse(userId!.ToString()));
 
-			var user = new ApplicationUser()
-			{
-				FullName = request.FullName,
-				Email = request.Email,
-				UserName = request.UserName,
-				EmailConfirmed = true, // Assuming email confirmation is not required for registration
-			};
-
-			var result = await _userManager.CreateAsync(user, request.Password);
-
-			if (!result.Succeeded) throw new ValidationException() { Errors = result.Errors.Select(E => E.Description) };
-
-			await _userManager.AddToRoleAsync(user, "Employee");
-
-			var roles = await _userManager.GetRolesAsync(user);
-
-			var response = new AuthResponseDto()
-			{
-				UserId = user.Id,
-				FullName = user.FullName,
-				Email = user.Email!,
-				Role = roles.FirstOrDefault() ?? "Employee", // the registered user will be an employee by default
-				Token = ""  // await GenerateTokenAsync()
-
-			};
-
-			return response;
- 
-		}
-		public async Task<AuthResponseDto> GetCurrentUser(ClaimsPrincipal claimsPrincipal)
-		{
-			var email = claimsPrincipal.FindFirstValue(ClaimTypes.Email);
-
-			var user = await _userManager.FindByEmailAsync(email!);
-
-			if (user is null) throw new NotFoundException("User", email!);
-
-			var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault() ?? throw new UnAuthorizedException("User has no role");
-
-			return new AuthResponseDto()
-			{
-				UserId = user!.Id,
-				Email = user!.Email!,
-				FullName = user.FullName,
-				Role = role,
-				Token = "" //await GenerateAccessToken()
-
-			};
-		}
-
-		public Task LogoutAsync(HttpResponse response)
-		{
-			// Clear the authentication cookie
-			// response.Cookies.Delete("YourAuthCookieName");
-
-			// Optionally, you can also sign out the user
-			//await _signInManager.SignOutAsync();
-
-			return Task.CompletedTask;
-		}
-	}
+			await _signInManager.SignOutAsync();
+        }
+    }
 }
