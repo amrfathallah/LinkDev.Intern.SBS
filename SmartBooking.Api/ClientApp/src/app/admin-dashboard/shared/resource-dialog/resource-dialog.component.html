@@ -13,7 +13,7 @@
     </mat-form-field>
 
     <!-- Resource Type -->
-    <mat-form-field appearance="outline" class="full-width ">
+    <mat-form-field appearance="outline" class="full-width" *ngIf="!data.isEdit">
       <mat-label>Resource Type</mat-label>
       <mat-select formControlName="type">
         <mat-option value="room">Meeting Room</mat-option>
@@ -21,15 +21,6 @@
       </mat-select>
       <mat-error *ngIf="resourceForm.get('type')?.hasError('required')">
         Resource type is required
-      </mat-error>
-    </mat-form-field>
-
-    <!-- Location -->
-    <mat-form-field appearance="outline" class="full-width ">
-      <mat-label>Location</mat-label>
-      <input matInput formControlName="location" placeholder="e.g., Floor 1, Wing A">
-      <mat-error *ngIf="resourceForm.get('location')?.hasError('required')">
-        Location is required
       </mat-error>
     </mat-form-field>
 
@@ -45,14 +36,25 @@
       </mat-error>
     </mat-form-field>
 
-    <!-- Equipment -->
-    <mat-form-field appearance="outline" class="full-width ">
-      <mat-label>Equipment</mat-label>
-      <textarea matInput formControlName="equipmentText"
-                placeholder="List equipment separated by commas (e.g., Projector, Whiteboard)"
-                rows="3"></textarea>
-    </mat-form-field>
+    <div style="display: flex; gap: 16px; justify-content: space-around;">
+      <!-- Opens At 'hh:mm:ss' -->
+      <mat-form-field appearance="outline" class="flex-grow">
+        <mat-label>Opens At</mat-label>
+        <input matInput formControlName="openAt" type="time" value="09:00" placeholder="HH:mm:ss">
+        <mat-error *ngIf="resourceForm.get('openAt')?.hasError('required')">
+          Opening time is required
+        </mat-error>
+      </mat-form-field>
 
+      <!-- Closes At 'hh:mm:ss' -->
+      <mat-form-field appearance="outline" class="flex-grow">
+        <mat-label>Closes At</mat-label>
+        <input matInput formControlName="closeAt" type="time" value="17:00" placeholder="HH:mm:ss">
+        <mat-error *ngIf="resourceForm.get('closeAt')?.hasError('required')">
+          Closing time is required
+        </mat-error>
+      </mat-form-field>
+    </div>
     <!-- Active Status (only for edit) -->
     <div *ngIf="data.isEdit" class="checkbox-container">
       <mat-checkbox formControlName="active">Active</mat-checkbox>

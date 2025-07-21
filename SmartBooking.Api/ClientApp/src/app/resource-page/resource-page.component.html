@@ -1,0 +1,42 @@
+<div class="resource-details-card">
+  <h2>{{ resource.name }}</h2>
+  <p>
+    <strong>Type:</strong> {{ resource.typeId === 1 ? "Meeting Room" : "Desk" }}
+  </p>
+  <p><strong>Capacity:</strong> {{ resource.capacity }}</p>
+  <p>
+    <strong>Status:</strong> {{ resource.isActive ? "Active" : "Inactive" }}
+  </p>
+  <p><strong>Opens at:</strong> {{ resource.openAt }}</p>
+  <p><strong>Closes at:</strong> {{ resource.closeAt }}</p>
+
+  <div class="resource-booking-container">
+    <h2>Booking for {{ resource.name }}</h2>
+    <p>
+      <strong>Available Time:</strong> {{ resource.openAt }} -
+      {{ resource.closeAt }}
+    </p>
+
+    <div class="slots-row">
+      <div
+        *ngFor="let slot of timeSlots; let i = index"
+        class="slot-box"
+        [class.inactive]="!resource.isActive"
+        [class.selected]="selectedSlots.includes(slot)"
+        (click)="onSlotClick(slot)"
+      >
+        Slot {{ i + 1 }}<br />
+        {{ slot }} - {{ getSlotEndTime(slot) }}
+      </div>
+    </div>
+
+    <button
+      mat-raised-button
+      color="primary"
+      class="book-button"
+      (click)="checkout()"
+    >
+      Checkout
+    </button>
+  </div>
+</div>

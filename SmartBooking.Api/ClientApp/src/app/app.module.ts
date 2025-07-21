@@ -27,6 +27,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -39,8 +41,12 @@ import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.compo
 import { BookingsManagementComponent } from './admin-dashboard/bookings-management/bookings-management.component';
 import { ResourcesManagementComponent } from './admin-dashboard/resources-management/resources-management.component';
 import { ReportsManagementComponent } from './admin-dashboard/reports-management/reports-management.component';
-import { ConfirmationDialogComponent, ResourceDialogComponent } from './admin-dashboard/shared';
-
+import {
+  ConfirmationDialogComponent,
+  ResourceDialogComponent,
+} from './admin-dashboard/shared';
+import { UserResourcesComponent } from './resources/user-resources.component';
+import { ResourceDetailsComponent } from './resource-page/resource-page.component';
 
 @NgModule({
   declarations: [
@@ -54,7 +60,9 @@ import { ConfirmationDialogComponent, ResourceDialogComponent } from './admin-da
     ResourcesManagementComponent,
     ReportsManagementComponent,
     ConfirmationDialogComponent,
-    ResourceDialogComponent
+    ResourceDialogComponent,
+    UserResourcesComponent,
+    ResourceDetailsComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -65,7 +73,12 @@ import { ConfirmationDialogComponent, ResourceDialogComponent } from './admin-da
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'counter', component: CounterComponent },
       { path: 'fetch-data', component: FetchDataComponent },
-      { path: 'admin-dashboard', component: AdminDashboardComponent }
+      { path: 'resources', component: UserResourcesComponent },
+      { path: 'admin-dashboard', component: AdminDashboardComponent },
+      {
+        path: 'resource-details/:id/:date',
+        component: ResourceDetailsComponent,
+      },
     ]),
     BrowserAnimationsModule,
     // Angular Material Modules
@@ -90,9 +103,11 @@ import { ConfirmationDialogComponent, ResourceDialogComponent } from './admin-da
     MatNativeDateModule,
     MatSnackBarModule,
     MatTooltipModule,
-    ReactiveFormsModule
+    MatButtonToggleModule,
+    MatProgressBarModule,
+    ReactiveFormsModule,
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

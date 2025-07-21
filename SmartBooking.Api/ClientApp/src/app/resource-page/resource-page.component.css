@@ -1,0 +1,43 @@
+.resource-details-card {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 1rem;
+  background-color: #fafafa;
+  max-width: 500px;
+  margin: auto;
+}
+
+.slots-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.slot-box {
+  padding: 10px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-block;
+  width: 120px;
+  text-align: center;
+  transition: background-color 0.3s;
+}
+
+.slot-box:hover {
+  background-color: #f0f0f0;
+}
+
+.slot-box.inactive {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.slot-box.selected {
+  background-color: #3f51b5;
+  color: white;
+  font-weight: bold;
+  border-color: #2c3e50;
+}

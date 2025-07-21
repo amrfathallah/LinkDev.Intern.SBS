@@ -5,18 +5,18 @@ import { MatSort } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmationDialogComponent, ResourceDialogComponent } from '../shared';
-
+import { AdminService } from '../../services/admin-service';
+import { CreateResourceDto } from 'src/app/models/resource/create-resource.dto';
+import { UpdateResourceDto } from 'src/app/models/resource/update-resource.dto';
 export interface Resource {
-  id: number;
+  id: string; // Changed from number to string to match API
   name: string;
   type: 'room' | 'desk';
-  location: string;
+  typeId: number;
   capacity: number;
-  equipment: string[];
   active: boolean;
-  utilizationRate: number;
-  nextBooking?: string;
 }
+
 
 @Component({
   selector: 'app-resources-management',
@@ -27,13 +27,23 @@ export class ResourcesManagementComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  resourcesDisplayedColumns: string[] = ['name', 'type', 'location', 'capacity', 'status', 'actions'];
+  resourcesDisplayedColumns: string[] = ['name', 'type', 'capacity', 'status', 'actions'];
   resourcesDataSource = new MatTableDataSource<Resource>();
   resourceType: 'all' | 'room' | 'desk' = 'all';
 
-  constructor(public dialog: MatDialog, private snackBar: MatSnackBar) {}
+  constructor(public dialog: MatDialog,
+              private snackBar: MatSnackBar,
+              private adminService: AdminService) {}
 
   ngOnInit() {
+    // Set up custom filter predicate for resource type filtering
+    this.resourcesDataSource.filterPredicate = (data: Resource, filter: string) => {
+      if (filter === 'all' || filter === '') {
+        return true;
+      }
+      return data.type === filter;
+    };
+
     this.loadResourcesData();
   }
 
@@ -47,6 +57,10 @@ export class ResourcesManagementComponent implements OnInit {
     if (type === 'all') {
       this.resourcesDataSource.filter = '';
     } else {
+
+      this.resourcesDataSource.filterPredicate = (data: Resource, filter: string) => {
+        return data.type === filter;
+      };
       this.resourcesDataSource.filter = type;
     }
   }
@@ -62,20 +76,43 @@ export class ResourcesManagementComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Update the resource in the data source
         const currentData = this.resourcesDataSource.data;
-        const index = currentData.findIndex(r => r.id === result.id);
-        if (index !== -1) {
-          currentData[index] = { ...result };
-          this.resourcesDataSource.data = [...currentData];
-
-          // Show success message
-          this.snackBar.open(`Resource "${result.name}" has been updated`, 'Close', {
-            duration: 3000,
-            horizontalPosition: 'right',
-            verticalPosition: 'top'
-          });
-        }
+        const updateResourceDto: UpdateResourceDto = {
+          name: result.name,
+          capacity: result.capacity,
+          openAt: result.openAt,
+          closeAt: result.closeAt
+        };
+        this.adminService.updateResource(result.id, updateResourceDto).subscribe({
+          next: (updatedResource: any) => {
+            const updatedResourceData: Resource = {
+              id: updatedResource.id,
+              name: updatedResource.name,
+              type: updatedResource.typeName.toLowerCase() === 'desk' ? 'desk' : 'room',
+              typeId: updatedResource.typeId,
+              capacity: updatedResource.capacity,
+              active: updatedResource.isActive
+            };
+            const index = currentData.findIndex(r => r.id === updatedResourceData.id);
+            if (index !== -1) {
+              currentData[index] = updatedResourceData;
+              this.resourcesDataSource.data = [...currentData];
+            }
+            this.snackBar.open(`Resource "${updatedResourceData.name}" has been updated`, 'Close', {
+              duration: 3000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top'
+            });
+          },
+          error: (error) => {
+            console.error('Error updating resource:', error);
+            this.snackBar.open('Error updating resource', 'Close', {
+              duration: 3000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top'
+            });
+          }
+        });
       }
     });
   }
@@ -96,13 +133,10 @@ export class ResourcesManagementComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Toggle the resource status
         resource.active = !resource.active;
 
-        // Update the data source to trigger change detection
         this.resourcesDataSource.data = [...this.resourcesDataSource.data];
 
-        // Show success message
         const statusText = resource.active ? 'activated' : 'deactivated';
         this.snackBar.open(`Resource "${resource.name}" has been ${statusText}`, 'Close', {
           duration: 3000,
@@ -115,7 +149,7 @@ export class ResourcesManagementComponent implements OnInit {
 
   deleteResource(resource: Resource) {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      width: '400px',
+      maxWidth: '400px',
       data: {
         title: 'Delete Resource',
         message: `Are you sure you want to permanently delete "${resource.name}"? This action cannot be undone.`,
@@ -126,12 +160,10 @@ export class ResourcesManagementComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Remove the resource from the data source
         const currentData = this.resourcesDataSource.data;
         const updatedData = currentData.filter(r => r.id !== resource.id);
         this.resourcesDataSource.data = updatedData;
 
-        // Show success message
         this.snackBar.open(`Resource "${resource.name}" has been deleted`, 'Close', {
           duration: 3000,
           horizontalPosition: 'right',
@@ -141,14 +173,9 @@ export class ResourcesManagementComponent implements OnInit {
     });
   }
 
-  viewResource(resource: Resource) {
-    console.log('View resource:', resource);
-    // Implement view resource dialog
-  }
-
   addResource() {
     const dialogRef = this.dialog.open(ResourceDialogComponent, {
-      width: '500px',
+      maxWidth: '500px',
       data: {
         isEdit: false
       }
@@ -156,74 +183,67 @@ export class ResourcesManagementComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Generate a new ID for the resource
         const currentData = this.resourcesDataSource.data;
-        const maxId = Math.max(...currentData.map(r => r.id), 0);
-        const newResource: Resource = {
-          ...result,
-          id: maxId + 1
+        const createResourceDto : CreateResourceDto = {
+          name: result.name,
+          typeId: result.type,
+          capacity: result.capacity,
+          openAt: result.openAt,
+          closeAt: result.closeAt
         };
+        this.adminService.createResource(createResourceDto).subscribe({
+          next: (createdResource: any) => {
+            const newResource: Resource = {
+              id: createdResource.id,
+              name: createdResource.name,
+              type: createdResource.typeName.toLowerCase() === 'desk' ? 'desk' : 'room',
+              typeId: createdResource.typeId,
+              capacity: createdResource.capacity,
+              active: createdResource.isActive
+            }
 
-        // Add the new resource to the data source
-        this.resourcesDataSource.data = [...currentData, newResource];
+            this.resourcesDataSource.data = [...currentData, newResource];
 
-        // Show success message
-        this.snackBar.open(`Resource "${newResource.name}" has been created`, 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
+            this.snackBar.open(`Resource "${newResource.name}" has been created`, 'Close', {
+              duration: 3000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top'
+            });
+          },
+          error: (error) => {
+            console.error('Error creating resource:', error);
+            this.snackBar.open('Error creating resource', 'Close', {
+              duration: 3000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top'
+            });
+          }
         });
       }
     });
   }
 
   private loadResourcesData() {
-    // Mock data - replace with actual API call
-    const mockResources: Resource[] = [
-      {
-        id: 1,
-        name: 'Conference Room A',
-        type: 'room',
-        location: 'Floor 1, Wing A',
-        capacity: 10,
-        equipment: ['Projector', 'Whiteboard', 'Video Conference'],
-        active: true,
-        utilizationRate: 78,
-        nextBooking: '9:00 AM - John Doe'
+    this.adminService.getResources().subscribe({
+      next: (resources) => {
+        const mappedResources: Resource[] = resources.map(r => ({
+          id: r.id,
+          name: r.name,
+          type: r.typeId === 2 ? 'desk' : 'room',
+          typeId: r.typeId,
+          capacity: r.capacity,
+          active: r.isActive,
+        }));
+        this.resourcesDataSource.data = mappedResources;
       },
-      {
-        id: 2,
-        name: 'Meeting Room B',
-        type: 'room',
-        location: 'Floor 2, Wing B',
-        capacity: 6,
-        equipment: ['TV Screen', 'Conference Phone'],
-        active: true,
-        utilizationRate: 65,
-        nextBooking: '2:00 PM - Team Meeting'
-      },
-      {
-        id: 3,
-        name: 'Desk 12',
-        type: 'desk',
-        location: 'Floor 3, Section C',
-        capacity: 1,
-        equipment: ['Monitor', 'Dock Station'],
-        active: true,
-        utilizationRate: 45
-      },
-      {
-        id: 4,
-        name: 'Conference Room C',
-        type: 'room',
-        location: 'Floor 1, Wing C',
-        capacity: 20,
-        equipment: ['Large Screen', 'Audio System', 'Video Conference'],
-        active: false,
-        utilizationRate: 0,
-        nextBooking: 'Under Maintenance'
+      error: (error) => {
+        console.error('Error loading resources:', error);
+        this.snackBar.open('Error loading resources', 'Close', {
+          duration: 3000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top'
+        });
       }
-    ];
-    this.resourcesDataSource.data = mockResources;
+    });
   }
 }

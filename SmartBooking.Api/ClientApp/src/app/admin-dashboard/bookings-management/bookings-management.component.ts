@@ -26,7 +26,7 @@ export class BookingsManagementComponent implements OnInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   filterForm: FormGroup;
-  bookingsDisplayedColumns: string[] = ['resourceName', 'resourceType', 'userName', 'startTime', 'endTime', 'status', 'actions'];
+  bookingsDisplayedColumns: string[] = ['resourceName', 'resourceType', 'userName', 'startTime', 'endTime', 'status'];
   bookingsDataSource = new MatTableDataSource<Booking>();
 
   constructor(
