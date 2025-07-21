@@ -30,7 +30,6 @@ import { AuthRoutingModule } from './auth/auth-routing.module';
       { path: 'counter', component: CounterComponent },
       { path: 'fetch-data', component: FetchDataComponent },
     ]),
-    AuthRoutingModule,
     AuthModule, // Importing the AuthModule to include authentication features
 
   ],
