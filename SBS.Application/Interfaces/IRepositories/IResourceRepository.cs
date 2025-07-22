@@ -7,8 +7,6 @@ namespace SBS.Application.Interfaces.IRepositories
 {
     public interface IResourceRepository : IRepository<Resource>
     {
-        Task<Resource?> GetByIdAsync(Guid id);
-        Task AddAsync(Resource resource);
         Task<Resource> GetResourceWithBookedSlotsAsync(Guid resourceId, DateOnly date);
     }
 } 
