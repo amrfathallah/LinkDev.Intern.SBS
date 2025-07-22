@@ -1,22 +1,75 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, map, Observable } from 'rxjs';
 import { LoginRequest } from '../models/login-request.model';
 import { RegisterRequest } from '../models/register-request.model';
 import { AuthResponse } from '../models/auth-response.model';
 import { ApiResponse } from '../models/api-response.model';
+import { JwtHelperService } from '@auth0/angular-jwt';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private baseUrl = 'https://localhost:7191/api/auth';
 
-  constructor(private http: HttpClient) {}
+  private isLoggedInSubject = new BehaviorSubject<boolean>(false);
+
+  public isLoggedIn$ = this.isLoggedInSubject.asObservable();
+
+  constructor(private http: HttpClient, private jwtHelper: JwtHelperService) {
+    const token = localStorage.getItem('token');
+    if (token && !this.jwtHelper.isTokenExpired(token)) {
+      this.isLoggedInSubject.next(true);
+    } else {
+      this.isLoggedInSubject.next(false);
+    }
+  }
 
   login(data: LoginRequest): Observable<ApiResponse> {
-    return this.http.post<ApiResponse>(`${this.baseUrl}/login`, data);
+    return this.http
+      .post<ApiResponse>(`${this.baseUrl}/login`, data, {
+        withCredentials: true,
+      })
+      .pipe(
+        map((response: ApiResponse) => {
+          if (response.success && response.data && response.data.token) {
+            localStorage.setItem('token', response.data.token);
+            this.isLoggedInSubject.next(true);
+          } else {
+            this.isLoggedInSubject.next(false);
+          }
+          return response;
+        })
+      );
   }
 
   register(data: RegisterRequest): Observable<ApiResponse> {
-    return this.http.post<ApiResponse>(`${this.baseUrl}/register`, data);
+    return this.http.post<ApiResponse>(`${this.baseUrl}/register`, data, {
+      withCredentials: true,
+    });
+  }
+
+  isAdmin() {
+    const token = localStorage.getItem('token');
+    if (token && !this.jwtHelper.isTokenExpired(token)) {
+      const decodedToken = this.jwtHelper.decodeToken(token);
+      return decodedToken.role === 'Admin';
+    } else {
+      return false;
+    }
+  }
+
+  getRole() {
+    const token = localStorage.getItem('token');
+    if (token && !this.jwtHelper.isTokenExpired(token)) {
+      const decodedToken = this.jwtHelper.decodeToken(token);
+      return decodedToken.role;
+    } else {
+      return null;
+    }
+  }
+
+  logout() {
+    localStorage.removeItem('token');
+    this.isLoggedInSubject.next(false);
   }
 }

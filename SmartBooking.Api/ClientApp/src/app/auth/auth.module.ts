@@ -23,6 +23,6 @@ import { MatCardModule } from '@angular/material/card';
     MatButtonModule,
     MatIconModule,
     MatCardModule,
-  ]
+  ],
 })
 export class AuthModule {}
