@@ -171,7 +171,7 @@ export class ResourcesManagementComponent implements OnInit {
         const currentData = this.resourcesDataSource.data;
         const createResourceDto : CreateResourceDto = {
           name: result.name,
-          typeId: result.type,
+          typeId: result.typeId,
           capacity: result.capacity,
           openAt: result.openAt,
           closeAt: result.closeAt

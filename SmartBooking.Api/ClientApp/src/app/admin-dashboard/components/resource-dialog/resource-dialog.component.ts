@@ -37,7 +37,7 @@ export class ResourceDialogComponent implements OnInit {
   private createForm(): FormGroup {
     return this.fb.group({
       name: ['', [Validators.required]],
-      type: ['', this.data.isEdit ? [] : [Validators.required]],
+      type: [1, this.data.isEdit ? [] : [Validators.required]],
       capacity: [1, [Validators.required, Validators.min(1)]],
       openAt: ['09:00', Validators.required],
       closeAt: ['17:00', Validators.required],
@@ -48,7 +48,7 @@ export class ResourceDialogComponent implements OnInit {
   private populateForm(resource: Resource): void {
     this.resourceForm.patchValue({
       name: resource.name,
-      type: resource.type,
+      type: resource.typeId,
       capacity: resource.capacity,
       openAt: resource.openAt.substring(0, 5),
       closeAt: resource.closeAt.substring(0, 5),
@@ -67,12 +67,12 @@ export class ResourceDialogComponent implements OnInit {
         // XXX: it's a hack, should be handled in a better way to match the expected format
         openAt: (formValue.openAt) + ":00",
         closeAt:(formValue.closeAt) + ":00",
-
+        typeId: formValue.type,
         active: formValue.active,
       };
 
       if (this.data.isEdit && this.data.resource) {
-        resourceData.type = this.data.resource.type;
+        resourceData.typeId = this.data.resource.typeId;
         resourceData.id = this.data.resource.id;
       } else {
         resourceData.typeId = formValue.type as ResourceType;
