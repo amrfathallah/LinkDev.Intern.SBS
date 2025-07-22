@@ -1,9 +1,9 @@
-import { GetResourceDto } from './../models/resource/get-resources.dto';
+import { GetResourceDto } from '../models/Dtos/get-resources.dto';
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { environment } from "src/environments/environment";
-import { CreateResourceDto } from "../models/resource/create-resource.dto";
-import { UpdateResourceDto } from "../models/resource/update-resource.dto";
+import { CreateResourceDto } from "../models/Dtos/create-resource.dto";
+import { UpdateResourceDto } from "../models/Dtos/update-resource.dto";
 @Injectable({
   providedIn: 'root'
 })
