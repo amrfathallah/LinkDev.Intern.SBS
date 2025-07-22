@@ -37,7 +37,9 @@ namespace SBS.Infrastructure.Repositories
             return await _appDbContext.Resources
                 .Include(r => r.Bookings.Where(b => b.Date == date))
                     .ThenInclude(b => b.BookingSlots)
+                        .ThenInclude(bs => bs.Slot) 
                 .FirstOrDefaultAsync(r => r.Id == resourceId);
         }
+
     }
 } 
