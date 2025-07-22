@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace SBS.Application.Interfaces.IRepositories
 {
-	public interface IResourceRepository : IRepository<Resource>
-	{
-	
+    public interface IResourceRepository : IRepository<Resource>
+    {
+		Task<Resource> GetResourceWithBookedSlotsAsync(Guid resourceId, DateOnly date);
 	}
-}
+} 

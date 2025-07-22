@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SBS.Application.DTOs
+namespace SBS.Application.DTOs.BookingDto
 {
 	public record BookingDto(Guid id, Guid ResourceId, DateOnly Date, List<int> SlotsIds);
 }

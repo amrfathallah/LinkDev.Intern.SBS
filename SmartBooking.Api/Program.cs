@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using SBS.Application;
 using SBS.Infrastructure;
 using SBS.Application;
 using SmartBooking.Api.Extensions;
+using SBS.Application.Mapping;
 
 var webApplicationBuilder = WebApplication.CreateBuilder(args);
 
@@ -9,11 +12,27 @@ var webApplicationBuilder = WebApplication.CreateBuilder(args);
 
 webApplicationBuilder.Services.AddControllersWithViews();
 
+webApplicationBuilder.Services.AddCors(options =>
+{
+    options.AddPolicy("Origins", policy =>
+    {
+        policy.WithOrigins(
+                "https://localhost:44417", // Development
+                "https://smart-office-eqbvh2eddnf5fyee.westeurope-01.azurewebsites.net" // Production
+              )
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
 
 webApplicationBuilder.Services.AddEndpointsApiExplorer().AddSwaggerGen();
 
 webApplicationBuilder.Services.AddInfrastructureServices(webApplicationBuilder.Configuration);
-webApplicationBuilder.Services.AddApplicationDependencies(webApplicationBuilder.Configuration);
+webApplicationBuilder.Services.AddApplicationServices(webApplicationBuilder.Configuration);
+
+
+
 
 
 var app = webApplicationBuilder.Build();
@@ -36,6 +55,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
+app.UseCors("Origins");
 
 app.MapControllerRoute(
     name: "default",

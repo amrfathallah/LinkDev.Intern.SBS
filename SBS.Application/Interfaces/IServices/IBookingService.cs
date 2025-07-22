@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SBS.Domain.Entities;
-using SBS.Application.DTOs;
+using SBS.Application.DTOs.BookingDto;
 
 namespace SBS.Application.Interfaces.IServices
 {
