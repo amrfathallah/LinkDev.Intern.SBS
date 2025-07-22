@@ -19,19 +19,30 @@ namespace SBS.Infrastructure.Repositories
 			_appDbContext = appDbContext;
 		}
 
-		public virtual async Task<List<T>> GetAllAsync()
+        public virtual async Task AddAsync(T instance)
+        {
+            await _appDbContext.Set<T>().AddAsync(instance);
+        }
+
+
+        public virtual async Task<List<T>> GetAllAsync()
 		{
 			return await _appDbContext.Set<T>().ToListAsync();
 		}
 
-		public virtual Task UpdateAsync(T instance)
-		{
-			//To do (Make Update Product DTO)
-			return null;
-		}
+        public virtual async Task<T?> GetByIdAsync(Guid id)
+        {
+            return await _appDbContext.Set<T>().FindAsync(id);
+        }
+
+
+        public virtual Task UpdateAsync(T instance)
+        {
+            _appDbContext.Set<T>().Update(instance);
+            return Task.CompletedTask;
+        }
 
 
 
-
-	}
+    }
 }
