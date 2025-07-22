@@ -17,12 +17,28 @@ using System.Text;
 
 var webApplicationBuilder = WebApplication.CreateBuilder(args);
 
+// Get allowed origins from configuration
+var allowedOrigins = webApplicationBuilder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+
+// Add CORS
+webApplicationBuilder.Services.AddCors(options =>
+{
+	options.AddPolicy("AllowAngularApp",
+		policy =>
+		{
+			policy.WithOrigins(allowedOrigins!) // frontend URL
+				  .AllowAnyHeader()
+				  .AllowAnyMethod()
+				  .AllowCredentials();
+		});
+});
+
 // Configure JWTSettings
 webApplicationBuilder.Services.Configure<JWTSettings>(
-    webApplicationBuilder.Configuration.GetSection("JWTSettings"));
+    webApplicationBuilder.Configuration.GetSection("JwtSettings"));
 
 var jwtSettings = webApplicationBuilder.Configuration
-    .GetSection("JWTSettings")
+    .GetSection("JwtSettings")
     .Get<JWTSettings>();
 
 // Add Infrastructure and Application Services
@@ -114,6 +130,9 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+
+// Use CORS
+app.UseCors("AllowAngularApp");
 
 // Enable Authentication & Authorization Middleware
 app.UseAuthentication();

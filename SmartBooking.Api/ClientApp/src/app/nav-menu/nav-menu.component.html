@@ -1,44 +1,49 @@
-<header>
-  <nav
-    class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3"
+<mat-toolbar color="primary" class="mat-elevation-z4">
+  <div
+    class="container-fluid d-flex align-items-center justify-content-between"
   >
-    <div class="container">
-      <a class="navbar-brand" [routerLink]="['/']">SmartBooking.Api</a>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-toggle="collapse"
-        data-target=".navbar-collapse"
-        aria-label="Toggle navigation"
-        [attr.aria-expanded]="isExpanded"
-        (click)="toggle()"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div
-        class="navbar-collapse collapse d-sm-inline-flex justify-content-end"
-        [ngClass]="{ show: isExpanded }"
-      >
-        <ul class="navbar-nav flex-grow">
-          <li
-            class="nav-item"
-            [routerLinkActive]="['link-active']"
-            [routerLinkActiveOptions]="{ exact: true }"
-          >
-            <a class="nav-link text-dark" [routerLink]="['/']">Home</a>
-          </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/counter']"
-              >Counter</a
-            >
-          </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/fetch-data']"
-              >Fetch data</a
-            >
-          </li>
-        </ul>
-      </div>
+    <!-- App Name -->
+    <span class="navbar-brand text-white" [routerLink]="['/']">
+      Smart Booking System
+    </span>
+
+    <!-- Links -->
+    <div class="d-flex align-items-center gap-3">
+      <ng-container *ngIf="isLoggedIn; else guestLinks">
+        <a
+          mat-button
+          class="text-white"
+          routerLinkActive="active-link"
+          routerLink="/dashboard"
+          >Dashboard</a
+        >
+        <a
+          mat-button
+          *ngIf="isAdmin"
+          class="text-white"
+          routerLinkActive="active-link"
+          routerLink="/admin"
+          >Admin Panel</a
+        >
+        <a mat-button class="text-white" (click)="logout()">Logout</a>
+      </ng-container>
+
+      <ng-template #guestLinks>
+        <a
+          mat-button
+          class="text-white"
+          routerLinkActive="active-link"
+          routerLink="/auth/login"
+          >Login</a
+        >
+        <a
+          mat-button
+          class="text-white"
+          routerLinkActive="active-link"
+          routerLink="/auth/register"
+          >Register</a
+        >
+      </ng-template>
     </div>
-  </nav>
-</header>
+  </div>
+</mat-toolbar>

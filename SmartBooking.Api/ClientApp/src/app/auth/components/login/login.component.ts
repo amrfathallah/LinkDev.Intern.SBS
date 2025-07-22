@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.css'],
 })
 export class LoginComponent {
   loginForm: FormGroup;
@@ -22,7 +22,7 @@ export class LoginComponent {
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(6)]],
     });
   }
 
@@ -35,16 +35,15 @@ export class LoginComponent {
         if (res.success) {
           this.successMessage = 'Login successful!';
           this.errorMessage = '';
-          localStorage.setItem('token', res.tokenDetails.token);
-          this.router.navigate(['/home']);
+            localStorage.setItem('token', res.data.token);
+          this.router.navigate(['/']);
         }
-
-
       },
       error: (err) => {
-        this.errorMessage = err.error?.message || 'Login failed';
+        this.errorMessage =
+          err.error?.message || 'Login failed. Please try again.';
         this.isSubmitting = false;
-      }
+      },
     });
   }
 }
