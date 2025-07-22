@@ -19,14 +19,15 @@
 
     <div class="slots-row">
       <div
-        *ngFor="let slot of timeSlots; let i = index"
+        *ngFor="let slot of slots; let i = index"
         class="slot-box"
-        [class.inactive]="!resource.isActive"
+        [class.inactive]="!slot.isActive"
+        [class.booked]="slot.isBooked && slot.isActive"
         [class.selected]="selectedSlots.includes(slot)"
         (click)="onSlotClick(slot)"
       >
         Slot {{ i + 1 }}<br />
-        {{ slot }} - {{ getSlotEndTime(slot) }}
+        {{ slot.startTime }} - {{ slot.endTime }}
       </div>
     </div>
 

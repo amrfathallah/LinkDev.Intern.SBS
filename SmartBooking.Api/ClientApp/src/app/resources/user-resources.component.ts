@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { GetResourceDto } from '../models/resource/get-resources.dto';
 import { Router } from '@angular/router';
+import { AdminService } from '../services/admin-service';
 
 export interface Resource {
   id: number;
@@ -26,118 +27,27 @@ export class UserResourcesComponent implements OnInit {
   searchQuery: string = '';
   selectedDate: Date = new Date();
 
-  constructor(private snackBar: MatSnackBar, private router: Router) {}
+  constructor(
+    private snackBar: MatSnackBar,
+    private router: Router,
+    private adminService: AdminService
+  ) {}
 
   ngOnInit() {
     this.loadResources();
   }
 
   private loadResources() {
-    // Mock data - replace with actual API call
-    const resources: GetResourceDto[] = [
-      {
-        id: '1',
-        name: 'Conference Room A',
-        typeId: 1,
-        type: 'room',
-        capacity: 12,
-        isActive: true,
-        openAt: '09:00:00',
-        closeAt: '17:00:00',
+    this.adminService.getResources().subscribe({
+      next: (data: GetResourceDto[]) => {
+        this.resources = data;
       },
-      {
-        id: '2',
-        name: 'Hot Desk 101',
-        typeId: 2,
-        type: 'Work Desk',
-        capacity: 1,
-        isActive: true,
-        openAt: '08:00:00',
-        closeAt: '18:00:00',
+      error: (err) => {
+        console.error('Failed to fetch resources', err);
       },
-      {
-        id: '3',
-        name: 'Private Office 1',
-        typeId: 3,
-        type: 'Private Office',
-        capacity: 4,
-        isActive: true,
-        openAt: '09:30:00',
-        closeAt: '19:30:00',
-      },
-      {
-        id: '4',
-        name: 'Workshop Room',
-        typeId: 4,
-        type: 'Training Room',
-        capacity: 20,
-        isActive: false,
-        openAt: '10:00:00',
-        closeAt: '16:00:00',
-      },
-      {
-        id: '5',
-        name: 'Huddle Room A',
-        typeId: 5,
-        type: 'Huddle Room',
-        capacity: 6,
-        isActive: true,
-        openAt: '08:30:00',
-        closeAt: '17:30:00',
-      },
-      {
-        id: '6',
-        name: 'Silent Zone',
-        typeId: 6,
-        type: 'Quiet Room',
-        capacity: 5,
-        isActive: false,
-        openAt: '07:00:00',
-        closeAt: '15:00:00',
-      },
-      {
-        id: '7',
-        name: 'Open Space A',
-        typeId: 7,
-        type: 'Open Area',
-        capacity: 25,
-        isActive: true,
-        openAt: '06:00:00',
-        closeAt: '22:00:00',
-      },
-      {
-        id: '8',
-        name: 'Conference Room B',
-        typeId: 1,
-        type: 'Meeting Room',
-        capacity: 15,
-        isActive: true,
-        openAt: '09:00:00',
-        closeAt: '18:00:00',
-      },
-      {
-        id: '9',
-        name: 'Hot Desk 102',
-        typeId: 2,
-        type: 'Work Desk',
-        capacity: 1,
-        isActive: false,
-        openAt: '08:00:00',
-        closeAt: '17:00:00',
-      },
-      {
-        id: '10',
-        name: 'Project Lab',
-        typeId: 8,
-        type: 'Lab',
-        capacity: 10,
-        isActive: true,
-        openAt: '10:00:00',
-        closeAt: '20:00:00',
-      },
-    ];
+    });
 
-    this.resources = resources.filter((resource) => resource.isActive);
+    this.resources = this.resources.filter((resource) => resource.isActive);
     this.applyFilters();
   }
 

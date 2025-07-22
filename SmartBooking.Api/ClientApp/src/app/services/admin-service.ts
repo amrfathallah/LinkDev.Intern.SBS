@@ -32,4 +32,10 @@ export class AdminService {
       resource
     );
   }
+
+  getBookedSlots(resourceId: string, date: string) {
+    return this._httpClient.get<string[]>(
+      `${environment.apiUrl}/api/Resource/booked-slots${resourceId}/?date=${date}`
+    );
+  }
 }

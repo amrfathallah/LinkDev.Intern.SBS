@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { GetResourceDto } from '../models/resource/get-resources.dto';
 import { ActivatedRoute, Route } from '@angular/router';
 import { AdminService } from '../services/admin-service';
+import { SlotDto } from '../models/slot.dto';
 
 @Component({
   selector: 'app-resource-booking',
@@ -14,7 +15,8 @@ export class ResourceDetailsComponent implements OnInit {
 
   id!: string;
   timeSlots: string[] = [];
-  selectedSlots: string[] = [];
+  slots: SlotDto[] = [];
+  selectedSlots: SlotDto[] = [];
   selectedDate!: Date;
 
   constructor(
@@ -25,14 +27,13 @@ export class ResourceDetailsComponent implements OnInit {
   ngOnInit(): void {
     const dateStr = this.router.snapshot.paramMap.get('date');
     this.selectedDate = dateStr ? new Date(dateStr) : new Date();
-    console.log('Selected date:', this.selectedDate.toString());
     this.id = this.router.snapshot.paramMap.get('id')!;
-    /*if (this.id) {
+    if (this.id) {
       this.adminService.getResourceById(this.id).subscribe({
         next: (data) => (this.resource = data),
         error: (err) => console.error('Failed to fetch resource', err),
       });
-    }*/
+    }
 
     this.resource = {
       id: '1',
@@ -44,12 +45,37 @@ export class ResourceDetailsComponent implements OnInit {
       openAt: '09:00:00',
       closeAt: '17:00:00',
     };
-
-    this.generateTimeSlots(this.resource.openAt, this.resource.closeAt);
+    this.loadSlots();
   }
 
-  generateTimeSlots(start: string, end: string): void {
-    const timeSlots: string[] = [];
+  loadSlots(): void {
+    const resourceId = this.resource.id;
+    const date = this.selectedDate.toISOString();
+
+    this.adminService.getBookedSlots(resourceId, date).subscribe({
+      next: (rawSlots) => {
+        const bookedSlots: SlotDto[] = rawSlots.map((slot: any) => ({
+          id: slot.id,
+          startTime: slot.startTime,
+          endTime: slot.endTime,
+          isActive: slot.isActive,
+          isBooked: true,
+        }));
+
+        this.generateTimeSlots(
+          this.resource.openAt,
+          this.resource.closeAt,
+          bookedSlots
+        );
+      },
+      error: (err) => {
+        this.generateTimeSlots(this.resource.openAt, this.resource.closeAt, []);
+      },
+    });
+  }
+
+  generateTimeSlots(start: string, end: string, bookedSlots: SlotDto[]): void {
+    this.slots = []; // reset
 
     const [startHours, startMinutes] = start.split(':').map(Number);
     const [endHours, endMinutes] = end.split(':').map(Number);
@@ -60,18 +86,33 @@ export class ResourceDetailsComponent implements OnInit {
     const endTime = new Date();
     endTime.setHours(endHours, endMinutes, 0, 0);
 
+    let idCounter = 1;
+
     while (current < endTime) {
-      const hours = current.getHours().toString().padStart(2, '0');
-      const minutes = current.getMinutes().toString().padStart(2, '0');
-      timeSlots.push(`${hours}:${minutes}`);
+      const slotStartStr = current.toTimeString().substring(0, 5);
+
+      const slotEnd = new Date(current.getTime());
+      slotEnd.setMinutes(slotEnd.getMinutes() + 30);
+      const slotEndStr = slotEnd.toTimeString().substring(0, 5);
+
+      const isBooked = bookedSlots.some(
+        (slot) => slot.startTime === slotStartStr
+      );
+
+      this.slots.push({
+        id: idCounter.toString(),
+        startTime: slotStartStr,
+        endTime: slotEndStr,
+        isActive: true,
+        isBooked: isBooked,
+      });
 
       current.setMinutes(current.getMinutes() + 30);
+      idCounter++;
     }
-
-    this.timeSlots = timeSlots;
   }
 
-  getSlotEndTime(startTime: string): string {
+  /*getSlotEndTime(startTime: string): string {
     const [hours, minutes] = startTime.split(':').map(Number);
     const start = new Date();
     start.setHours(hours, minutes, 0, 0);
@@ -80,16 +121,17 @@ export class ResourceDetailsComponent implements OnInit {
     const endHours = start.getHours().toString().padStart(2, '0');
     const endMinutes = start.getMinutes().toString().padStart(2, '0');
     return `${endHours}:${endMinutes}`;
-  }
+  }*/
 
-  onSlotClick(slot: string): void {
-    if (!this.resource.isActive) return;
+  onSlotClick(slot: SlotDto): void {
+    if (!this.resource.isActive || !slot.isActive || slot.isBooked) return;
 
-    const index = this.selectedSlots.indexOf(slot);
+    const index = this.selectedSlots.findIndex(
+      (s) => s.startTime === slot.startTime
+    );
 
     if (index > -1) {
-      // Allow deselection freely
-      this.selectedSlots.splice(index, 1);
+      this.selectedSlots.splice(index, 1); // Deselect
       return;
     }
 
@@ -99,8 +141,8 @@ export class ResourceDetailsComponent implements OnInit {
     }
 
     const lastSlot = this.selectedSlots[this.selectedSlots.length - 1];
-    const lastSlotTime = this.parseTime(lastSlot);
-    const currentSlotTime = this.parseTime(slot);
+    const lastSlotTime = this.parseTime(lastSlot.startTime);
+    const currentSlotTime = this.parseTime(slot.startTime);
 
     const diff =
       (currentSlotTime.getTime() - lastSlotTime.getTime()) / (1000 * 60);
@@ -122,26 +164,18 @@ export class ResourceDetailsComponent implements OnInit {
   areSlotsConsecutive(): boolean {
     if (this.selectedSlots.length <= 1) return true;
 
-    // Parse times to Date objects
-    const parsedDates = this.selectedSlots.map((timeStr) => {
-      const [hours, minutes] = timeStr.split(':').map(Number);
-      if (isNaN(hours) || isNaN(minutes)) {
-        throw new Error(`Invalid slot format: ${timeStr}`);
-      }
+    const parsedDates = this.selectedSlots.map((slot) => {
+      const [hours, minutes] = slot.startTime.split(':').map(Number);
       const date = new Date();
       date.setHours(hours, minutes, 0, 0);
       return date;
     });
 
-    // Sort times ascending
     parsedDates.sort((a, b) => a.getTime() - b.getTime());
 
-    // Check each slot is exactly 30 minutes after the previous
     for (let i = 0; i < parsedDates.length - 1; i++) {
-      const diffInMs = parsedDates[i + 1].getTime() - parsedDates[i].getTime();
-      if (diffInMs !== 30 * 60 * 1000) {
-        return false;
-      }
+      const diff = parsedDates[i + 1].getTime() - parsedDates[i].getTime();
+      if (diff !== 30 * 60 * 1000) return false;
     }
 
     return true;
