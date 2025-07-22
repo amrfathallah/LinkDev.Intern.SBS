@@ -4,9 +4,8 @@ import { BehaviorSubject, map, Observable } from 'rxjs';
 import { LoginRequest } from '../models/login-request.model';
 import { RegisterRequest } from '../models/register-request.model';
 import { AuthResponse } from '../models/auth-response.model';
-import { ApiResponse } from '../../shared/models/api-response.model';
+import { ApiResponse } from '../models/api-response.model';
 import { JwtHelperService } from '@auth0/angular-jwt';
-import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -51,6 +50,43 @@ export class AuthService {
         withCredentials: true,
       }
     );
+  }
+
+  private isLoggedInSubject = new BehaviorSubject<boolean>(false);
+
+  public isLoggedIn$ = this.isLoggedInSubject.asObservable();
+
+  constructor(private http: HttpClient, private jwtHelper: JwtHelperService) {
+    const token = localStorage.getItem('token');
+    if (token && !this.jwtHelper.isTokenExpired(token)) {
+      this.isLoggedInSubject.next(true);
+    } else {
+      this.isLoggedInSubject.next(false);
+    }
+  }
+
+  login(data: LoginRequest): Observable<ApiResponse> {
+    return this.http
+      .post<ApiResponse>(`${this.baseUrl}/login`, data, {
+        withCredentials: true,
+      })
+      .pipe(
+        map((response: ApiResponse) => {
+          if (response.success && response.data && response.data.token) {
+            localStorage.setItem('token', response.data.token);
+            this.isLoggedInSubject.next(true);
+          } else {
+            this.isLoggedInSubject.next(false);
+          }
+          return response;
+        })
+      );
+  }
+
+  register(data: RegisterRequest): Observable<ApiResponse> {
+    return this.http.post<ApiResponse>(`${this.baseUrl}/register`, data, {
+      withCredentials: true,
+    });
   }
 
   isAdmin() {

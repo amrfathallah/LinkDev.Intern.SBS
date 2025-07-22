@@ -22,7 +22,7 @@ export class LoginComponent {
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
     });
   }
 
@@ -35,18 +35,13 @@ export class LoginComponent {
         if (res.success) {
           this.successMessage = 'Login successful!';
           this.errorMessage = '';
-          this.isSubmitting = false;
+            localStorage.setItem('token', res.data.token);
           this.router.navigate(['/']);
-        } else {
-          this.errorMessage = 'Login failed. Please try again.';
-          this.successMessage = '';
-          this.isSubmitting = false;
         }
-
-
       },
       error: (err) => {
-        this.errorMessage = 'Login failed. Please try again.';
+        this.errorMessage =
+          err.error?.message || 'Login failed. Please try again.';
         this.isSubmitting = false;
       },
     });
