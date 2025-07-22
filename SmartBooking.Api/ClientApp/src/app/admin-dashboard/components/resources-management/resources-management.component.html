@@ -10,7 +10,7 @@
 
   <mat-card-content>
     <!-- Resource Type Tabs -->
-    <mat-tab-group class="resource-tabs" (selectedTabChange)="filterResourcesByType($event.index === 0 ? null : $event.index === 1 ? ResourceType.Room : ResourceType.Desk)">
+    <mat-tab-group class="resource-tabs" (selectedTabChange)="filterResourcesByType($event.index === 0 ? ResourceFilter.All : $event.index === 1 ? ResourceFilter.Room : ResourceFilter.Desk)">
       <mat-tab label="All Resources">
       </mat-tab>
       <mat-tab label="Meeting Rooms">

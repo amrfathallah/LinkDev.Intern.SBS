@@ -3,17 +3,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ResourceType } from '../../enums/ResourceType.enum';
-
-
-export interface Resource {
-  id: number;
-  name: string;
-  type: number;
-  capacity: number;
-  openAt: string;
-  closeAt: string;
-  active: boolean;
-}
+import { Resource } from '../../models/Resource.model';
 
 export interface ResourceDialogData {
   resource?: Resource;
@@ -27,7 +17,7 @@ export interface ResourceDialogData {
 })
 export class ResourceDialogComponent implements OnInit {
   resourceForm: FormGroup;
-  ResourceType = ResourceType; // Expose enum to template
+  ResourceType = ResourceType;
 
   constructor(
     public dialogRef: MatDialogRef<ResourceDialogComponent>,
@@ -43,6 +33,7 @@ export class ResourceDialogComponent implements OnInit {
     }
   }
 
+  // TODO: figure out what is the best practices for making forms
   private createForm(): FormGroup {
     return this.fb.group({
       name: ['', [Validators.required]],
@@ -59,8 +50,8 @@ export class ResourceDialogComponent implements OnInit {
       name: resource.name,
       type: resource.type,
       capacity: resource.capacity,
-      openAt: resource.openAt.substring(0, 5), // Remove seconds part (HH:mm:ss -> HH:mm)
-      closeAt: resource.closeAt.substring(0, 5), // Remove seconds part (HH:mm:ss -> HH:mm)
+      openAt: resource.openAt.substring(0, 5),
+      closeAt: resource.closeAt.substring(0, 5),
       active: resource.active
     });
   }
@@ -72,8 +63,11 @@ export class ResourceDialogComponent implements OnInit {
       const resourceData: Partial<Resource> = {
         name: formValue.name,
         capacity: formValue.capacity,
+
+        // XXX: it's a hack, should be handled in a better way to match the expected format
         openAt: (formValue.openAt) + ":00",
         closeAt:(formValue.closeAt) + ":00",
+
         active: formValue.active,
       };
 
@@ -81,9 +75,8 @@ export class ResourceDialogComponent implements OnInit {
         resourceData.type = this.data.resource.type;
         resourceData.id = this.data.resource.id;
       } else {
-        resourceData.type = formValue.type === ResourceType.Desk ? 2 : 1;
+        resourceData.typeId = formValue.type as ResourceType;
       }
-
       this.dialogRef.close(resourceData);
     }
   }

@@ -98,3 +98,19 @@
     gap: 16px;
   }
 }
+
+/* Snackbar Styling */
+::ng-deep .success-snackbar {
+  background-color: #4caf50 !important;
+  color: white !important;
+}
+
+::ng-deep .error-snackbar {
+  background-color: #f44336 !important;
+  color: white !important;
+}
+
+::ng-deep .success-snackbar .mat-simple-snackbar-action,
+::ng-deep .error-snackbar .mat-simple-snackbar-action {
+  color: white !important;
+}
