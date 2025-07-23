@@ -20,5 +20,7 @@ namespace SBS.Application.Interfaces.IServices
          User login -> AccessToken / RefreshToken -> access_token expired -> interceptor detection
          */
         ClaimsPrincipal? GetUserInfoFromExpiredToken(string token);        // Get user details from an expired token, Return NULL if the given Token in unveiled.
+
+        Task<ApplicationUser> refreshExpiredToken(TokenDTO token); // Check if the expired token is valid or not, Return TRUE if the token is valid, otherwise FALSE.
     }
 }

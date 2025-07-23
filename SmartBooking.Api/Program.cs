@@ -70,7 +70,7 @@ webApplicationBuilder.Services.AddControllersWithViews();
 webApplicationBuilder.Services.AddEndpointsApiExplorer();
 webApplicationBuilder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "SMO API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "SmartBoking API", Version = "v1" });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {

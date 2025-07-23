@@ -21,13 +21,13 @@ namespace SBS.Application.Services.Auth
             _userManager = userManager;
         }
 
-        public async Task<TokenDTO> GenerateToken(ApplicationUser user, string r, string?validRefreshToken)
+        public async Task<TokenDTO> GenerateToken(ApplicationUser user, string role, string?validRefreshToken)
         {
             var claims = new List<Claim> {                          //List the user information inside the token
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new(ClaimTypes.Email, user.Email!),
                 new(ClaimTypes.Name, user.FullName),
-                new(ClaimTypes.Role, r),
+                new(ClaimTypes.Role, role),
                 new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             };
 
@@ -80,5 +80,26 @@ namespace SBS.Application.Services.Auth
             return principal; // Passes the user information to the Refresh controller 
         }
 
+        public async Task<ApplicationUser> refreshExpiredToken(TokenDTO token)
+        {
+            // Step 1: Extract claims from exp. Access token
+            var principal = GetUserInfoFromExpiredToken(token.AccessToken);
+            if (principal == null)
+                throw new UnauthorizedAccessException("Invalid Access Token");
+
+            // Step 2: Get userId from the extracted claims
+            var userId = principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                throw new UnauthorizedAccessException("User ID not found in the token claims");
+
+            // Step 3: Get user from the database
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                throw new UnauthorizedAccessException("User not found in the database");
+
+            // Step 4: Check if the token is Expired or no
+
+            return user;
+        }
     }
 }
