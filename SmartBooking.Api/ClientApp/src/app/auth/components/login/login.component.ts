@@ -35,7 +35,6 @@ export class LoginComponent {
         if (res.success) {
           this.successMessage = 'Login successful!';
           this.errorMessage = '';
-          localStorage.setItem('token', res.data.token);
           this.isSubmitting = false;
           this.router.navigate(['/']);
         } else {
