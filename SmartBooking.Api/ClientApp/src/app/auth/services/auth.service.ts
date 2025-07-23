@@ -4,7 +4,7 @@ import { BehaviorSubject, map, Observable } from 'rxjs';
 import { LoginRequest } from '../models/login-request.model';
 import { RegisterRequest } from '../models/register-request.model';
 import { AuthResponse } from '../models/auth-response.model';
-import { ApiResponse } from '../../shared';
+import { ApiResponse } from '../../shared/models/api-response.model';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { environment } from '../../../environments/environment';
 
