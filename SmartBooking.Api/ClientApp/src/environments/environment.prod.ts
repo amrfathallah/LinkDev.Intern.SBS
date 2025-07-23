@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://localhost:7191/api',
-  apiDomain: 'localhost:7191',
+  apiBaseUrl: 'https://smart-office-eqbvh2eddnf5fyee.westeurope-01.azurewebsites.net/api',
+  apiDomain: 'smart-office-eqbvh2eddnf5fyee.westeurope-01.azurewebsites.net',
 };
