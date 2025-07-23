@@ -35,13 +35,17 @@ export class LoginComponent {
         if (res.success) {
           this.successMessage = 'Login successful!';
           this.errorMessage = '';
-            localStorage.setItem('token', res.data.token);
+          localStorage.setItem('token', res.data.token);
+          this.isSubmitting = false;
           this.router.navigate(['/']);
+        } else {
+          this.errorMessage = 'Login failed. Please try again.';
+          this.successMessage = '';
+          this.isSubmitting = false;
         }
       },
       error: (err) => {
-        this.errorMessage =
-          err.error?.message || 'Login failed. Please try again.';
+        this.errorMessage = 'Login failed. Please try again.';
         this.isSubmitting = false;
       },
     });
