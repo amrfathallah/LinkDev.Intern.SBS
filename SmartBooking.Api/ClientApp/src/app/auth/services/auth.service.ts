@@ -3,7 +3,8 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import { LoginRequest } from '../models/login-request.model';
 import { RegisterRequest } from '../models/register-request.model';
-import { ApiResponse } from '../models/api-response.model';
+import { AuthResponse } from '../models/auth-response.model';
+import { ApiResponse } from '../../shared';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { environment } from '../../../environments/environment';
 
@@ -67,11 +68,11 @@ export class AuthService {
 
   login(data: LoginRequest): Observable<ApiResponse> {
     return this.http
-      .post<ApiResponse>(`${this.baseUrl}/login`, data, {
+      .post<ApiResponse<AuthResponse>>(`${this.baseUrl}/login`, data, {
         withCredentials: true,
       })
       .pipe(
-        map((response: ApiResponse) => {
+        map((response: ApiResponse<AuthResponse>) => {
           if (response.success && response.data && response.data.token) {
             localStorage.setItem('token', response.data.token);
             this.isLoggedInSubject.next(true);
@@ -83,10 +84,14 @@ export class AuthService {
       );
   }
 
-  register(data: RegisterRequest): Observable<ApiResponse> {
-    return this.http.post<ApiResponse>(`${this.baseUrl}/register`, data, {
-      withCredentials: true,
-    });
+  register(data: RegisterRequest): Observable<ApiResponse<AuthResponse>> {
+    return this.http.post<ApiResponse<AuthResponse>>(
+      `${this.baseUrl}/register`,
+      data,
+      {
+        withCredentials: true,
+      }
+    );
   }
 
   isAdmin() {
