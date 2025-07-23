@@ -1,21 +1,15 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
 using SBS.Application;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using SBS.Application;
 using SBS.Application.Interfaces.Common;
-using SBS.Application.Interfaces.Initializers;
 using SBS.Application.Settings;
 using SBS.Domain.Entities;
 using SBS.Infrastructure;
 using SBS.Infrastructure.CurrentUserService;
 using SBS.Infrastructure.Persistence._Data;
-using SBS.Infrastructure.Persistence.Initializers;
 using SmartBooking.Api.Extensions;
-using SBS.Application.Mapping;
 using System.Text;
 
 var webApplicationBuilder = WebApplication.CreateBuilder(args);
@@ -46,7 +40,7 @@ var jwtSettings = webApplicationBuilder.Configuration
 
 // Add Infrastructure and Application Services
 webApplicationBuilder.Services.AddInfrastructureServices(webApplicationBuilder.Configuration);
-webApplicationBuilder.Services.AddApplicationServices();
+webApplicationBuilder.Services.AddApplicationServices(webApplicationBuilder.Configuration);
 
 // Add Identity services (only once)
 webApplicationBuilder.Services
