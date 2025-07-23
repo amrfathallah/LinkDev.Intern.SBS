@@ -266,7 +266,7 @@ namespace SBS.Infrastructure.Persistence._Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Bookings", (string)null);
+                    b.ToTable("Bookings");
                 });
 
             modelBuilder.Entity("SBS.Domain.Entities.BookingSlot", b =>
@@ -290,7 +290,7 @@ namespace SBS.Infrastructure.Persistence._Data.Migrations
 
                     b.HasIndex("SlotId");
 
-                    b.ToTable("BookingSlots", (string)null);
+                    b.ToTable("BookingSlots");
                 });
 
             modelBuilder.Entity("SBS.Domain.Entities.BookingStatus", b =>
@@ -311,7 +311,7 @@ namespace SBS.Infrastructure.Persistence._Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BookingStatuses", (string)null);
+                    b.ToTable("BookingStatuses");
 
                     b.HasData(
                         new
@@ -380,7 +380,7 @@ namespace SBS.Infrastructure.Persistence._Data.Migrations
 
                     b.HasIndex("TypeId");
 
-                    b.ToTable("Resources", (string)null);
+                    b.ToTable("Resources");
                 });
 
             modelBuilder.Entity("SBS.Domain.Entities.ResourceType", b =>
@@ -401,7 +401,7 @@ namespace SBS.Infrastructure.Persistence._Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ResourceTypes", (string)null);
+                    b.ToTable("ResourceTypes");
 
                     b.HasData(
                         new
@@ -453,105 +453,135 @@ namespace SBS.Infrastructure.Persistence._Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Slots", (string)null);
+                    b.ToTable("Slots");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 7, 16, 9, 56, 6, 710, DateTimeKind.Utc).AddTicks(6935),
+                            CreatedAt = new DateTime(2025, 7, 17, 15, 39, 11, 929, DateTimeKind.Utc).AddTicks(6832),
                             CreatedBy = "Seeder",
                             EndTime = new TimeSpan(0, 10, 0, 0, 0),
                             IsActive = true,
                             IsDeleted = false,
-                            LastModifiedAt = new DateTime(2025, 7, 16, 9, 56, 6, 710, DateTimeKind.Utc).AddTicks(6936),
+                            LastModifiedAt = new DateTime(2025, 7, 17, 15, 39, 11, 929, DateTimeKind.Utc).AddTicks(6833),
                             LastModifiedBy = "Seeder",
                             StartTime = new TimeSpan(0, 9, 0, 0, 0)
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 7, 16, 9, 56, 6, 710, DateTimeKind.Utc).AddTicks(6941),
+                            CreatedAt = new DateTime(2025, 7, 17, 15, 39, 11, 929, DateTimeKind.Utc).AddTicks(6839),
                             CreatedBy = "Seeder",
                             EndTime = new TimeSpan(0, 11, 0, 0, 0),
                             IsActive = true,
                             IsDeleted = false,
-                            LastModifiedAt = new DateTime(2025, 7, 16, 9, 56, 6, 710, DateTimeKind.Utc).AddTicks(6942),
+                            LastModifiedAt = new DateTime(2025, 7, 17, 15, 39, 11, 929, DateTimeKind.Utc).AddTicks(6839),
                             LastModifiedBy = "Seeder",
                             StartTime = new TimeSpan(0, 10, 0, 0, 0)
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2025, 7, 16, 9, 56, 6, 710, DateTimeKind.Utc).AddTicks(6945),
+                            CreatedAt = new DateTime(2025, 7, 17, 15, 39, 11, 929, DateTimeKind.Utc).AddTicks(6841),
                             CreatedBy = "Seeder",
                             EndTime = new TimeSpan(0, 12, 0, 0, 0),
                             IsActive = true,
                             IsDeleted = false,
-                            LastModifiedAt = new DateTime(2025, 7, 16, 9, 56, 6, 710, DateTimeKind.Utc).AddTicks(6946),
+                            LastModifiedAt = new DateTime(2025, 7, 17, 15, 39, 11, 929, DateTimeKind.Utc).AddTicks(6842),
                             LastModifiedBy = "Seeder",
                             StartTime = new TimeSpan(0, 11, 0, 0, 0)
                         },
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2025, 7, 16, 9, 56, 6, 710, DateTimeKind.Utc).AddTicks(6949),
+                            CreatedAt = new DateTime(2025, 7, 17, 15, 39, 11, 929, DateTimeKind.Utc).AddTicks(6843),
                             CreatedBy = "Seeder",
                             EndTime = new TimeSpan(0, 13, 0, 0, 0),
                             IsActive = true,
                             IsDeleted = false,
-                            LastModifiedAt = new DateTime(2025, 7, 16, 9, 56, 6, 710, DateTimeKind.Utc).AddTicks(6949),
+                            LastModifiedAt = new DateTime(2025, 7, 17, 15, 39, 11, 929, DateTimeKind.Utc).AddTicks(6844),
                             LastModifiedBy = "Seeder",
                             StartTime = new TimeSpan(0, 12, 0, 0, 0)
                         },
                         new
                         {
                             Id = 5,
-                            CreatedAt = new DateTime(2025, 7, 16, 9, 56, 6, 710, DateTimeKind.Utc).AddTicks(6952),
+                            CreatedAt = new DateTime(2025, 7, 17, 15, 39, 11, 929, DateTimeKind.Utc).AddTicks(6845),
                             CreatedBy = "Seeder",
                             EndTime = new TimeSpan(0, 14, 0, 0, 0),
                             IsActive = true,
                             IsDeleted = false,
-                            LastModifiedAt = new DateTime(2025, 7, 16, 9, 56, 6, 710, DateTimeKind.Utc).AddTicks(6952),
+                            LastModifiedAt = new DateTime(2025, 7, 17, 15, 39, 11, 929, DateTimeKind.Utc).AddTicks(6846),
                             LastModifiedBy = "Seeder",
                             StartTime = new TimeSpan(0, 13, 0, 0, 0)
                         },
                         new
                         {
                             Id = 6,
-                            CreatedAt = new DateTime(2025, 7, 16, 9, 56, 6, 710, DateTimeKind.Utc).AddTicks(6955),
+                            CreatedAt = new DateTime(2025, 7, 17, 15, 39, 11, 929, DateTimeKind.Utc).AddTicks(6847),
                             CreatedBy = "Seeder",
                             EndTime = new TimeSpan(0, 15, 0, 0, 0),
                             IsActive = true,
                             IsDeleted = false,
-                            LastModifiedAt = new DateTime(2025, 7, 16, 9, 56, 6, 710, DateTimeKind.Utc).AddTicks(6955),
+                            LastModifiedAt = new DateTime(2025, 7, 17, 15, 39, 11, 929, DateTimeKind.Utc).AddTicks(6848),
                             LastModifiedBy = "Seeder",
                             StartTime = new TimeSpan(0, 14, 0, 0, 0)
                         },
                         new
                         {
                             Id = 7,
-                            CreatedAt = new DateTime(2025, 7, 16, 9, 56, 6, 710, DateTimeKind.Utc).AddTicks(6958),
+                            CreatedAt = new DateTime(2025, 7, 17, 15, 39, 11, 929, DateTimeKind.Utc).AddTicks(6850),
                             CreatedBy = "Seeder",
                             EndTime = new TimeSpan(0, 16, 0, 0, 0),
                             IsActive = true,
                             IsDeleted = false,
-                            LastModifiedAt = new DateTime(2025, 7, 16, 9, 56, 6, 710, DateTimeKind.Utc).AddTicks(6958),
+                            LastModifiedAt = new DateTime(2025, 7, 17, 15, 39, 11, 929, DateTimeKind.Utc).AddTicks(6850),
                             LastModifiedBy = "Seeder",
                             StartTime = new TimeSpan(0, 15, 0, 0, 0)
                         },
                         new
                         {
                             Id = 8,
-                            CreatedAt = new DateTime(2025, 7, 16, 9, 56, 6, 710, DateTimeKind.Utc).AddTicks(6961),
+                            CreatedAt = new DateTime(2025, 7, 17, 15, 39, 11, 929, DateTimeKind.Utc).AddTicks(6852),
                             CreatedBy = "Seeder",
                             EndTime = new TimeSpan(0, 17, 0, 0, 0),
                             IsActive = true,
                             IsDeleted = false,
-                            LastModifiedAt = new DateTime(2025, 7, 16, 9, 56, 6, 710, DateTimeKind.Utc).AddTicks(6962),
+                            LastModifiedAt = new DateTime(2025, 7, 17, 15, 39, 11, 929, DateTimeKind.Utc).AddTicks(6852),
                             LastModifiedBy = "Seeder",
                             StartTime = new TimeSpan(0, 16, 0, 0, 0)
                         });
+                });
+
+            modelBuilder.Entity("SBS.Domain.Entities.UserRefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserRefreshTokens");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
