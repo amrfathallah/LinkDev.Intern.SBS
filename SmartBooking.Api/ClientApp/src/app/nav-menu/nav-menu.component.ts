@@ -17,7 +17,7 @@ export class NavMenuComponent implements OnInit {
 
   checkLoginStatus() {
     this.authService.isLoggedIn$.subscribe((isLoggedIn) => {
-      debugger;
+     
       this.isLoggedIn = isLoggedIn;
       this.isAdmin = this.authService.isAdmin();
     });
