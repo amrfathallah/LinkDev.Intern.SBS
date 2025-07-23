@@ -18,6 +18,7 @@ import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component
 import { JwtModule } from '@auth0/angular-jwt';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { environment } from '../environments/environment';
 
 export function tokenGetter() {
   return localStorage.getItem('token');
@@ -41,8 +42,8 @@ export function tokenGetter() {
     JwtModule.forRoot({
       config: {
         tokenGetter: tokenGetter,
-        allowedDomains: ['https://localhost:7191'],
-        disallowedRoutes: ['https://localhost:7191/api/auth/login'],
+        allowedDomains: [environment.apiDomain],
+        disallowedRoutes: [`${environment.apiBaseUrl}/auth/login`],
       },
     }),
     AuthModule,
