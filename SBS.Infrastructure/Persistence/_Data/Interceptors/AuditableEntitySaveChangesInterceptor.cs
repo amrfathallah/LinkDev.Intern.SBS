@@ -37,7 +37,7 @@ namespace SBS.Infrastructure.Persistence._Data.Interceptors
 
 			if (dbContext is null) return;
 
-			var entries = dbContext.ChangeTracker.Entries<BaseAuditableEntity<Guid>>()
+			var entries = dbContext.ChangeTracker.Entries<IBaseAuditableEntity>()
 						  .Where(entity => entity.State is EntityState.Added or EntityState.Modified);
 
 			var userId = _currentUserService.UserId ?? "System";
