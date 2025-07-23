@@ -1,77 +1,153 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using SBS.Application;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using SBS.Application;
+using SBS.Application.Interfaces.Common;
+using SBS.Application.Interfaces.Initializers;
+using SBS.Application.Settings;
+using SBS.Domain.Entities;
 using SBS.Infrastructure;
+using SBS.Infrastructure.CurrentUserService;
+using SBS.Infrastructure.Persistence._Data;
+using SBS.Infrastructure.Persistence.Initializers;
 using SmartBooking.Api.Extensions;
 using SBS.Application.Mapping;
+using System.Text;
 
 var webApplicationBuilder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Get allowed origins from configuration
+var allowedOrigins = webApplicationBuilder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
 
-webApplicationBuilder.Services.AddControllersWithViews();
-
+// Add CORS
 webApplicationBuilder.Services.AddCors(options =>
 {
-    options.AddPolicy("Origins", policy =>
-    {
-        policy.WithOrigins(
-                "https://localhost:44417", // Development
-                "https://smart-office-eqbvh2eddnf5fyee.westeurope-01.azurewebsites.net" // Production
-              )
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials();
-    });
+	options.AddPolicy("AllowAngularApp",
+		policy =>
+		{
+			policy.WithOrigins(allowedOrigins!) // frontend URL
+				  .AllowAnyHeader()
+				  .AllowAnyMethod()
+				  .AllowCredentials();
+		});
 });
 
-webApplicationBuilder.Services.AddEndpointsApiExplorer().AddSwaggerGen();
+// Configure JWTSettings
+webApplicationBuilder.Services.Configure<JWTSettings>(
+    webApplicationBuilder.Configuration.GetSection("JwtSettings"));
 
+var jwtSettings = webApplicationBuilder.Configuration
+    .GetSection("JwtSettings")
+    .Get<JWTSettings>();
+
+// Add Infrastructure and Application Services
 webApplicationBuilder.Services.AddInfrastructureServices(webApplicationBuilder.Configuration);
-webApplicationBuilder.Services.AddApplicationServices(webApplicationBuilder.Configuration);
+webApplicationBuilder.Services.AddApplicationServices();
+
+// Add Identity services (only once)
+webApplicationBuilder.Services
+    .AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
+    {
+        options.User.RequireUniqueEmail = true;
+    })
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
+// Add Authentication with JWT
+webApplicationBuilder.Services
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer( op =>
+    {
+        op.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidIssuer = jwtSettings!.Issuer,
+            ValidAudience = jwtSettings.Audience,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret))
+        };
+    });
+webApplicationBuilder.Services.AddAuthorization();
+// Register CurrentUserService
+webApplicationBuilder.Services.AddHttpContextAccessor();
+webApplicationBuilder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
 
 
+// Add Controllers and Swagger
+webApplicationBuilder.Services.AddControllersWithViews();
+webApplicationBuilder.Services.AddEndpointsApiExplorer();
+webApplicationBuilder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "SMO API", Version = "v1" });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type=ReferenceType.SecurityScheme,
+                    Id="Bearer"
+                }
+            },
+            new string[]{}
+        }
+    });
+});
 
 
 var app = webApplicationBuilder.Build();
 
 
+// Configure the HTTP request pipeline
+app.UseSwagger();
 
-#region Configure Kestrel Middlewares
-// Configure the HTTP request pipeline.
+app.UseSwaggerUI();
 if (!app.Environment.IsDevelopment())
 {
-
-	app.UseSwagger();
-	app.UseSwaggerUI();
-
-	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-	app.UseHsts();
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-app.UseCors("Origins");
+// Use CORS
+app.UseCors("AllowAngularApp");
+
+// Enable Authentication & Authorization Middleware
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller}/{action=Index}/{id?}");
 
+app.MapControllers();
 app.MapFallbackToFile("index.html");
 
-app.MapControllers();
-
-
-#region Update Database Initialization
-
+// Database Initialization (via Extension Method)
 await app.InitializeDbAsync();
-
-#endregion
-
-
-#endregion
 app.Run();
-

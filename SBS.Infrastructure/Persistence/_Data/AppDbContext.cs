@@ -21,7 +21,7 @@ namespace SBS.Infrastructure.Persistence._Data
 
 		public DbSet<ResourceType> ResourceTypes { get; set; }
 
-
+		public DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
 
 
 		public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
