@@ -1,12 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SBS.Application.Interfaces;
 using SBS.Application.Interfaces.Initializers;
+using SBS.Application.Interfaces.IRepositories;
 using SBS.Application.Interfaces.IServices;
 using SBS.Application.Services.Auth;
 using SBS.Infrastructure.Persistence._Data;
 using SBS.Infrastructure.Persistence._Data.Interceptors;
 using SBS.Infrastructure.Persistence.Initializers;
+using SBS.Infrastructure.Repositories;
 using SBS.Infrastructure.Services;
 using System;
 using System.Collections.Generic;
@@ -30,8 +33,13 @@ namespace SBS.Infrastructure
 
 
 
-			// Register the IDbInitializer implementation
-			services.AddScoped<IDbInitializer, DbInitializer>();
+            #region Register IDbInitializer
+            services.AddScoped<IDbInitializer, DbInitializer>();
+            #endregion
+
+            #region Register Repositories
+            services.AddScoped<IResourceRepository,ResourceRepository>();
+            #endregion
 
 
 
@@ -44,6 +52,10 @@ namespace SBS.Infrastructure
 			services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
             services.AddScoped<IAuthService, AuthService>();
+            #endregion
+
+            #region Register UnitOfWork
+            services.AddScoped<IUnitOfWork,UnitOfWork>();
             #endregion
 
             //services.AddScoped<IDbInitializer, DbInitializer>(); 

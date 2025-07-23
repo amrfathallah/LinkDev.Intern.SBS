@@ -1,0 +1,71 @@
+<h2 mat-dialog-title>{{ data.isEdit ? 'Edit Resource' : 'Add New Resource' }}</h2>
+
+<form [formGroup]="resourceForm" (ngSubmit)="onSave()">
+  <div mat-dialog-content class="dialog-content" style="padding: 20px;">
+
+    <!-- Resource Name -->
+    <mat-form-field appearance="outline" class="full-width ">
+      <mat-label>Resource Name</mat-label>
+      <input matInput formControlName="name" placeholder="Enter resource name">
+      <mat-error *ngIf="resourceForm.get('name')?.hasError('required')">
+        Resource name is required
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Resource Type -->
+    <mat-form-field appearance="outline" class="full-width" *ngIf="!data.isEdit">
+      <mat-label>Resource Type</mat-label>
+      <mat-select formControlName="type">
+        <mat-option [value]="ResourceType.Room">Meeting Room</mat-option>
+        <mat-option [value]="ResourceType.Desk">Desk</mat-option>
+      </mat-select>
+      <mat-error *ngIf="resourceForm.get('type')?.hasError('required')">
+        Resource type is required
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Capacity -->
+    <mat-form-field appearance="outline" class="full-width ">
+      <mat-label>Capacity</mat-label>
+      <input matInput type="number" formControlName="capacity" placeholder="Number of people">
+      <mat-error *ngIf="resourceForm.get('capacity')?.hasError('required')">
+        Capacity is required
+      </mat-error>
+      <mat-error *ngIf="resourceForm.get('capacity')?.hasError('min')">
+        Capacity must be at least 1
+      </mat-error>
+    </mat-form-field>
+
+    <div style="display: flex; gap: 16px; justify-content: space-around;">
+      <!-- Opens At 'hh:mm:ss' -->
+      <mat-form-field appearance="outline" class="flex-grow">
+        <mat-label>Opens At</mat-label>
+        <input matInput formControlName="openAt" type="time" value="09:00" placeholder="HH:mm:ss">
+        <mat-error *ngIf="resourceForm.get('openAt')?.hasError('required')">
+          Opening time is required
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Closes At 'hh:mm:ss' -->
+      <mat-form-field appearance="outline" class="flex-grow">
+        <mat-label>Closes At</mat-label>
+        <input matInput formControlName="closeAt" type="time" value="17:00" placeholder="HH:mm:ss">
+        <mat-error *ngIf="resourceForm.get('closeAt')?.hasError('required')">
+          Closing time is required
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <!-- Active Status (only for edit) -->
+    <div *ngIf="data.isEdit" class="checkbox-container">
+      <mat-checkbox formControlName="active">Active</mat-checkbox>
+    </div>
+
+  </div>
+
+  <div mat-dialog-actions align="end" class="dialog-actions" style="padding: 20px;">
+    <button mat-button type="button" (click)="onCancel()">Cancel</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="!resourceForm.valid">
+      {{ data.isEdit ? 'Update' : 'Create' }}
+    </button>
+  </div>
+</form>

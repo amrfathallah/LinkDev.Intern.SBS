@@ -9,13 +9,10 @@
   <ItemGroup>
     <Compile Remove="Data\**" />
     <Compile Remove="Migrations\**" />
-    <Compile Remove="Repositories\**" />
     <EmbeddedResource Remove="Data\**" />
     <EmbeddedResource Remove="Migrations\**" />
-    <EmbeddedResource Remove="Repositories\**" />
     <None Remove="Data\**" />
     <None Remove="Migrations\**" />
-    <None Remove="Repositories\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,6 +28,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.0.1" />
   </ItemGroup>
 
   <ItemGroup>

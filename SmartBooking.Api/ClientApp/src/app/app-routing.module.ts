@@ -10,11 +10,13 @@ const routes: Routes = [
     component: AuthLayoutComponent,
     loadChildren: () => import('./auth/auth.module').then((m) => m.AuthModule),
   },
-
+  {
+    path: 'admin-dashboard',
+    loadChildren: () => import('./admin-dashboard/modules/admin-dashboard.module').then((m) => m.AdminDashboardModule),
+  },
    {
     path: '',
     component: MainLayoutComponent,
-
   },
 
 

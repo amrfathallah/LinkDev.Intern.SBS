@@ -1,0 +1,47 @@
+<!-- Dashboard Header with Tabs Only -->
+<div class="dashboard-tabs-header">
+  <div class="tabs-container">
+    <button mat-flat-button
+            [color]="currentView === AdminView.Resources ? 'primary' : ''"
+            (click)="switchView(AdminView.Resources)"
+            class="tab-button"
+            [class.active]="currentView === AdminView.Resources">
+      <mat-icon>meeting_room</mat-icon>
+      Manage Resources
+    </button>
+    <button mat-flat-button
+            [color]="currentView === AdminView.Bookings ? 'primary' : ''"
+            (click)="switchView(AdminView.Bookings)"
+            class="tab-button"
+            [class.active]="currentView === AdminView.Bookings">
+      <mat-icon>meeting_room</mat-icon>
+      Bookings
+    </button>
+    <button mat-flat-button
+            [color]="currentView === AdminView.Reports ? 'primary' : ''"
+            (click)="switchView(AdminView.Reports)"
+            class="tab-button"
+            [class.active]="currentView === AdminView.Reports">
+      <mat-icon>assessment</mat-icon>
+      Reports
+    </button>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="dashboard-content">
+  <!-- Manage Bookings View -->
+  <div *ngIf="currentView === AdminView.Bookings" class="view-section">
+    <app-bookings-management></app-bookings-management>
+  </div>
+  <!-- Manage Resources View -->
+  <div *ngIf="currentView === AdminView.Resources" class="view-section">
+    <app-resources-management></app-resources-management>
+  </div>
+
+  <!-- Reports View -->
+  <div *ngIf="currentView === AdminView.Reports" class="view-section">
+    <app-reports-management></app-reports-management>
+  </div>
+
+</div>
