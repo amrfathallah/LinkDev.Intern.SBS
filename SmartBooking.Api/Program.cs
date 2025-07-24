@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using SBS.Application;
 using SBS.Infrastructure;
-using SBS.Application;
 using SmartBooking.Api.Extensions;
 using SBS.Application.Mapping;
 
