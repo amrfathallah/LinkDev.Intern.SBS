@@ -3,10 +3,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SBS.Application.Interfaces.Initializers;
 using SBS.Application.Interfaces.IServices;
+using SBS.Application.Interfaces.IRepositories;
 using SBS.Application.Services.Auth;
 using SBS.Infrastructure.Persistence._Data;
 using SBS.Infrastructure.Persistence._Data.Interceptors;
 using SBS.Infrastructure.Persistence.Initializers;
+using SBS.Infrastructure.Repositories;
 using SBS.Infrastructure.Services;
 using System;
 using System.Collections.Generic;
@@ -44,6 +46,8 @@ namespace SBS.Infrastructure
 			services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
             services.AddScoped<IAuthService, AuthService>();
+
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             #endregion
 
             //services.AddScoped<IDbInitializer, DbInitializer>(); 

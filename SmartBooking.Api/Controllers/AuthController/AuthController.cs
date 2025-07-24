@@ -50,32 +50,14 @@ namespace SmartBooking.Api.Controllers.AuthController
 
         [HttpPost("refresh")]
         [AllowAnonymous]
-        public async Task<IActionResult> Refresh(TokenDTO tokenDto)
+        public async Task<ActionResult<ApiResponse<AuthResponseDto>>> Refresh(TokenDTO tokenDto)
         {
-            // Step 1: Check the expired Access token
-            ApplicationUser? user = null;
-            try
+            ApiResponse<AuthResponseDto> response = await _refreshTokenService.RefreshExpiredToken(tokenDto);
+            if (!response.Success)
             {
-                user = await _tokenService.refreshExpiredToken(tokenDto);
-
+                return BadRequest(response);
             }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Unauthorized(ex.Message);
-            }
-
-            // Step 2: Validate the refresh token
-            var validRefToken = await _refreshTokenService.IsRefreshTokenValidAsync(user.Id, tokenDto.RefreshToken);
-            if (!validRefToken)
-                return Unauthorized("Invalid Refresh token");
-
-
-            // Step 3: Issue new AccessToken and RefreshToken
-            var userRole = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
-            var newToken = await _tokenService.GenerateToken(user, userRole!, tokenDto.RefreshToken);
-
-
-            return Ok(newToken);
+            return Ok(response);
         }
 
         [HttpPost("logout")] // POST: /api/auth/logout
@@ -86,5 +68,12 @@ namespace SmartBooking.Api.Controllers.AuthController
             return Ok(new { Message = "Logged out successfully." });
         }
 
+        [HttpGet("me")] // GET: /api/auth/me
+        [Authorize]
+        public async Task<ActionResult<AuthResponseDto>> GetCurrentUser()
+        {
+            //var result = await _authService.GetCurrentUser(User);
+            return Ok(User?.Identity?.Name);
+        }
     }
 }

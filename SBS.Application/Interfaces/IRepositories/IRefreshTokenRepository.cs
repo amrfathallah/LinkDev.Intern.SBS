@@ -1,15 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SBS.Application.DTOs.Auth;
-using SBS.Domain.Entities;
+﻿using SBS.Application.DTOs.Auth;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SBS.Application.Interfaces.IServices
+namespace SBS.Application.Interfaces.IRepositories
 {
-    public interface IRefreshTokenService
+    public interface IRefreshTokenRepository
     {
         Task StoreRefreshTokenAsync(Guid UserId, string RefreshToken);     // Save RefreshToken in the Database
 
