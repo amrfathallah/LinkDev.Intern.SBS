@@ -32,7 +32,7 @@ namespace SBS.Application.Services
 
         public async Task<ResourceDto?> GetByIdAsync(Guid id)
         {
-            var resource = await _unitOfWork.Resources.GetAsync(id);
+            var resource = await _unitOfWork.Resources.GetByIdAsync(id);
             return resource == null ? null : _mapper.Map<ResourceDto>(resource);
         }
 
@@ -60,7 +60,7 @@ namespace SBS.Application.Services
             await _unitOfWork.BeginTransactionAsync();
             try
             {
-                var resource = await _unitOfWork.Resources.GetAsync(id);
+                var resource = await _unitOfWork.Resources.GetByIdAsync(id);
                 if (resource is null) return null;
                 resource.Name = dto.Name;
                 resource.Capacity = dto.Capacity;
@@ -83,7 +83,7 @@ namespace SBS.Application.Services
             await _unitOfWork.BeginTransactionAsync();
             try
             {
-                var resource = await _unitOfWork.Resources.GetAsync(id);
+                var resource = await _unitOfWork.Resources.GetByIdAsync(id);
                 if (resource == null) return false;
                 resource.IsActive = isActive;
                 await _unitOfWork.CommitAsync();
@@ -102,7 +102,7 @@ namespace SBS.Application.Services
             await _unitOfWork.BeginTransactionAsync();
             try
             {
-                var resource = await _unitOfWork.Resources.GetAsync(id);
+                var resource = await _unitOfWork.Resources.GetByIdAsync(id);
                 if (resource == null) return false;
                 var hasBookings = await _unitOfWork.Bookings.HasBookingsForResourceAsync(id);
                 if (hasBookings) return false;

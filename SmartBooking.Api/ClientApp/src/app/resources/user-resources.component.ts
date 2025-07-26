@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { GetResourceDto } from '../models/resource/get-resources.dto';
+import { GetResourceDto } from './models/dtos/get-resources.dto';
 import { Router } from '@angular/router';
-import { AdminService } from '../services/admin-service';
+import { ResourceService } from './services/resource-service';
 
 export interface Resource {
   id: number;
@@ -30,7 +30,7 @@ export class UserResourcesComponent implements OnInit {
   constructor(
     private snackBar: MatSnackBar,
     private router: Router,
-    private adminService: AdminService
+    private resourceService: ResourceService
   ) {}
 
   ngOnInit() {
@@ -38,17 +38,20 @@ export class UserResourcesComponent implements OnInit {
   }
 
   private loadResources() {
-    this.adminService.getResources().subscribe({
+    this.resourceService.getResources().subscribe({
       next: (data: GetResourceDto[]) => {
         this.resources = data;
+        this.resources = this.resources.filter((resource) => resource.isActive);
+        this.applyFilters();
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Failed to fetch resources', err);
+        this.snackBar.open('Failed to load resources', 'Close', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
       },
     });
-
-    this.resources = this.resources.filter((resource) => resource.isActive);
-    this.applyFilters();
   }
 
   filterByType(type: 'all' | 1 | 2) {
@@ -84,7 +87,7 @@ export class UserResourcesComponent implements OnInit {
 
   bookResource(resourceId: string) {
     this.router.navigate([
-      '/resource-details',
+      '/resources/details',
       resourceId,
       this.selectedDate.toISOString().split('T')[0],
     ]);

@@ -25,9 +25,16 @@
         [class.booked]="slot.isBooked && slot.isActive"
         [class.selected]="selectedSlots.includes(slot)"
         (click)="onSlotClick(slot)"
+        [title]="slot.isBooked ? 'This slot is already reserved' : 'Click to select this slot'"
       >
-        Slot {{ i + 1 }}<br />
-        {{ slot.startTime }} - {{ slot.endTime }}
+        <div *ngIf="!slot.isBooked">
+          Slot {{ i + 1 }}<br />
+          {{ slot.startTime }} - {{ slot.endTime }}
+        </div>
+        <div *ngIf="slot.isBooked" class="booked-slot-content">
+          {{ slot.startTime }} - {{ slot.endTime }}<br />
+          <small>RESERVED</small>
+        </div>
       </div>
     </div>
 

@@ -14,6 +14,10 @@ const routes: Routes = [
     path: 'admin-dashboard',
     loadChildren: () => import('./admin-dashboard/modules/admin-dashboard.module').then((m) => m.AdminDashboardModule),
   },
+  {
+    path: 'resources',
+    loadChildren: () => import('./resources/modules/resource.module').then((m) => m.ResourceModule),
+  },
    {
     path: '',
     component: MainLayoutComponent,
