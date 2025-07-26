@@ -9,9 +9,10 @@ namespace SBS.Application.Interfaces.IRepositories
 {
 	public interface IRepository<T> where T : class
 	{
-		Task AddAsync(T booking);
-		Task<T?> GetAsync(Guid id);
+		Task<T?> GetByIdAsync(Guid id);
+		Task AddAsync(T instance);
 		Task<List<T>> GetAllAsync();
 		Task DeleteAsync(T instance);
+		Task UpdateAsync(T instance);
 	}
 }

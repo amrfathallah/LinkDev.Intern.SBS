@@ -4,17 +4,9 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { BookingStatus } from '../../enums/BookingStatus.enum';
+import { Booking } from '../../models/Booking.model';
 
-export interface Booking {
-  id: number;
-  resourceName: string;
-  resourceType: string;
-  userName: string;
-  startTime: Date;
-  endTime: Date;
-  status: 'upcoming' | 'happening' | 'finished' | 'cancelled';
-  attendees: number;
-}
 
 @Component({
   selector: 'app-bookings-management',
@@ -24,15 +16,21 @@ export interface Booking {
 export class BookingsManagementComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-
   filterForm: FormGroup;
+
+
+  // TODO: is this the best way to do it?
+  // angular material requires a list of displayed columns
   bookingsDisplayedColumns: string[] = ['resourceName', 'resourceType', 'userName', 'startTime', 'endTime', 'status'];
+
   bookingsDataSource = new MatTableDataSource<Booking>();
 
   constructor(
     public dialog: MatDialog,
     private fb: FormBuilder
   ) {
+
+    // TODO: figure out what is the best practices for making forms
     this.filterForm = this.fb.group({
       startDate: [''],
       endDate: [''],
@@ -53,7 +51,6 @@ export class BookingsManagementComponent implements OnInit {
 
   applyBookingsFilter() {
     const filterValues = this.filterForm.value;
-    // Implement filtering logic here
     console.log('Applying filters:', filterValues);
   }
 
@@ -66,33 +63,18 @@ export class BookingsManagementComponent implements OnInit {
     this.loadBookingsData();
   }
 
-  getStatusClass(status: string): string {
+  // this function returns a css class so it should be a string
+  getStatusClass(status: BookingStatus): string {
     switch (status) {
-      case 'upcoming': return 'status-upcoming';
-      case 'happening': return 'status-happening';
-      case 'finished': return 'status-finished';
-      case 'cancelled': return 'status-cancelled';
+      case BookingStatus.Upcoming: return 'status-upcoming';
+      case BookingStatus.Happening: return 'status-happening';
+      case BookingStatus.Finished: return 'status-finished';
+      case BookingStatus.Cancelled: return 'status-cancelled';
       default: return '';
     }
   }
 
-  editBooking(booking: Booking) {
-    console.log('Edit booking:', booking);
-    // Implement edit booking dialog
-  }
-
-  cancelBooking(booking: Booking) {
-    console.log('Cancel booking:', booking);
-    // Implement cancel booking logic
-  }
-
-  viewBooking(booking: Booking) {
-    console.log('View booking:', booking);
-    // Implement view booking dialog
-  }
-
   private loadBookingsData() {
-    // Mock data - replace with actual API call
     const mockBookings: Booking[] = [
       {
         id: 1,
@@ -101,7 +83,7 @@ export class BookingsManagementComponent implements OnInit {
         userName: 'John Doe',
         startTime: new Date('2025-07-15T09:00:00'),
         endTime: new Date('2025-07-15T10:00:00'),
-        status: 'upcoming',
+        status: BookingStatus.Upcoming,
         attendees: 5
       },
       {
@@ -111,7 +93,7 @@ export class BookingsManagementComponent implements OnInit {
         userName: 'Sarah Mitchell',
         startTime: new Date('2025-07-15T08:00:00'),
         endTime: new Date('2025-07-15T17:00:00'),
-        status: 'happening',
+        status: BookingStatus.Happening,
         attendees: 1
       },
       {
@@ -121,7 +103,7 @@ export class BookingsManagementComponent implements OnInit {
         userName: 'Mike Johnson',
         startTime: new Date('2025-07-14T14:00:00'),
         endTime: new Date('2025-07-14T15:30:00'),
-        status: 'finished',
+        status: BookingStatus.Finished,
         attendees: 3
       },
       {
@@ -131,7 +113,7 @@ export class BookingsManagementComponent implements OnInit {
         userName: 'Emily Davis',
         startTime: new Date('2025-07-15T11:00:00'),
         endTime: new Date('2025-07-15T12:00:00'),
-        status: 'cancelled',
+        status: BookingStatus.Cancelled,
         attendees: 8
       }
     ];

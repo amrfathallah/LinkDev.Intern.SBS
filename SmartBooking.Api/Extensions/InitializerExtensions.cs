@@ -16,6 +16,7 @@ namespace SmartBooking.Api.Extensions
 			{
 
 				await dbInitializer.InitializeDbAsync();
+				await dbInitializer.SeedAsync();
 			}
 			catch (Exception ex)
 			{

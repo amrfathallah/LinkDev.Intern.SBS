@@ -20,12 +20,28 @@ namespace SBS.Infrastructure.Repositories
             _appDbContext = appDbContext;
         }
 
-		public async Task<Resource> GetResourceWithBookedSlotsAsync(Guid resourceId, DateOnly date)
-		{
-			return await _appDbContext.Resources
-				.Include(r => r.Bookings.Where(b => b.Date == date))
-					.ThenInclude(b => b.BookingSlots)
-				.FirstOrDefaultAsync(r => r.Id == resourceId);
-		}
-	}
+        public async Task<Resource?> GetByIdAsync(Guid id)
+        {
+            return await _appDbContext.Resources.Include(r => r.Type).FirstOrDefaultAsync(r => r.Id == id);
+        }
+
+        public async Task AddAsync(Resource resource)
+        {
+            await _appDbContext.Resources.AddAsync(resource);
+        }
+        public async Task UpdateAsync(Resource resource)
+        {
+            _appDbContext.Resources.Update(resource);
+        }
+
+        public async Task<Resource> GetResourceWithBookedSlotsAsync(Guid resourceId, DateOnly date)
+        {
+            return await _appDbContext.Resources
+                .Include(r => r.Bookings.Where(b => b.Date == date))
+                    .ThenInclude(b => b.BookingSlots)
+                        .ThenInclude(bs => bs.Slot) 
+                .FirstOrDefaultAsync(r => r.Id == resourceId);
+        }
+
+    }
 } 

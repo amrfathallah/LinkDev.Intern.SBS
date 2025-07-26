@@ -12,15 +12,15 @@ export class AdminService {
   constructor(private _httpClient:HttpClient) {}
 
   createResource(resource: CreateResourceDto) {
-    return this._httpClient.post(`${environment.apiUrl}/api/Resource`, resource);
+    return this._httpClient.post(`${environment.apiBaseUrl}/Resource`, resource);
   }
   getResources() {
-    return this._httpClient.get<GetResourceDto[]>(`${environment.apiUrl}/api/Resource`);
+    return this._httpClient.get<GetResourceDto[]>(`${environment.apiBaseUrl}/Resource`);
   }
   updateResource(id: string, resource: UpdateResourceDto) {
-    return this._httpClient.put(`${environment.apiUrl}/api/Resource/${id}`, resource);
+    return this._httpClient.put(`${environment.apiBaseUrl}/Resource/${id}`, resource);
   }
   deleteResource(id: string){
-    return this._httpClient.delete(`${environment.apiUrl}/api/Resource/${id}`);
+    return this._httpClient.delete(`${environment.apiBaseUrl}/Resource/${id}`);
   }
 }

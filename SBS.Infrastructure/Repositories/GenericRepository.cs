@@ -19,10 +19,28 @@ namespace SBS.Infrastructure.Repositories
 			_appDbContext = appDbContext;
 		}
 
-		public virtual async Task<List<T>> GetAllAsync()
+        public virtual async Task AddAsync(T instance)
+        {
+            await _appDbContext.Set<T>().AddAsync(instance);
+        }
+
+
+        public virtual async Task<List<T>> GetAllAsync()
 		{
 			return await _appDbContext.Set<T>().ToListAsync();
 		}
+
+        public virtual async Task<T?> GetByIdAsync(Guid id)
+        {
+            return await _appDbContext.Set<T>().FindAsync(id);
+        }
+
+
+        public virtual Task UpdateAsync(T instance)
+        {
+            _appDbContext.Set<T>().Update(instance);
+            return Task.CompletedTask;
+        }
 
 		public virtual Task DeleteAsync(T instance)
 		{
@@ -30,18 +48,5 @@ namespace SBS.Infrastructure.Repositories
 			return Task.CompletedTask;
 		}
 
-		public async Task AddAsync(T instance)
-		{
-			await _appDbContext.Set<T>().AddAsync(instance);
-		}
-
-		public async Task<T?> GetAsync(Guid id)
-		{
-			return await _appDbContext.Set<T>().FindAsync(id);
-		}
-
-
-
-
-	}
+    }
 }

@@ -2,26 +2,26 @@
 <div class="dashboard-tabs-header">
   <div class="tabs-container">
     <button mat-flat-button
-            [color]="currentView === 'resources' ? 'primary' : ''"
-            (click)="switchView('resources')"
+            [color]="currentView === AdminView.Resources ? 'primary' : ''"
+            (click)="switchView(AdminView.Resources)"
             class="tab-button"
-            [class.active]="currentView === 'resources'">
+            [class.active]="currentView === AdminView.Resources">
       <mat-icon>meeting_room</mat-icon>
       Manage Resources
     </button>
     <button mat-flat-button
-            [color]="currentView === 'bookings' ? 'primary' : ''"
-            (click)="switchView('bookings')"
+            [color]="currentView === AdminView.Bookings ? 'primary' : ''"
+            (click)="switchView(AdminView.Bookings)"
             class="tab-button"
-            [class.active]="currentView === 'bookings'">
+            [class.active]="currentView === AdminView.Bookings">
       <mat-icon>meeting_room</mat-icon>
       Bookings
     </button>
     <button mat-flat-button
-            [color]="currentView === 'reports' ? 'primary' : ''"
-            (click)="switchView('reports')"
+            [color]="currentView === AdminView.Reports ? 'primary' : ''"
+            (click)="switchView(AdminView.Reports)"
             class="tab-button"
-            [class.active]="currentView === 'reports'">
+            [class.active]="currentView === AdminView.Reports">
       <mat-icon>assessment</mat-icon>
       Reports
     </button>
@@ -31,16 +31,16 @@
 <!-- Main Content -->
 <div class="dashboard-content">
   <!-- Manage Bookings View -->
-  <div *ngIf="currentView === 'bookings'" class="view-section">
+  <div *ngIf="currentView === AdminView.Bookings" class="view-section">
     <app-bookings-management></app-bookings-management>
   </div>
   <!-- Manage Resources View -->
-  <div *ngIf="currentView === 'resources'" class="view-section">
+  <div *ngIf="currentView === AdminView.Resources" class="view-section">
     <app-resources-management></app-resources-management>
   </div>
 
   <!-- Reports View -->
-  <div *ngIf="currentView === 'reports'" class="view-section">
+  <div *ngIf="currentView === AdminView.Reports" class="view-section">
     <app-reports-management></app-reports-management>
   </div>
 

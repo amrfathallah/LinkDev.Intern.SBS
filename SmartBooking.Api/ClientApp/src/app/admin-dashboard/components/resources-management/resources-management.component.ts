@@ -11,6 +11,7 @@ import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation
 import { ResourceDialogComponent } from '../resource-dialog/resource-dialog.component';
 import { Resource } from '../../models/Resource.model';
 import { ResourceType } from '../../enums/ResourceType.enum';
+import { ResourceFilter } from '../../enums/ResourceFilter.enum';
 
 
 @Component({
@@ -22,10 +23,14 @@ export class ResourcesManagementComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
+  // TODO: is this the best way to do it?
+  // angular material requires a list of displayed columns
+  // sometimes there are columns like 'actions' that are not in the model
   resourcesDisplayedColumns: string[] = ['name', 'type', 'capacity', 'openAt', 'closeAt', 'status', 'actions'];
   resourcesDataSource = new MatTableDataSource<Resource>();
-  resourceType: ResourceType | null = null;
+  currentFilter: ResourceFilter = ResourceFilter.All;
   ResourceType = ResourceType;
+  ResourceFilter = ResourceFilter;
 
   constructor(public dialog: MatDialog,
               private snackBar: MatSnackBar,
@@ -33,10 +38,17 @@ export class ResourcesManagementComponent implements OnInit {
 
   ngOnInit() {
     this.resourcesDataSource.filterPredicate = (data: Resource, filter: string) => {
-      if (filter === 'all' || filter === '') {
-        return true;
+      const resourceFilter = filter as ResourceFilter;
+      switch (resourceFilter) {
+        case ResourceFilter.All:
+          return true;
+        case ResourceFilter.Desk:
+          return data.typeId === ResourceType.Desk;
+        case ResourceFilter.Room:
+          return data.typeId === ResourceType.Room;
+        default:
+          return true;
       }
-      return data.typeId === (filter as unknown as ResourceType);
     };
 
     this.loadResourcesData();
@@ -47,13 +59,9 @@ export class ResourcesManagementComponent implements OnInit {
     this.resourcesDataSource.sort = this.sort;
   }
 
-  filterResourcesByType(type: null | ResourceType) {
-    this.resourceType = type;
-    if (type === null) {
-      this.resourcesDataSource.filter = '';
-    } else {
-      this.resourcesDataSource.filter = String(type);
-    }
+  filterResourcesByType(type: ResourceFilter) {
+    this.currentFilter = type;
+    this.resourcesDataSource.filter = type;
   }
 
   editResource(resource: Resource) {
@@ -92,50 +100,12 @@ export class ResourcesManagementComponent implements OnInit {
               currentData[index] = updatedResourceData;
               this.resourcesDataSource.data = [...currentData];
             }
-            this.snackBar.open(`Resource "${updatedResourceData.name}" has been updated`, 'Close', {
-              duration: 3000,
-              horizontalPosition: 'right',
-              verticalPosition: 'top'
-            });
+            this.showSnackBar(`Resource "${updatedResourceData.name}" has been updated`);
           },
           error: (error) => {
             console.error('Error updating resource:', error);
-            this.snackBar.open('Error updating resource', 'Close', {
-              duration: 3000,
-              horizontalPosition: 'right',
-              verticalPosition: 'top'
-            });
+            this.showSnackBar('Error updating resource', true);
           }
-        });
-      }
-    });
-  }
-
-  toggleResourceStatus(resource: Resource) {
-    const action = resource.active ? 'deactivate' : 'activate';
-    const actionText = resource.active ? 'Deactivate' : 'Activate';
-
-    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      width: '400px',
-      data: {
-        title: `${actionText} Resource`,
-        message: `Are you sure you want to ${action} "${resource.name}"?`,
-        confirmText: actionText,
-        cancelText: 'Cancel'
-      }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        resource.active = !resource.active;
-
-        this.resourcesDataSource.data = [...this.resourcesDataSource.data];
-
-        const statusText = resource.active ? 'activated' : 'deactivated';
-        this.snackBar.open(`Resource "${resource.name}" has been ${statusText}`, 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
         });
       }
     });
@@ -157,11 +127,7 @@ export class ResourcesManagementComponent implements OnInit {
         this.adminService.deleteResource(resource.id).subscribe({
           next: () => {
         this.removeResourceFromDataSource(resource);
-        this.snackBar.open(`Resource "${resource.name}" has been deleted`, 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
-        });
+        this.showSnackBar(`Resource "${resource.name}" has been deleted`);
           },
           error: (error) => {
             let errorMessage = 'Error deleting resource';
@@ -171,11 +137,7 @@ export class ResourcesManagementComponent implements OnInit {
               errorMessage = `Resource "${resource.name}" not found.`;
             }
             console.error('Error deleting resource:', error);
-            this.snackBar.open(errorMessage, 'Close', {
-              duration: 3000,
-              horizontalPosition: 'right',
-              verticalPosition: 'top'
-            });
+            this.showSnackBar(errorMessage, true);
           }
         });
       }
@@ -186,6 +148,15 @@ export class ResourcesManagementComponent implements OnInit {
     const currentData = this.resourcesDataSource.data;
     const updatedData = currentData.filter(r => r.id !== resource.id);
     this.resourcesDataSource.data = updatedData;
+  }
+
+  private showSnackBar(message: string, isError: boolean = false) {
+    this.snackBar.open(message, 'Close', {
+      duration: 3000,
+      horizontalPosition: 'right',
+      verticalPosition: 'top',
+      panelClass: isError ? 'error-snackbar' : 'success-snackbar'
+    });
   }
   addResource() {
     const dialogRef = this.dialog.open(ResourceDialogComponent, {
@@ -200,7 +171,7 @@ export class ResourcesManagementComponent implements OnInit {
         const currentData = this.resourcesDataSource.data;
         const createResourceDto : CreateResourceDto = {
           name: result.name,
-          typeId: result.type,
+          typeId: result.typeId,
           capacity: result.capacity,
           openAt: result.openAt,
           closeAt: result.closeAt
@@ -220,19 +191,11 @@ export class ResourcesManagementComponent implements OnInit {
 
             this.resourcesDataSource.data = [...currentData, newResource];
 
-            this.snackBar.open(`Resource "${newResource.name}" has been created`, 'Close', {
-              duration: 3000,
-              horizontalPosition: 'right',
-              verticalPosition: 'top'
-            });
+            this.showSnackBar(`Resource "${newResource.name}" has been created`);
           },
           error: (error) => {
             console.error('Error creating resource:', error);
-            this.snackBar.open('Error creating resource', 'Close', {
-              duration: 3000,
-              horizontalPosition: 'right',
-              verticalPosition: 'top'
-            });
+            this.showSnackBar('Error creating resource', true);
           }
         });
       }
@@ -256,11 +219,7 @@ export class ResourcesManagementComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading resources:', error);
-        this.snackBar.open('Error loading resources', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
-        });
+        this.showSnackBar('Error loading resources', true);
       }
     });
   }

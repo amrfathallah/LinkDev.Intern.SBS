@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { AdminView } from './enums/AdminView.enum';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -6,9 +7,10 @@ import { Component } from '@angular/core';
   styleUrls: ['./admin-dashboard.component.css']
 })
 export class AdminDashboardComponent {
-  currentView: 'resources' | 'reports' | 'bookings' = 'resources';
+  currentView: AdminView = AdminView.Resources;
+  AdminView = AdminView;
 
-  switchView(view: 'resources' | 'reports' | 'bookings') {
+  switchView(view: AdminView) {
     this.currentView = view;
   }
 }
