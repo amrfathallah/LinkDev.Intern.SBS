@@ -19,7 +19,6 @@ namespace SBS.Application
 			services.AddAutoMapper(Mapper => Mapper.AddProfile(new MappingProfile()));
 			services.AddScoped<IBookingService, BookingService>();
 			services.AddScoped<IResourceService, ResourceService>();
-			services.AddScoped<ISlotService, SlotService>();
 
 			
 

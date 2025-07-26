@@ -12,7 +12,7 @@ namespace SBS.Application.Interfaces
 		IBookingRepository Bookings { get; }
 		IBookingSlotRepository BookingSlotRepository { get; }
 		ISlotRepository SlotRepository { get; }
-		IResourceRepository ResourceRepository { get; }
+		IResourceRepository Resources { get; }
 
 		Task<int> CommitAsync();
 		Task BeginTransactionAsync();

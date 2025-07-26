@@ -32,7 +32,7 @@ namespace SBS.Application.Services
 
         public async Task<ResourceDto?> GetByIdAsync(Guid id)
         {
-            var resource = await _unitOfWork.Resources.GetByIdAsync(id);
+            var resource = await _unitOfWork.Resources.GetAsync(id);
             return resource == null ? null : _mapper.Map<ResourceDto>(resource);
         }
 
@@ -60,14 +60,13 @@ namespace SBS.Application.Services
             await _unitOfWork.BeginTransactionAsync();
             try
             {
-                var resource = await _unitOfWork.Resources.GetByIdAsync(id);
+                var resource = await _unitOfWork.Resources.GetAsync(id);
                 if (resource is null) return null;
                 resource.Name = dto.Name;
                 resource.Capacity = dto.Capacity;
                 resource.OpenAt = dto.OpenAt;
                 resource.CloseAt = dto.CloseAt;
                 resource.IsActive = dto.IsActive;
-                await _unitOfWork.Resources.UpdateAsync(resource);
                 await _unitOfWork.CommitAsync();
                 await _unitOfWork.CommitTransactionAsync();
                 return _mapper.Map<ResourceDto>(resource);
@@ -84,10 +83,9 @@ namespace SBS.Application.Services
             await _unitOfWork.BeginTransactionAsync();
             try
             {
-                var resource = await _unitOfWork.Resources.GetByIdAsync(id);
+                var resource = await _unitOfWork.Resources.GetAsync(id);
                 if (resource == null) return false;
                 resource.IsActive = isActive;
-                await _unitOfWork.Resources.UpdateAsync(resource);
                 await _unitOfWork.CommitAsync();
                 await _unitOfWork.CommitTransactionAsync();
                 return true;
@@ -104,12 +102,11 @@ namespace SBS.Application.Services
             await _unitOfWork.BeginTransactionAsync();
             try
             {
-                var resource = await _unitOfWork.Resources.GetByIdAsync(id);
+                var resource = await _unitOfWork.Resources.GetAsync(id);
                 if (resource == null) return false;
                 var hasBookings = await _unitOfWork.Bookings.HasBookingsForResourceAsync(id);
                 if (hasBookings) return false;
                 resource.IsDeleted = true;
-                await _unitOfWork.Resources.UpdateAsync(resource);
                 await _unitOfWork.CommitAsync();
                 await _unitOfWork.CommitTransactionAsync();
                 return true;
@@ -126,15 +123,16 @@ namespace SBS.Application.Services
             var dateOnly = DateOnly.FromDateTime(request.Date);
             var resource = await _unitOfWork.Resources.GetResourceWithBookedSlotsAsync(request.ResourceId, dateOnly);
             if (resource == null)
-                return null;
+                throw new InvalidOperationException("Resource not found");
 
             var bookedSlots = resource.Bookings
                 .SelectMany(b => b.BookingSlots)
+                .Where(bs => bs.Slot != null)
                 .Select(bs => new BookedSlotDto
                 {
                     SlotId = bs.SlotId,
-                    StartTime = bs.Slot.StartTime,
-                    EndTime = bs.Slot.EndTime
+                    StartTime = bs.Slot!.StartTime,
+                    EndTime = bs.Slot!.EndTime
                 })
                 .ToList();
 

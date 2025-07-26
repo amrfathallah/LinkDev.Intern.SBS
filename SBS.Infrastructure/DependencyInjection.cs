@@ -31,6 +31,7 @@ namespace SBS.Infrastructure
 			#region Register IDbInitializer
 			// Register the IDbInitializer implementation
 			services.AddScoped<IDbInitializer, DbInitializer>();
+			#endregion
 
             #region Register Repositories
             services.AddScoped<IResourceRepository,ResourceRepository>();

@@ -27,7 +27,7 @@ namespace SBS.Application.Services
 			await _unitOfWork.BeginTransactionAsync();
 
 			//Input Validation
-			if(_unitOfWork.ResourceRepository.GetAsync(requestDto.ResourceId) == null)
+			if(_unitOfWork.Resources.GetAsync(requestDto.ResourceId) == null)
 			{
 				throw new Exception("Resource doesn't exist");
 			}

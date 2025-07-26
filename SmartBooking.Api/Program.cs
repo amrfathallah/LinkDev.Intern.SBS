@@ -28,7 +28,7 @@ webApplicationBuilder.Services.AddCors(options =>
 webApplicationBuilder.Services.AddEndpointsApiExplorer().AddSwaggerGen();
 
 webApplicationBuilder.Services.AddInfrastructureServices(webApplicationBuilder.Configuration);
-webApplicationBuilder.Services.AddApplicationServices(webApplicationBuilder.Configuration);
+webApplicationBuilder.Services.AddApplicationDependencies(webApplicationBuilder.Configuration);
 
 
 

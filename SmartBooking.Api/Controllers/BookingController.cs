@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SBS.Application.DTOs;
+using SBS.Application.DTOs.BookingDto;
 using SBS.Application.Interfaces.IServices;
 
 namespace SmartBooking.Api.Controllers
