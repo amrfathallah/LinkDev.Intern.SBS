@@ -86,12 +86,5 @@ namespace SmartBooking.Api.Controllers.AuthController
             return Ok(new { Message = "Logged out successfully." });
         }
 
-        [HttpGet("me")] // GET: /api/auth/me
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<AuthResponseDto>> GetCurrentUser()
-        {
-            //var result = await _authService.GetCurrentUser(User);
-            return Ok(User?.Identity?.Name);
-        }
     }
 }
