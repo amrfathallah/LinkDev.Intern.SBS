@@ -5,6 +5,7 @@ import { ActivatedRoute, Route } from '@angular/router';
 import { SlotDto } from '../../models/dtos/slot.dto';
 import { ResourceService } from '../../services/resource-service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { BookingRequestDto } from '../../models/dtos/booking-request.dto';
 
 @Component({
   selector: 'app-resource-booking',
@@ -37,7 +38,7 @@ export class ResourceDetailsComponent implements OnInit {
         error: (err) => console.error('Failed to fetch resource', err),
       });
     }
-  } 
+  }
 
   loadSlots(): void {
     // Format date as YYYY-MM-DD for the API
@@ -48,8 +49,8 @@ export class ResourceDetailsComponent implements OnInit {
       next: (response) => {
         const bookedSlots: SlotDto[] = response.bookedSlots.map((slot) => ({
           id: slot.slotId.toString(),
-          startTime: slot.startTime.substring(0, 5), 
-          endTime: slot.endTime.substring(0, 5), 
+          startTime: slot.startTime.substring(0, 5),
+          endTime: slot.endTime.substring(0, 5),
           isActive: true,
           isBooked: true,
         }));
@@ -65,9 +66,10 @@ export class ResourceDetailsComponent implements OnInit {
         console.error('Error details:', err.error);
         this.snackBar.open('Failed to load booked slots. Showing all slots as available.', 'Close', {
           duration: 4000,
-          panelClass: ['error-snackbar']
+          panelClass: ['error-snackbar'],
+          horizontalPosition: 'right',
+          verticalPosition: 'top'
         });
-        // Generate slots without any booked slots
         this.generateTimeSlots(this.resource.openAt, this.resource.closeAt, []);
       },
     });
@@ -91,12 +93,11 @@ export class ResourceDetailsComponent implements OnInit {
       const slotStartStr = current.toTimeString().substring(0, 5);
 
       const slotEnd = new Date(current.getTime());
-      slotEnd.setMinutes(slotEnd.getMinutes() + 30);
+      slotEnd.setMinutes(slotEnd.getMinutes() + 60);
       const slotEndStr = slotEnd.toTimeString().substring(0, 5);
 
       const isBooked = bookedSlots.some(
         (slot) => {
-          // Normalize both time formats to HH:MM for comparison
           const bookedSlotTime = slot.startTime.substring(0, 5); // Remove seconds if present
           return bookedSlotTime === slotStartStr;
         }
@@ -110,7 +111,7 @@ export class ResourceDetailsComponent implements OnInit {
         isBooked: isBooked,
       });
 
-      current.setMinutes(current.getMinutes() + 30);
+      current.setMinutes(current.getMinutes() + 60);
       idCounter++;
     }
   }
@@ -130,7 +131,9 @@ export class ResourceDetailsComponent implements OnInit {
     if (!this.resource.isActive || !slot.isActive) {
       this.snackBar.open('This resource is not available', 'Close', {
         duration: 3000,
-        panelClass: ['warning-snackbar']
+        panelClass: ['warning-snackbar'],
+        horizontalPosition: 'right',
+        verticalPosition: 'top'
       });
       return;
     }
@@ -138,7 +141,9 @@ export class ResourceDetailsComponent implements OnInit {
     if (slot.isBooked) {
       this.snackBar.open(`Slot ${slot.startTime} - ${slot.endTime} is already reserved`, 'Close', {
         duration: 3000,
-        panelClass: ['error-snackbar']
+        panelClass: ['error-snackbar'],
+        horizontalPosition: 'right',
+        verticalPosition: 'top'
       });
       return;
     }
@@ -151,7 +156,9 @@ export class ResourceDetailsComponent implements OnInit {
       this.selectedSlots.splice(index, 1); // Deselect
       this.snackBar.open(`Slot ${slot.startTime} - ${slot.endTime} deselected`, 'Close', {
         duration: 2000,
-        panelClass: ['info-snackbar']
+        panelClass: ['info-snackbar'],
+        horizontalPosition: 'right',
+        verticalPosition: 'top'
       });
       return;
     }
@@ -160,7 +167,9 @@ export class ResourceDetailsComponent implements OnInit {
       this.selectedSlots.push(slot);
       this.snackBar.open(`Slot ${slot.startTime} - ${slot.endTime} selected`, 'Close', {
         duration: 2000,
-        panelClass: ['success-snackbar']
+        panelClass: ['success-snackbar'],
+        horizontalPosition: 'right',
+        verticalPosition: 'top'
       });
       return;
     }
@@ -172,16 +181,20 @@ export class ResourceDetailsComponent implements OnInit {
     const diff =
       (currentSlotTime.getTime() - lastSlotTime.getTime()) / (1000 * 60);
 
-    if (diff === 30) {
+    if (diff === 60) {
       this.selectedSlots.push(slot);
       this.snackBar.open(`Slot ${slot.startTime} - ${slot.endTime} added to selection`, 'Close', {
         duration: 2000,
-        panelClass: ['success-snackbar']
+        panelClass: ['success-snackbar'],
+        horizontalPosition: 'right',
+        verticalPosition: 'top'
       });
     } else {
       this.snackBar.open('You can only select consecutive slots', 'Close', {
         duration: 3000,
-        panelClass: ['warning-snackbar']
+        panelClass: ['warning-snackbar'],
+        horizontalPosition: 'right',
+        verticalPosition: 'top'
       });
     }
   }  parseTime(timeStr: string): Date {
@@ -191,7 +204,17 @@ export class ResourceDetailsComponent implements OnInit {
     return date;
   }
 
-  areSlotsConsecutive(): boolean {
+  getSlotIdFromTime(timeStr: string): number {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    const slotStartHour = 9; // 9:00 AM
+    const slotStartMinute = 0;
+
+    // Calculate total minutes from start time
+    const totalMinutes = (hours * 60 + minutes) - (slotStartHour * 60 + slotStartMinute);
+
+    // Each slot is 60 minutes, so slot ID = (totalMinutes / 60) + 1
+    return Math.floor(totalMinutes / 60) + 1;
+  }  areSlotsConsecutive(): boolean {
     if (this.selectedSlots.length <= 1) return true;
 
     const parsedDates = this.selectedSlots.map((slot) => {
@@ -205,7 +228,7 @@ export class ResourceDetailsComponent implements OnInit {
 
     for (let i = 0; i < parsedDates.length - 1; i++) {
       const diff = parsedDates[i + 1].getTime() - parsedDates[i].getTime();
-      if (diff !== 30 * 60 * 1000) return false;
+      if (diff !== 60 * 60 * 1000) return false;
     }
 
     return true;
@@ -215,7 +238,9 @@ export class ResourceDetailsComponent implements OnInit {
     if (this.selectedSlots.length === 0) {
       this.snackBar.open('No slots selected. Please select at least one slot.', 'Close', {
         duration: 3000,
-        panelClass: ['warning-snackbar']
+        panelClass: ['warning-snackbar'],
+        horizontalPosition: 'right',
+        verticalPosition: 'top'
       });
       return;
     }
@@ -223,16 +248,60 @@ export class ResourceDetailsComponent implements OnInit {
     if (!this.areSlotsConsecutive()) {
       this.snackBar.open('Selected slots are not consecutive. Please select consecutive slots.', 'Close', {
         duration: 3000,
-        panelClass: ['warning-snackbar']
+        panelClass: ['warning-snackbar'],
+        horizontalPosition: 'right',
+        verticalPosition: 'top'
       });
       return;
     }
 
-    this.snackBar.open(`Booking ${this.selectedSlots.length} slots successfully!`, 'Close', {
-      duration: 4000,
-      panelClass: ['success-snackbar']
+    const slotIds = this.selectedSlots.map(slot => this.getSlotIdFromTime(slot.startTime));
+
+    const bookingRequest: BookingRequestDto = {
+      resourceId: this.resource.id,
+      date: this.selectedDate.toISOString().split('T')[0], // YYYY-MM-DD format
+      slotsIds: slotIds
+    };
+
+    this.snackBar.open('Processing booking...', 'Close', {
+      duration: 2000,
+      panelClass: ['info-snackbar'],
+      horizontalPosition: 'right',
+      verticalPosition: 'top'
     });
-    
-    // TODO: api call
+
+    // booking API call
+    this.resourceService.bookSlots(bookingRequest).subscribe({
+      next: (response) => {
+        this.snackBar.open(`Successfully booked ${this.selectedSlots.length} slots!`, 'Close', {
+          duration: 4000,
+          panelClass: ['success-snackbar'],
+          horizontalPosition: 'right',
+          verticalPosition: 'top'
+        });
+
+        this.selectedSlots = [];
+        this.loadSlots(); // Reload
+      },
+      error: (err) => {
+        console.error('Booking failed:', err);
+        let errorMessage = 'Booking failed. Please try again.';
+
+        if (err.status === 409) {
+          errorMessage = 'Selected slots are no longer available. Please select different slots.';
+        } else if (err.status === 400) {
+          errorMessage = 'Invalid booking request. Please check your selection.';
+        } else if (err.status === 500) {
+          errorMessage = 'Server error occurred. Please try again later.';
+        }
+
+        this.snackBar.open(errorMessage, 'Close', {
+          duration: 5000,
+          panelClass: ['error-snackbar'],
+          horizontalPosition: 'right',
+          verticalPosition: 'top'
+        });
+      }
+    });
   }
 }

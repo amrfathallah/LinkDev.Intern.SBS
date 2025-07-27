@@ -43,8 +43,9 @@
       color="primary"
       class="book-button"
       (click)="checkout()"
+      [disabled]="selectedSlots.length === 0"
     >
-      Checkout
+      {{ selectedSlots.length === 0 ? 'Select Slots to Book' : 'Book ' + selectedSlots.length + ' Slot(s)' }}
     </button>
   </div>
 </div>
