@@ -20,15 +20,7 @@ namespace SBS.Infrastructure.Repositories
 			_appDbContext = appDbContext;
 		}
 
-		public async Task AddAsync(Booking booking)
-		{
-			await _appDbContext.Bookings.AddAsync(booking);
-		}
-
-		public async Task<Booking?> GetAsync(Guid id)
-		{
-			return await _appDbContext.Bookings.FindAsync(id);
-		}
+		
 
 		public async Task<bool> HasBookingsForResourceAsync(Guid resourceId)
 		{

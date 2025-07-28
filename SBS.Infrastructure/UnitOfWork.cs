@@ -16,7 +16,8 @@ namespace SBS.Infrastructure
 
 		public IBookingRepository Bookings { get; }
 		public IBookingSlotRepository BookingSlotRepository { get; }
-        public IResourceRepository Resources { get; }
+		public ISlotRepository SlotRepository { get; }
+		public IResourceRepository Resources { get; }
 
 
 		public UnitOfWork(AppDbContext appDbContext)
@@ -24,7 +25,8 @@ namespace SBS.Infrastructure
 			_appDbContext = appDbContext;
 			Bookings = new BookingRepository(_appDbContext);
 			BookingSlotRepository = new BookingSlotRepository(_appDbContext);
-            Resources = new ResourceRepository(_appDbContext);
+			SlotRepository = new SlotRepository(_appDbContext);
+			Resources = new ResourceRepository(_appDbContext);
 		}
 
 		public async Task BeginTransactionAsync()

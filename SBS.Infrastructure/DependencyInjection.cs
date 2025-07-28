@@ -54,9 +54,8 @@ namespace SBS.Infrastructure
             services.AddScoped<IAuthService, AuthService>();
             #endregion
 
-            #region Register UnitOfWork
-            services.AddScoped<IUnitOfWork,UnitOfWork>();
-            #endregion
+			services.AddScoped<IUnitOfWork, UnitOfWork>();
+			services.AddScoped<IBookingConflictValidator, BookingConflictValidator>();
 
             //services.AddScoped<IDbInitializer, DbInitializer>(); 
 

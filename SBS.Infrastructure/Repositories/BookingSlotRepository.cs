@@ -27,7 +27,7 @@ namespace SBS.Infrastructure.Repositories
 			}
 		}
 
-		public async Task<List<BookingSlot>?> GetAsync(Guid id)
+		public async Task<List<BookingSlot>?> GetRangeAsync(Guid id)
 		{
 			return await _appDbContext.BookingSlots.Include(bs => bs.Slot).Where(bs => bs.BookingId == id).ToListAsync();
 		}

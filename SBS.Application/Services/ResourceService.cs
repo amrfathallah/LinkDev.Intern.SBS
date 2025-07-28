@@ -67,7 +67,6 @@ namespace SBS.Application.Services
                 resource.OpenAt = dto.OpenAt;
                 resource.CloseAt = dto.CloseAt;
                 resource.IsActive = dto.IsActive;
-                await _unitOfWork.Resources.UpdateAsync(resource);
                 await _unitOfWork.CommitAsync();
                 await _unitOfWork.CommitTransactionAsync();
                 return _mapper.Map<ResourceDto>(resource);
@@ -87,7 +86,6 @@ namespace SBS.Application.Services
                 var resource = await _unitOfWork.Resources.GetByIdAsync(id);
                 if (resource == null) return false;
                 resource.IsActive = isActive;
-                await _unitOfWork.Resources.UpdateAsync(resource);
                 await _unitOfWork.CommitAsync();
                 await _unitOfWork.CommitTransactionAsync();
                 return true;
@@ -109,7 +107,6 @@ namespace SBS.Application.Services
                 var hasBookings = await _unitOfWork.Bookings.HasBookingsForResourceAsync(id);
                 if (hasBookings) return false;
                 resource.IsDeleted = true;
-                await _unitOfWork.Resources.UpdateAsync(resource);
                 await _unitOfWork.CommitAsync();
                 await _unitOfWork.CommitTransactionAsync();
                 return true;
@@ -126,15 +123,16 @@ namespace SBS.Application.Services
             var dateOnly = DateOnly.FromDateTime(request.Date);
             var resource = await _unitOfWork.Resources.GetResourceWithBookedSlotsAsync(request.ResourceId, dateOnly);
             if (resource == null)
-                return null;
+                throw new InvalidOperationException("Resource not found");
 
             var bookedSlots = resource.Bookings
                 .SelectMany(b => b.BookingSlots)
+                .Where(bs => bs.Slot != null)
                 .Select(bs => new BookedSlotDto
                 {
                     SlotId = bs.SlotId,
-                    StartTime = bs.Slot.StartTime,
-                    EndTime = bs.Slot.EndTime
+                    StartTime = bs.Slot!.StartTime,
+                    EndTime = bs.Slot!.EndTime
                 })
                 .ToList();
 

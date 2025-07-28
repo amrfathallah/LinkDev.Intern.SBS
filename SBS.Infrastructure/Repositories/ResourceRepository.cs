@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SBS.Application.Interfaces.IRepositories;
 using SBS.Domain.Entities;
 using SBS.Infrastructure.Persistence._Data;
@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace SBS.Infrastructure.Repositories
 {

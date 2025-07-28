@@ -7,12 +7,8 @@ using System.Threading.Tasks;
 
 namespace SBS.Application.Interfaces.IRepositories
 {
-	public interface IRepository<T> where T : class
+	public interface ISlotRepository : IRepository<Slot>
 	{
-		Task<T?> GetByIdAsync(Guid id);
-		Task AddAsync(T instance);
-		Task<List<T>> GetAllAsync();
-		Task DeleteAsync(T instance);
-		Task UpdateAsync(T instance);
+		Task<List<Slot>> GetByIdsAsync(List<int> slotIds);
 	}
 }

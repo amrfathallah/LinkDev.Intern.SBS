@@ -40,7 +40,7 @@ var jwtSettings = webApplicationBuilder.Configuration
 
 // Add Infrastructure and Application Services
 webApplicationBuilder.Services.AddInfrastructureServices(webApplicationBuilder.Configuration);
-webApplicationBuilder.Services.AddApplicationServices(webApplicationBuilder.Configuration);
+webApplicationBuilder.Services.AddApplicationDependencies(webApplicationBuilder.Configuration);
 
 // Add Identity services (only once)
 webApplicationBuilder.Services

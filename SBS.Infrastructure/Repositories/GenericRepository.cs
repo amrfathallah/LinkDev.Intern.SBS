@@ -42,7 +42,11 @@ namespace SBS.Infrastructure.Repositories
             return Task.CompletedTask;
         }
 
-
+		public virtual Task DeleteAsync(T instance)
+		{
+			_appDbContext.Set<T>().Remove(instance);
+			return Task.CompletedTask;
+		}
 
     }
 }
