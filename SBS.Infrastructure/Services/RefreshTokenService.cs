@@ -1,91 +1,140 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using SBS.Application.DTOs.Auth;
+using SBS.Application.Interfaces.IRepositories;
 using SBS.Application.Interfaces.IServices;
 using SBS.Application.Settings;
 using SBS.Domain.Entities;
 using SBS.Infrastructure.Persistence._Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Security.Claims;
+
 
 namespace SBS.Infrastructure.Services
 {
     public class RefreshTokenService : IRefreshTokenService
     {
-        private readonly AppDbContext appDbContext;
-        private readonly JWTSettings _jWTSettings;
-        public RefreshTokenService(IOptions<JWTSettings> options, AppDbContext appDb) 
-        { 
-            appDbContext = appDb; 
-            _jWTSettings = options.Value;
+        private readonly IRefreshTokenRepository _refreshTokenRepository;
+        private readonly ITokenService _tokenService;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly JWTSettings _jwtSettings;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public RefreshTokenService(
+            IRefreshTokenRepository refreshTokenRepository,
+            ITokenService tokenService,
+            UserManager<ApplicationUser> userManager,
+            AppDbContext appDbContext,
+            IOptions<JWTSettings> jwtSettings,
+            IHttpContextAccessor httpContextAccessor)
+        {
+            _refreshTokenRepository = refreshTokenRepository;
+            _tokenService = tokenService;
+            _userManager = userManager;
+            _jwtSettings = jwtSettings.Value;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<bool> IsRefreshTokenValidAsync(Guid UserId, string RefreshToken)
         {
-            return await appDbContext.UserRefreshTokens.AnyAsync(t =>
-                t.UserId == UserId
-                && t.RefreshToken == RefreshToken
-                && t.ExpAt > DateTime.UtcNow
-                && !t.IsRevoked
-            );
+            return await _refreshTokenRepository.IsRefreshTokenValidAsync(UserId, RefreshToken);
         }
 
         public async Task RevokeRefreshTokenAsync(Guid UserId)
         {
-            // First Revoke all old tokens
-            var oldToken = appDbContext.UserRefreshTokens.Where(t => t.UserId == UserId && !t.IsRevoked);
-            foreach (var t in oldToken) { t.IsRevoked = true; }
-
-
-            await appDbContext.SaveChangesAsync();
+            await _refreshTokenRepository.RevokeRefreshTokenAsync(UserId);
 
         }
 
         public Task StoreRefreshTokenAsync(Guid UserId, string RefreshToken)
         {
-            var token = new UserRefreshToken
-            {
-                UserId = UserId,
-                RefreshToken = RefreshToken,
-                ExpAt = DateTime.UtcNow.AddDays(_jWTSettings.RefreshTokenExpiry),
-                CreateAt = DateTime.UtcNow
-            };
-
-            appDbContext.UserRefreshTokens.Add(token);
-            return appDbContext.SaveChangesAsync();
+            return _refreshTokenRepository.StoreRefreshTokenAsync(UserId, RefreshToken, _jwtSettings.RefreshTokenExpiry);
         }
 
         public async Task UpdateRefreshTokenAsync(Guid UserId, string NewRefreshToken)
         {
-            // Find the latest token for the user
-            var token = await appDbContext.UserRefreshTokens
-                .Where(t => t.UserId == UserId && !t.IsRevoked)
-                .OrderByDescending(t => t.CreateAt)
-                .FirstOrDefaultAsync();
+            await _refreshTokenRepository.UpdateRefreshTokenAsync(UserId, NewRefreshToken, _jwtSettings.RefreshTokenExpiry);
+        }
 
-            if (token != null)
+        public async Task<ApiResponse<AuthResponseDto>> RefreshExpiredToken(TokenDTO token)
+        {
+            try
             {
-                // Update the existing token record
-                token.RefreshToken = NewRefreshToken;
-                token.ExpAt = DateTime.UtcNow.AddDays(_jWTSettings.RefreshTokenExpiry);
-                token.CreateAt = DateTime.UtcNow;
-            }
-            else
-            {
-                // If no token exists, create a new one
-                var newToken = new UserRefreshToken
+                // Step 1: Extract claims from exp. Access token
+                var principal = _httpContextAccessor.HttpContext?.User;
+                if (principal == null)
                 {
-                    UserId = UserId,
-                    RefreshToken = NewRefreshToken,
-                    ExpAt = DateTime.UtcNow.AddDays(_jWTSettings.RefreshTokenExpiry),
-                    CreateAt = DateTime.UtcNow
-                };
-                appDbContext.UserRefreshTokens.Add(newToken);
-            }
+                    return new ApiResponse<AuthResponseDto>
+                    {
+                        Message = "Invalid Access Token",
+                        Success = false,
+                    };
+                }
 
-            await appDbContext.SaveChangesAsync();
+                // Step 2: Get userId from the extracted claims
+                var userId = principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userId == null)
+                {
+                    return new ApiResponse<AuthResponseDto>
+                    {
+                        Message = "User Id not found in the token claims",
+                        Success = false,
+                    };
+                }
+
+                // Step 3: Get user from the database
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return new ApiResponse<AuthResponseDto>
+                    {
+                        Message = "User not found in the database",
+                        Success = false,
+                    };
+                }
+
+                // Step 4: Validate the refresh token
+                var isValidRefreshToken = await IsRefreshTokenValidAsync(user.Id, token.RefreshToken);
+                if (!isValidRefreshToken)
+                {
+                    return new ApiResponse<AuthResponseDto>
+                    {
+                        Message = "Invalid Refresh Token",
+                        Success = false,
+                    };
+                }
+
+                // Step 5: Get user role
+                var role = principal?.FindFirst(ClaimTypes.Role)?.Value;
+                if (role == null)
+                {
+                    return new ApiResponse<AuthResponseDto>
+                    {
+                        Message = "User role not found in the token claims",
+                        Success = false,
+                    };
+                }
+
+                // Step 6: Generate new token and return response to the controller
+                return new ApiResponse<AuthResponseDto>
+                {
+                    Success = true,
+                    Message = "Token refreshed successfully",
+                    Data = new AuthResponseDto
+                    {
+                        Token = (await _tokenService.GenerateToken(user, role, token.RefreshToken)).AccessToken,
+                        RefreshToken = token.RefreshToken
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<AuthResponseDto>
+                {
+                    Success = false,
+                    Message = $"An error occurred while refreshing the token {ex}",
+                };
+            }
         }
     }
 }

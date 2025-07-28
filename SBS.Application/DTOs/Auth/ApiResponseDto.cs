@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace SBS.Application.DTOs.Auth
 {
-    // TODO: Put APIResponse class in a common place
     public class ApiResponse<T>
     {
         public bool Success { get; set; }

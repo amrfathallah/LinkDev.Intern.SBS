@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using SBS.Application.DTOs.Auth;
+using SBS.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,5 +18,7 @@ namespace SBS.Application.Interfaces.IServices
         Task UpdateRefreshTokenAsync(Guid UserId, string NewRefreshToken); // Update exp. token with new one
 
         Task RevokeRefreshTokenAsync(Guid UserId); // Revoke token if we found suspicious token 
+
+        Task<ApiResponse<AuthResponseDto>> RefreshExpiredToken(TokenDTO token);
     }
 }

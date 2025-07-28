@@ -21,13 +21,13 @@ namespace SBS.Application.Services.Auth
             _userManager = userManager;
         }
 
-        public async Task<TokenDTO> GenerateToken(ApplicationUser user, string r, string?validRefreshToken)
+        public async Task<TokenDTO> GenerateToken(ApplicationUser user, string role, string?validRefreshToken)
         {
             var claims = new List<Claim> {                          //List the user information inside the token
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new(ClaimTypes.Email, user.Email!),
                 new(ClaimTypes.Name, user.FullName),
-                new(ClaimTypes.Role, r),
+                new(ClaimTypes.Role, role),
                 new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             };
 
@@ -79,6 +79,5 @@ namespace SBS.Application.Services.Auth
 
             return principal; // Passes the user information to the Refresh controller 
         }
-
     }
 }

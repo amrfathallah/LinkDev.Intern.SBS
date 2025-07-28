@@ -50,34 +50,14 @@ namespace SmartBooking.Api.Controllers.AuthController
 
         [HttpPost("refresh")]
         [AllowAnonymous]
-        public async Task<IActionResult> Refresh(TokenDTO tokenDto)
+        public async Task<ActionResult<ApiResponse<AuthResponseDto>>> Refresh(TokenDTO tokenDto)
         {
-            // Step 1: Extract claims from exp. Access token
-            var principal = _tokenService.GetUserInfoFromExpiredToken(tokenDto.AccessToken);
-            if (principal == null)
-                return Unauthorized("Invalid Access Token");
-
-            // Step 2: Get userId from the extracted claims
-            var userId = principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null)
-                return Unauthorized("User not found in the token");
-
-            // Step 3: Get user from the database
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-                return Unauthorized("User not found in the database");
-
-            // Step 4: Validate the refresh token
-            var validRefToken = await _refreshTokenService.IsRefreshTokenValidAsync(user.Id, tokenDto.RefreshToken);
-            if (!validRefToken)
-                return Unauthorized("Invalid Refresh token");
-
-            // Step 5: Issue new AccessToken and RefreshToken
-            var userRole = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
-            var newToken = await _tokenService.GenerateToken(user, userRole!, tokenDto.RefreshToken);
-
-
-            return Ok(newToken);
+            ApiResponse<AuthResponseDto> response = await _refreshTokenService.RefreshExpiredToken(tokenDto);
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
 
         [HttpPost("logout")] // POST: /api/auth/logout
@@ -86,14 +66,6 @@ namespace SmartBooking.Api.Controllers.AuthController
         {
             await _authService.LogoutAsync(Response);
             return Ok(new { Message = "Logged out successfully." });
-        }
-
-        [HttpGet("me")] // GET: /api/auth/me
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<AuthResponseDto>> GetCurrentUser()
-        {
-            //var result = await _authService.GetCurrentUser(User);
-            return Ok(User?.Identity?.Name);
         }
     }
 }
