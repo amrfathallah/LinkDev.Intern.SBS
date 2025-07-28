@@ -3,7 +3,6 @@ using SBS.Application;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using SBS.Application;
 using SBS.Application.Interfaces.Common;
 using SBS.Application.Settings;
 using SBS.Domain.Entities;

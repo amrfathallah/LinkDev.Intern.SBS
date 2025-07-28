@@ -8,8 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-using SBS.Application.Services.Auth;
 using IResourceService = SBS.Application.Interfaces.IServices.IResourceService;
 
 namespace SBS.Application
@@ -22,10 +20,6 @@ namespace SBS.Application
 			services.AddScoped<IBookingService, BookingService>();
 			services.AddScoped<IResourceService, ResourceService>();
 
-			
-
-
-			services.AddScoped(typeof(IAuthService), typeof(AuthService));
 
             return services;
 		}
