@@ -52,47 +52,8 @@ export class AuthService {
       }
     );
   }
+  
 
-  private isLoggedInSubject = new BehaviorSubject<boolean>(false);
-
-  public isLoggedIn$ = this.isLoggedInSubject.asObservable();
-
-  constructor(private http: HttpClient, private jwtHelper: JwtHelperService) {
-    const token = localStorage.getItem('token');
-    if (token && !this.jwtHelper.isTokenExpired(token)) {
-      this.isLoggedInSubject.next(true);
-    } else {
-      this.isLoggedInSubject.next(false);
-    }
-  }
-
-  login(data: LoginRequest): Observable<ApiResponse> {
-    return this.http
-      .post<ApiResponse<AuthResponse>>(`${this.baseUrl}/login`, data, {
-        withCredentials: true,
-      })
-      .pipe(
-        map((response: ApiResponse<AuthResponse>) => {
-          if (response.success && response.data && response.data.token) {
-            localStorage.setItem('token', response.data.token);
-            this.isLoggedInSubject.next(true);
-          } else {
-            this.isLoggedInSubject.next(false);
-          }
-          return response;
-        })
-      );
-  }
-
-  register(data: RegisterRequest): Observable<ApiResponse<AuthResponse>> {
-    return this.http.post<ApiResponse<AuthResponse>>(
-      `${this.baseUrl}/register`,
-      data,
-      {
-        withCredentials: true,
-      }
-    );
-  }
 
   isAdmin() {
     const token = localStorage.getItem('token');

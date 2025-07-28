@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SBS.Application.Interfaces;
 using SBS.Application.Interfaces.Initializers;
+using SBS.Application.Interfaces.IRepositories;
 using SBS.Application.Interfaces.IServices;
 using SBS.Application.Interfaces.IRepositories;
 using SBS.Application.Services.Auth;
@@ -32,8 +34,13 @@ namespace SBS.Infrastructure
 
 
 
-			// Register the IDbInitializer implementation
-			services.AddScoped<IDbInitializer, DbInitializer>();
+            #region Register IDbInitializer
+            services.AddScoped<IDbInitializer, DbInitializer>();
+            #endregion
+
+            #region Register Repositories
+            services.AddScoped<IResourceRepository,ResourceRepository>();
+            #endregion
 
 
 
@@ -49,6 +56,9 @@ namespace SBS.Infrastructure
 
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             #endregion
+
+			services.AddScoped<IUnitOfWork, UnitOfWork>();
+			services.AddScoped<IBookingConflictValidator, BookingConflictValidator>();
 
             //services.AddScoped<IDbInitializer, DbInitializer>(); 
 

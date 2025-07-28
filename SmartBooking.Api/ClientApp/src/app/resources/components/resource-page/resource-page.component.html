@@ -1,0 +1,51 @@
+<div class="resource-details-card">
+  <h2>{{ resource.name }}</h2>
+  <p>
+    <strong>Type:</strong> {{ resource.typeId === 1 ? "Meeting Room" : "Desk" }}
+  </p>
+  <p><strong>Capacity:</strong> {{ resource.capacity }}</p>
+  <p>
+    <strong>Status:</strong> {{ resource.isActive ? "Active" : "Inactive" }}
+  </p>
+  <p><strong>Opens at:</strong> {{ resource.openAt }}</p>
+  <p><strong>Closes at:</strong> {{ resource.closeAt }}</p>
+
+  <div class="resource-booking-container">
+    <h2>Booking for {{ resource.name }}</h2>
+    <p>
+      <strong>Available Time:</strong> {{ resource.openAt }} -
+      {{ resource.closeAt }}
+    </p>
+
+    <div class="slots-row">
+      <div
+        *ngFor="let slot of slots; let i = index"
+        class="slot-box"
+        [class.inactive]="!slot.isActive"
+        [class.booked]="slot.isBooked && slot.isActive"
+        [class.selected]="selectedSlots.includes(slot)"
+        (click)="onSlotClick(slot)"
+        [title]="slot.isBooked ? 'This slot is already reserved' : 'Click to select this slot'"
+      >
+        <div *ngIf="!slot.isBooked">
+          Slot {{ i + 1 }}<br />
+          {{ slot.startTime }} - {{ slot.endTime }}
+        </div>
+        <div *ngIf="slot.isBooked" class="booked-slot-content">
+          {{ slot.startTime }} - {{ slot.endTime }}<br />
+          <small>RESERVED</small>
+        </div>
+      </div>
+    </div>
+
+    <button
+      mat-raised-button
+      color="primary"
+      class="book-button"
+      (click)="checkout()"
+      [disabled]="selectedSlots.length === 0"
+    >
+      {{ selectedSlots.length === 0 ? 'Select Slots to Book' : 'Book ' + selectedSlots.length + ' Slot(s)' }}
+    </button>
+  </div>
+</div>
