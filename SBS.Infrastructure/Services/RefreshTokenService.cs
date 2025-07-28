@@ -15,7 +15,7 @@ using System.Security.Claims;
 
 namespace SBS.Infrastructure.Services
 {
-    public class RefreshTokenService : IRefreshTokenService, IActionResult
+    public class RefreshTokenService : IRefreshTokenService, IActionResult //TODO: remove IActionResult
     {
         private readonly IRefreshTokenRepository _refreshTokenRepository;
 
@@ -50,6 +50,7 @@ namespace SBS.Infrastructure.Services
            return await _refreshTokenRepository.RefreshExpiredToken(token);
         }
 
+        //TODO: remove this
         public Task ExecuteResultAsync(ActionContext context)
         {
             throw new NotImplementedException();

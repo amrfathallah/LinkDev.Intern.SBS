@@ -130,7 +130,7 @@ namespace SBS.Infrastructure.Repositories
         }
 
         public async Task<ApiResponse<AuthResponseDto>> RefreshExpiredToken(TokenDTO token)
-        {
+        { 
             try
             {
                 // Step 1: Extract claims from exp. Access token
@@ -210,6 +210,7 @@ namespace SBS.Infrastructure.Repositories
             }
         }
 
+        //TODO: remove this
         public Task ExecuteResultAsync(ActionContext context)
         {
             throw new NotImplementedException();
