@@ -3,35 +3,33 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using SBS.Application;
+
 using SBS.Application.Interfaces.Common;
-using SBS.Application.Interfaces.Initializers;
 using SBS.Application.Settings;
 using SBS.Domain.Entities;
 using SBS.Infrastructure;
 using SBS.Infrastructure.CurrentUserService;
 using SBS.Infrastructure.Persistence._Data;
-using SBS.Infrastructure.Persistence.Initializers;
 using SmartBooking.Api.Extensions;
 using System.Text;
 
 var webApplicationBuilder = WebApplication.CreateBuilder(args);
 
-//// Get allowed origins from configuration
-//var allowedOrigins = webApplicationBuilder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+// Get allowed origins from configuration
+var allowedOrigins = webApplicationBuilder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
 
-// Add CORS
-//webApplicationBuilder.Services.AddCors(options =>
-//{
-//	options.AddPolicy("AllowAngularApp",
-//		policy =>
-//		{
-//			policy.WithOrigins(allowedOrigins!) // frontend URL
-//				  .AllowAnyHeader()
-//				  .AllowAnyMethod()
-//				  .AllowCredentials();
-//		});
-//});
+//Add CORS
+webApplicationBuilder.Services.AddCors(options =>
+{
+	options.AddPolicy("AllowAngularApp",
+       policy =>
+		{
+			policy.WithOrigins(allowedOrigins!) // frontend URL
+				  .AllowAnyHeader()
+				  .AllowAnyMethod()
+				  .AllowCredentials();
+		});
+});
 
 // Configure JWTSettings
 webApplicationBuilder.Services.Configure<JWTSettings>(
@@ -79,7 +77,7 @@ webApplicationBuilder.Services.AddAuthorization();
 webApplicationBuilder.Services.AddHttpContextAccessor();
 webApplicationBuilder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
-
+webApplicationBuilder.Services.AddHttpContextAccessor();
 
 // Add Controllers and Swagger
 webApplicationBuilder.Services.AddControllersWithViews();
@@ -131,8 +129,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-//// Use CORS
-//app.UseCors("AllowAngularApp");
+// Use CORS
+app.UseCors("AllowAngularApp");
 
 // Enable Authentication & Authorization Middleware
 app.UseAuthentication();

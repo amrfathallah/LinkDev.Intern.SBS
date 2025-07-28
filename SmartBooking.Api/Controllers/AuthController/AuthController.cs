@@ -72,7 +72,13 @@ namespace SmartBooking.Api.Controllers.AuthController
         [Authorize]
         public async Task<ActionResult<AuthResponseDto>> GetCurrentUser()
         {
-            //var result = await _authService.GetCurrentUser(User);
+            return Ok(User?.Identity?.Name);
+        }
+
+        [HttpGet("me2")] // GET: /api/auth/me
+        [AllowAnonymous]
+        public async Task<ActionResult<AuthResponseDto>> GetCurrentUser2()
+        {
             return Ok(User?.Identity?.Name);
         }
     }
