@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SBS.Application.DTOs.Auth;
+using SBS.Application.DTOs.Common;
 using SBS.Domain.Entities;
 using System;
 using System.Collections.Generic;

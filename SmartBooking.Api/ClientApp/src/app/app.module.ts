@@ -23,21 +23,6 @@ export function tokenGetter() {
   return localStorage.getItem('token');
 }
 
-import { AuthModule } from './auth/auth.module';
-import { AuthRoutingModule } from './auth/auth-routing.module';
-import { AppRoutingModule } from './app-routing.module';
-import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
-import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
-
-import { JwtModule } from '@auth0/angular-jwt';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { environment } from '../environments/environment';
-
-export function tokenGetter() {
-  return localStorage.getItem('token');
-}
-
 @NgModule({
   declarations: [
     AppComponent,
