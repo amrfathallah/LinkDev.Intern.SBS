@@ -17,11 +17,11 @@ var webApplicationBuilder = WebApplication.CreateBuilder(args);
 // Get allowed origins from configuration
 var allowedOrigins = webApplicationBuilder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
 
-// Add CORS
+//Add CORS
 webApplicationBuilder.Services.AddCors(options =>
 {
 	options.AddPolicy("AllowAngularApp",
-		policy =>
+       policy =>
 		{
 			policy.WithOrigins(allowedOrigins!) // frontend URL
 				  .AllowAnyHeader()
@@ -40,7 +40,7 @@ var jwtSettings = webApplicationBuilder.Configuration
 
 // Add Infrastructure and Application Services
 webApplicationBuilder.Services.AddInfrastructureServices(webApplicationBuilder.Configuration);
-webApplicationBuilder.Services.AddApplicationServices(webApplicationBuilder.Configuration);
+webApplicationBuilder.Services.AddApplicationDependencies(webApplicationBuilder.Configuration);
 
 // Add Identity services (only once)
 webApplicationBuilder.Services
@@ -76,14 +76,14 @@ webApplicationBuilder.Services.AddAuthorization();
 webApplicationBuilder.Services.AddHttpContextAccessor();
 webApplicationBuilder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
-
+webApplicationBuilder.Services.AddHttpContextAccessor();
 
 // Add Controllers and Swagger
 webApplicationBuilder.Services.AddControllersWithViews();
 webApplicationBuilder.Services.AddEndpointsApiExplorer();
 webApplicationBuilder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "SMO API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "SmartBoking API", Version = "v1" });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {

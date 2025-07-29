@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SBS.Infrastructure.Repositories
 {
-	internal abstract class GenericRepository<T> : IRepository<T> where T : class
+	public abstract class GenericRepository<T> : IRepository<T> where T : class
 	{
 		private readonly AppDbContext _appDbContext;
 
@@ -42,7 +42,11 @@ namespace SBS.Infrastructure.Repositories
             return Task.CompletedTask;
         }
 
-
+		public virtual Task DeleteAsync(T instance)
+		{
+			_appDbContext.Set<T>().Remove(instance);
+			return Task.CompletedTask;
+		}
 
     }
 }

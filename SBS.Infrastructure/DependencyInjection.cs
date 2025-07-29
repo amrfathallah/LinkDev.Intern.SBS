@@ -5,6 +5,7 @@ using SBS.Application.Interfaces;
 using SBS.Application.Interfaces.Initializers;
 using SBS.Application.Interfaces.IRepositories;
 using SBS.Application.Interfaces.IServices;
+using SBS.Application.Interfaces.IRepositories;
 using SBS.Application.Services.Auth;
 using SBS.Infrastructure.Persistence._Data;
 using SBS.Infrastructure.Persistence._Data.Interceptors;
@@ -52,11 +53,12 @@ namespace SBS.Infrastructure
 			services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
             services.AddScoped<IAuthService, AuthService>();
+
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             #endregion
 
-            #region Register UnitOfWork
-            services.AddScoped<IUnitOfWork,UnitOfWork>();
-            #endregion
+			services.AddScoped<IUnitOfWork, UnitOfWork>();
+			services.AddScoped<IBookingConflictValidator, BookingConflictValidator>();
 
             //services.AddScoped<IDbInitializer, DbInitializer>(); 
 
