@@ -10,43 +10,39 @@ using SBS.Application.Interfaces.IRepositories;
 
 namespace SBS.Infrastructure
 {
-    internal class UnitOfWork : IUnitOfWork
+    internal class UnitOfWork(AppDbContext appDbContext) : IUnitOfWork
 	{
-		private readonly AppDbContext _appDbContext;
-
-		public IBookingRepository Bookings { get; }
-		public IBookingSlotRepository BookingSlotRepository { get; }
-		public ISlotRepository SlotRepository { get; }
-		public IResourceRepository Resources { get; }
+		private IBookingRepository? _bookings;
+		private IBookingSlotRepository? _bookingSlots;
+		private ISlotRepository? _slotRepository;
+		private IResourceRepository? _resourceRepository;
 
 
-		public UnitOfWork(AppDbContext appDbContext)
-		{
-			_appDbContext = appDbContext;
-			Bookings = new BookingRepository(_appDbContext);
-			BookingSlotRepository = new BookingSlotRepository(_appDbContext);
-			SlotRepository = new SlotRepository(_appDbContext);
-			Resources = new ResourceRepository(_appDbContext);
-		}
+		public IBookingRepository Bookings => _bookings ??= new BookingRepository(appDbContext);
+		public IBookingSlotRepository BookingSlotRepository => _bookingSlots ??= new BookingSlotRepository(appDbContext);
+
+		public IResourceRepository Resources => _resourceRepository ??= new ResourceRepository(appDbContext);
+
+		public ISlotRepository SlotRepository => _slotRepository ??= new SlotRepository(appDbContext);
 
 		public async Task BeginTransactionAsync()
 		{
-			await _appDbContext.Database.BeginTransactionAsync();
+			await appDbContext.Database.BeginTransactionAsync();
 		}
 
 		public async Task<int> CommitAsync()
 		{
-			return await _appDbContext.SaveChangesAsync();
+			return await appDbContext.SaveChangesAsync();
 		}
 
 		public async Task CommitTransactionAsync()
 		{
-			await _appDbContext.Database.CommitTransactionAsync();
+			await appDbContext.Database.CommitTransactionAsync();
 		}
 
 		public async Task RollBackTransactionAsync()
 		{
-			await _appDbContext.Database.RollbackTransactionAsync();
+			await appDbContext.Database.RollbackTransactionAsync();
 		}
 	}
 }

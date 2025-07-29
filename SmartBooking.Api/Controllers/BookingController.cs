@@ -52,5 +52,21 @@ namespace SmartBooking.Api.Controllers
 			
 		}
 
+
+		[HttpGet("allBooking")]
+		public async Task<IActionResult> GetAllBookings([FromQuery] ViewBookingsParams ViewBookingquery)
+		{
+			try
+			{
+
+				var result = await _bookingService.GetAllBookingsAsync(ViewBookingquery);
+				return Ok(result);
+			}
+			catch (Exception)
+			{
+
+				return StatusCode(500, "An error occurred while fetching bookings.");
+			}
+		}
 	}
 }

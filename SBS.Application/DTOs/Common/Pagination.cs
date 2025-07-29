@@ -15,7 +15,7 @@ namespace SBS.Application.DTOs.Common
 			Count = count;
 		}
 
-		public required IEnumerable<T> Items { get; set; }
+		public required IEnumerable<T> Data { get; set; }
 		public int PageIndex { get; set; }
 		public int PageSize { get; set; }
 		public int Count { get; set; }

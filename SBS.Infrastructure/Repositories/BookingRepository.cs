@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace SBS.Infrastructure.Repositories
 {
-    internal class BookingRepository : GenericRepository<Booking>, IBookingRepository
+	internal class BookingRepository : GenericRepository<Booking>, IBookingRepository
 	{
 		private readonly AppDbContext _appDbContext;
 
@@ -20,11 +20,19 @@ namespace SBS.Infrastructure.Repositories
 			_appDbContext = appDbContext;
 		}
 
-		
 
 		public async Task<bool> HasBookingsForResourceAsync(Guid resourceId)
 		{
 			return await _appDbContext.Bookings.AnyAsync(b => b.ResourceId == resourceId);
 		}
+		public IQueryable<Booking> GetAllBookingWithIncludes()
+		{
+			return _appDbContext.Bookings
+				.Include(b => b.User)
+				.Include(b => b.Resource).ThenInclude(r => r!.Type)
+				.Include(b => b.BookingSlots).ThenInclude(b => b.Slot);
+		}
+
+		
 	}
 }

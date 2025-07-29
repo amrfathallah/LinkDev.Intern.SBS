@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SBS.Application.Services;
 
 namespace SBS.Infrastructure
 {
@@ -55,7 +56,12 @@ namespace SBS.Infrastructure
             services.AddScoped<IAuthService, AuthService>();
 
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-            #endregion
+			#endregion
+
+
+			// Register Application Services
+			services.AddScoped<IBookingService, BookingService>();
+
 
 			services.AddScoped<IUnitOfWork, UnitOfWork>();
 			services.AddScoped<IBookingConflictValidator, BookingConflictValidator>();

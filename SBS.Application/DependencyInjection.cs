@@ -17,7 +17,6 @@ namespace SBS.Application
 		public static IServiceCollection AddApplicationDependencies(this IServiceCollection services, IConfiguration configuration)
 		{
 			services.AddAutoMapper(Mapper => Mapper.AddProfile(new MappingProfile()));
-			services.AddScoped<IBookingService, BookingService>();
 			services.AddScoped<IResourceService, ResourceService>();
 
 

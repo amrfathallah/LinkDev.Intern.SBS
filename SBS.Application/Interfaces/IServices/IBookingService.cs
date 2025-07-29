@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SBS.Domain.Entities;
 using SBS.Application.DTOs.BookingDto;
+using SBS.Application.DTOs.Common;
 
 namespace SBS.Application.Interfaces.IServices
 {
@@ -12,7 +13,7 @@ namespace SBS.Application.Interfaces.IServices
     {
         public Task<bool> BookAsync(BookingRequestDto requestDto, Guid userId, string createdBy);
 
-		Task<IEnumerable<BookingDto>> GetAllBookingsAsync();
+		public Task<Pagination<ViewAllBookingDto>> GetAllBookingsAsync( ViewBookingsParams viewBookingsParams );
 
 	}
 }
