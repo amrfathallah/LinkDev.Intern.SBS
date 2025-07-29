@@ -11,5 +11,8 @@ namespace SBS.Application.Interfaces.IServices
     public interface IBookingService
     {
         public Task<bool> BookAsync(BookingRequestDto requestDto, Guid userId, string createdBy);
-    }
+
+		Task<IEnumerable<BookingDto>> GetAllBookingsAsync();
+
+	}
 }
