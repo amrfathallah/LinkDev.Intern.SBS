@@ -143,5 +143,31 @@ namespace SBS.Application.Services
                 BookedSlots = bookedSlots
             };
         }
+
+        public async Task<List<ResourceDto>> GetAvailableResourcesAsync(DateOnly date)
+        {
+            var resources = await _unitOfWork.Resources.GetAllAsync();
+            var filteredResources = resources.Where(r => r.IsActive && !r.IsDeleted).ToList();
+
+            var allSlots = await _unitOfWork.SlotRepository.GetAllAsync();
+            var availableResources = new List<ResourceDto>();
+
+            foreach (var resource in filteredResources)
+            {
+                var resourceWithBookings = await _unitOfWork.Resources.GetResourceWithBookedSlotsAsync(resource.Id, date);
+                var bookedSlotIds = resourceWithBookings?.Bookings
+                    .SelectMany(b => b.BookingSlots)
+                    .Where(bs => bs.Slot != null)
+                    .Select(bs => bs.SlotId)
+                    .ToHashSet() ?? new HashSet<int>();
+
+                if (allSlots.Any(slot => !bookedSlotIds.Contains(slot.Id)))
+                {
+                    availableResources.Add(_mapper.Map<ResourceDto>(resource));
+                }
+            }
+
+            return availableResources;
+        }
     }
 }

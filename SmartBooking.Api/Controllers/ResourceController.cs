@@ -89,5 +89,12 @@ namespace SmartBooking.Api.Controllers
                 return NotFound();
             return Ok(result);
         }
+
+        [HttpGet("available")]
+        public async Task<IActionResult> GetAvailable([FromQuery] DateOnly date)
+        {
+            var resources = await _resourceService.GetAvailableResourcesAsync(date);
+            return Ok(resources);
+        }
     }
 } 
