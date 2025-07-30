@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using SBS.Application.DTOs.Auth;
+using SBS.Application.DTOs.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;

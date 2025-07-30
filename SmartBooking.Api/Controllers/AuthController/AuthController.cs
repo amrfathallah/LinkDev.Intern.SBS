@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using SBS.Application.DTOs.Auth;
+using SBS.Application.DTOs.Common;
 using SBS.Application.Interfaces.IServices;
 using SBS.Domain.Entities;
 using SmartBooking.Api.Controllers._Base;

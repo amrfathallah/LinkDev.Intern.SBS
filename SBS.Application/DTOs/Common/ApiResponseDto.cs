@@ -4,12 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SBS.Application.DTOs.Auth
+namespace SBS.Application.DTOs.Common
 {
-    public class ApiResponse<T>
+    public class ApiResponse
     {
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;
+    }
+    public class ApiResponse<T> : ApiResponse
+    {
         public T? Data { get; set; }
     }
 }
