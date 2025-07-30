@@ -10,5 +10,8 @@ namespace SBS.Application.Interfaces.IRepositories
     public interface IBookingRepository : IRepository<Booking>
     {
         Task<bool> HasBookingsForResourceAsync(Guid resourceId);
+        Task<IEnumerable<Booking>> GetBookingsByUserAsync(Guid userId);
+
+        Task<bool> CancelBookingAsync(Guid bookingId);
 	}
 }

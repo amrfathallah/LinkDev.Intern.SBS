@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace SBS.Infrastructure.Repositories
 {
-    internal class BookingRepository : GenericRepository<Booking>, IBookingRepository
+	internal class BookingRepository : GenericRepository<Booking>, IBookingRepository
 	{
 		private readonly AppDbContext _appDbContext;
 
@@ -20,11 +20,35 @@ namespace SBS.Infrastructure.Repositories
 			_appDbContext = appDbContext;
 		}
 
-		
+		public async Task<bool> CancelBookingAsync(Guid bookingId)
+		{
+			var booking = await _appDbContext.Bookings.FindAsync(bookingId);
+			if (booking == null)
+			{
+				throw new Exception("Booking not found");
+			}
+			if (booking.IsDeleted)
+			{
+				throw new Exception("Booking is already deleted");
+			}
+			booking.IsDeleted = true;
+			return true;
+		}
+
+		public async Task<IEnumerable<Booking>> GetBookingsByUserAsync(Guid userId)
+		{
+			return await _appDbContext.Bookings
+				.Include(b => b.BookingSlots)
+					.ThenInclude(bs => bs.Slot)
+				.Where(b => b.UserId == userId)
+				.Where(b => !b.IsDeleted)
+				.ToListAsync();
+		}
 
 		public async Task<bool> HasBookingsForResourceAsync(Guid resourceId)
 		{
 			return await _appDbContext.Bookings.AnyAsync(b => b.ResourceId == resourceId);
 		}
+
 	}
 }

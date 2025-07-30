@@ -77,10 +77,68 @@ namespace SBS.Application.Services
             await _unitOfWork.CommitTransactionAsync();
 
             return true;
+        }
 
+        public async Task<bool> CancelBookingAsync(Guid bookingId, Guid userId)
+        {
+            var booking = await _unitOfWork.Bookings.GetByIdAsync(bookingId);
+            if (booking == null)
+            {
+                throw new Exception("Booking not found");
+            }
+            if (booking.UserId != userId)
+            {
+                throw new Exception("You can only cancel your own bookings");
+            }
+            if (booking.CreatedAt.AddMinutes(30) < DateTime.UtcNow)
+            {
+                throw new Exception("You can only cancel bookings within 30 minutes of creation");
+            }
+            var result = await _unitOfWork.Bookings.CancelBookingAsync(bookingId);
+            await _unitOfWork.CommitAsync();
+            return result;
+        }
 
-
-
+        public async Task<List<MyBookingDto>> GetBookingsByUserAsync(Guid userId)
+        {
+            var bookings = await _unitOfWork.Bookings.GetBookingsByUserAsync(userId);
+            return bookings.Select(booking => new MyBookingDto(
+                booking.Id,
+                booking.ResourceId,
+                booking.Date,
+                GetBookingStatus(booking),
+                GetSlotTimeRange(booking.BookingSlots).Item1,
+                GetSlotTimeRange(booking.BookingSlots).Item2
+            )).ToList();
+        }
+        private BookingStatusEnum GetBookingStatus(Booking booking)
+        {
+            var TimeRange = GetSlotTimeRange(booking.BookingSlots);
+            if (booking.Date.Day.Equals(DateTime.Today.Day))
+            {
+                var currentTime = DateTime.Now.TimeOfDay;
+                BookingStatusEnum status;
+                if (currentTime < TimeRange.Item1)
+                {
+                    status = BookingStatusEnum.Upcoming;
+                }
+                else if (currentTime >= TimeRange.Item1 && currentTime <= TimeRange.Item2)
+                {
+                    status = BookingStatusEnum.Happening;
+                }
+                else
+                {
+                    status = BookingStatusEnum.Finished;
+                }
+                return status;
+            }
+            return DateOnly.FromDateTime(DateTime.Now) > booking.Date? BookingStatusEnum.Finished : BookingStatusEnum.Upcoming;
+        }
+        private Tuple<TimeSpan, TimeSpan> GetSlotTimeRange(IEnumerable<BookingSlot> bookingSlots)
+        {
+            var startTime = bookingSlots.Min(bs => bs.Slot.StartTime);
+            var endTime = bookingSlots.Max(bs => bs.Slot.EndTime);
+            return Tuple.Create(startTime, endTime);
         }
     }
 }
