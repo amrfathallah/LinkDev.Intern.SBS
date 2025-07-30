@@ -6,6 +6,9 @@ import { GetResourceDto } from "../models/dtos/get-resources.dto";
 import { ResourceBookedSlotsDto } from "../models/dtos/resource-booked-slots.dto";
 import { GetBookedSlotsRequestDto } from "../models/dtos/get-booked-slots-request.dto";
 import { BookingRequestDto } from "../models/dtos/booking-request.dto";
+import { ApiResponse } from "src/app/shared/models/api-response.model";
+import { SlotDto } from "../models/dtos/slot.dto";
+import { map, Observable } from "rxjs";
 
 @Injectable({
   providedIn: "root",
@@ -29,6 +32,11 @@ export class ResourceService {
       `${environment.apiBaseUrl}/Resource/booked-slots`,
       request,
       { headers }
+    ).pipe(
+      map(response => {
+        console.log('Booked slots fetched:', response);
+        return response;
+      })
     );
   }
   getResources() {
@@ -49,10 +57,15 @@ export class ResourceService {
 
     console.log('Booking request payload:', JSON.stringify(bookingData, null, 2)); // Debug log
 
-    return this._httpClient.post<any>(
+    return this._httpClient.post<ApiResponse<any>>(
       `${environment.apiBaseUrl}/Booking/book`,
       bookingData,
       { headers }
+    );
+  }
+  getSlots():Observable<ApiResponse<SlotDto[]>> {
+    return this._httpClient.get<ApiResponse<SlotDto[]>>(
+      `${environment.apiBaseUrl}/Slot/getAll`
     );
   }
 }

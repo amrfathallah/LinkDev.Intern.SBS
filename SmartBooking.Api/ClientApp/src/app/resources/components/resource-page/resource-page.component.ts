@@ -2,10 +2,12 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { GetResourceDto } from '../../models/dtos/get-resources.dto';
 import { ActivatedRoute, Route } from '@angular/router';
-import { SlotDto } from '../../models/dtos/slot.dto';
+import { SlotDto, ComponentSlotDto } from '../../models/dtos/slot.dto';
 import { ResourceService } from '../../services/resource-service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BookingRequestDto } from '../../models/dtos/booking-request.dto';
+// Interface for component's internal slot representation
+
 
 @Component({
   selector: 'app-resource-booking',
@@ -18,8 +20,9 @@ export class ResourceDetailsComponent implements OnInit {
 
   id!: string;
   timeSlots: string[] = [];
-  slots: SlotDto[] = [];
-  selectedSlots: SlotDto[] = [];
+  slots: ComponentSlotDto[] = [];
+  allSlots: SlotDto[] = [];
+  selectedSlots: ComponentSlotDto[] = [];
   selectedDate!: Date;
 
   constructor(
@@ -34,100 +37,93 @@ export class ResourceDetailsComponent implements OnInit {
     this.id = this.router.snapshot.paramMap.get('id')!;
     if (this.id) {
       this.resourceService.getResourceById(this.id).subscribe({
-        next: (data) => (this.resource = data,this.loadSlots()),
+        next: (response) => {
+          this.resource = response;
+          this.loadSlots();
+        },
         error: (err) => console.error('Failed to fetch resource', err),
       });
     }
   }
 
   loadSlots(): void {
-    // Format date as YYYY-MM-DD for the API
     const date = this.selectedDate.toISOString().split('T')[0];
 
+    this.resourceService.getSlots().subscribe({
+      next: (slotsResponse) => {
+        this.allSlots = slotsResponse.data || [];
+        this.resourceService.getBookedSlots(this.id, date).subscribe({
+          next: (bookedResponse) => {
+            const bookedSlots: SlotDto[] = bookedResponse.bookedSlots.map((slot) => ({
+              id: slot.slotId.toString(),
+              startTime: slot.startTime.substring(0, 5),
+              endTime: slot.endTime.substring(0, 5),
+            }));
 
-    this.resourceService.getBookedSlots(this.id, date).subscribe({
-      next: (response) => {
-        const bookedSlots: SlotDto[] = response.bookedSlots.map((slot) => ({
-          id: slot.slotId.toString(),
-          startTime: slot.startTime.substring(0, 5),
-          endTime: slot.endTime.substring(0, 5),
-          isActive: true,
-          isBooked: true,
-        }));
-
-        this.generateTimeSlots(
-          this.resource.openAt,
-          this.resource.closeAt,
-          bookedSlots
-        );
+            this.filterSlotsForResource(bookedSlots);
+          },
+          error: (err) => {
+            console.error('Failed to load booked slots:', err);
+            console.error('Error details:', err.error);
+            this.snackBar.open('Failed to load booked slots. Showing all slots as available.', 'Close', {
+              duration: 4000,
+              panelClass: ['error-snackbar'],
+              horizontalPosition: 'right',
+              verticalPosition: 'top'
+            });
+            this.filterSlotsForResource([]);
+          },
+        });
       },
       error: (err) => {
-        console.error('Failed to load booked slots:', err);
-        console.error('Error details:', err.error);
-        this.snackBar.open('Failed to load booked slots. Showing all slots as available.', 'Close', {
+        console.error('Failed to load slots:', err);
+        this.snackBar.open('Failed to load available slots.', 'Close', {
           duration: 4000,
           panelClass: ['error-snackbar'],
           horizontalPosition: 'right',
           verticalPosition: 'top'
         });
-        this.generateTimeSlots(this.resource.openAt, this.resource.closeAt, []);
-      },
+      }
     });
   }
 
-  generateTimeSlots(start: string, end: string, bookedSlots: SlotDto[]): void {
+  filterSlotsForResource(bookedSlots: SlotDto[]): void {
     this.slots = []; // reset
 
-    const [startHours, startMinutes] = start.split(':').map(Number);
-    const [endHours, endMinutes] = end.split(':').map(Number);
+    const [openHours, openMinutes] = this.resource.openAt.split(':').map(Number);
+    const [closeHours, closeMinutes] = this.resource.closeAt.split(':').map(Number);
 
-    let current = new Date();
-    current.setHours(startHours, startMinutes, 0, 0);
+    const openTime = new Date();
+    openTime.setHours(openHours, openMinutes, 0, 0);
 
-    const endTime = new Date();
-    endTime.setHours(endHours, endMinutes, 0, 0);
+    const closeTime = new Date();
+    closeTime.setHours(closeHours, closeMinutes, 0, 0);
 
-    let idCounter = 1;
+    this.slots = this.allSlots
+      .filter(slot => {
+        const [slotHours, slotMinutes] = slot.startTime.split(':').map(Number);
+        const slotTime = new Date();
+        slotTime.setHours(slotHours, slotMinutes, 0, 0);
+        return slotTime >= openTime && slotTime < closeTime;
+      })
+      .map(slot => {
+        const isBooked = bookedSlots.some(bookedSlot =>
+          bookedSlot.startTime === slot.startTime.substring(0, 5)
+        );
 
-    while (current < endTime) {
-      const slotStartStr = current.toTimeString().substring(0, 5);
-
-      const slotEnd = new Date(current.getTime());
-      slotEnd.setMinutes(slotEnd.getMinutes() + 60);
-      const slotEndStr = slotEnd.toTimeString().substring(0, 5);
-
-      const isBooked = bookedSlots.some(
-        (slot) => {
-          const bookedSlotTime = slot.startTime.substring(0, 5); // Remove seconds if present
-          return bookedSlotTime === slotStartStr;
-        }
-      );
-
-      this.slots.push({
-        id: idCounter.toString(),
-        startTime: slotStartStr,
-        endTime: slotEndStr,
-        isActive: true,
-        isBooked: isBooked,
+        return {
+          id: slot.id,
+          startTime: slot.startTime.substring(0, 5), // Format as HH:MM
+          endTime: slot.endTime.substring(0, 5), // Format as HH:MM
+          isActive: true,
+          isBooked: isBooked,
+        } as ComponentSlotDto;
       });
 
-      current.setMinutes(current.getMinutes() + 60);
-      idCounter++;
-    }
+    console.log(`Filtered ${this.slots.length} slots for resource operating hours ${this.resource.openAt} - ${this.resource.closeAt}`);
   }
 
-  /*getSlotEndTime(startTime: string): string {
-    const [hours, minutes] = startTime.split(':').map(Number);
-    const start = new Date();
-    start.setHours(hours, minutes, 0, 0);
-    start.setMinutes(start.getMinutes() + 30);
-
-    const endHours = start.getHours().toString().padStart(2, '0');
-    const endMinutes = start.getMinutes().toString().padStart(2, '0');
-    return `${endHours}:${endMinutes}`;
-  }*/
-
-  onSlotClick(slot: SlotDto): void {
+  onSlotClick(slot: ComponentSlotDto): void {
     if (!this.resource.isActive || !slot.isActive) {
       this.snackBar.open('This resource is not available', 'Close', {
         duration: 3000,
@@ -205,11 +201,18 @@ export class ResourceDetailsComponent implements OnInit {
   }
 
   getSlotIdFromTime(timeStr: string): number {
+    const matchingSlot = this.allSlots.find(slot =>
+      slot.startTime.substring(0, 5) === timeStr
+    );
+
+    if (matchingSlot) {
+      return parseInt(matchingSlot.id);
+    }
+
     const [hours, minutes] = timeStr.split(':').map(Number);
-    const slotStartHour = 9; // 9:00 AM
+    const slotStartHour = 9;
     const slotStartMinute = 0;
 
-    // Calculate total minutes from start time
     const totalMinutes = (hours * 60 + minutes) - (slotStartHour * 60 + slotStartMinute);
 
     // Each slot is 60 minutes, so slot ID = (totalMinutes / 60) + 1

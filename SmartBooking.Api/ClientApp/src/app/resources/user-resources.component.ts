@@ -3,6 +3,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { GetResourceDto } from './models/dtos/get-resources.dto';
 import { Router } from '@angular/router';
 import { ResourceService } from './services/resource-service';
+import { ApiResponse } from '../shared/models/api-response.model';
 
 export interface Resource {
   id: number;
@@ -104,11 +105,5 @@ export class UserResourcesComponent implements OnInit {
       return 'warn';
     }
     return 'accent';
-  }
-
-  getUtilizationColor(rate: number): string {
-    if (rate >= 70) return 'warn';
-    if (rate >= 40) return 'accent';
-    return 'primary';
   }
 }
