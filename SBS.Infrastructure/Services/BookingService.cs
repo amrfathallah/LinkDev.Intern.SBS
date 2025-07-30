@@ -14,76 +14,76 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SBS.Application.Services
 {
-	public class BookingService : IBookingService
-	{
-		private readonly IUnitOfWork _unitOfWork;
-		private readonly IBookingConflictValidator _conflictValidator;
+    public class BookingService : IBookingService
+    {
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IBookingConflictValidator _conflictValidator;
 		private readonly IMapper _mapper;
 
 		public BookingService(IUnitOfWork unitOfWork, IBookingConflictValidator bookingConflictValidator, IMapper mapper)
-		{
-			_unitOfWork = unitOfWork;
-			_conflictValidator = bookingConflictValidator;
+        {
+            _unitOfWork = unitOfWork;
+            _conflictValidator = bookingConflictValidator;
 			_mapper = mapper;
-		}
+        }
 
-		public async Task<bool> BookAsync(BookingRequestDto requestDto, Guid userId, string createdBy)
-		{
-			await _unitOfWork.BeginTransactionAsync();
+        public async Task<bool> BookAsync(BookingRequestDto requestDto, Guid userId, string createdBy)
+        {
+            await _unitOfWork.BeginTransactionAsync();
 
-			//Input Validation
-			if (await _unitOfWork.Resources.GetByIdAsync(requestDto.ResourceId) == null)
-			{
-				throw new Exception("Resource doesn't exist");
-			}
+            //Input Validation
+            if (await _unitOfWork.Resources.GetByIdAsync(requestDto.ResourceId) == null)
+            {
+                throw new Exception("Resource doesn't exist");
+            }
 
-			var slots = await _unitOfWork.SlotRepository.GetByIdsAsync(requestDto.SlotsIds);
-			if (slots.Count != requestDto.SlotsIds.Count)
-			{
-				throw new Exception("Invalid slots are selected");
-			}
+            var slots = await _unitOfWork.SlotRepository.GetByIdsAsync(requestDto.SlotsIds);
+            if (slots.Count != requestDto.SlotsIds.Count)
+            {
+                throw new Exception("Invalid slots are selected");
+            }
 
-			if (requestDto.Date < DateOnly.FromDateTime(DateTime.Today))
-			{
-				throw new Exception("Can't book a resource in the past");
-			}
-
-
-			//Check for booking conflicts
-			if (await _conflictValidator.HasConflictAsync(requestDto.ResourceId, requestDto.Date, requestDto.SlotsIds))
-			{
-				return false;
-			}
+            if (requestDto.Date < DateOnly.FromDateTime(DateTime.Today))
+            {
+                throw new Exception("Can't book a resource in the past");
+            }
 
 
-			//Booking Logic
-			var booking = new Booking
-			{
-				UserId = userId,
-				ResourceId = requestDto.ResourceId,
-				Date = requestDto.Date,
-				StatusId = (int)BookingStatusEnum.Upcoming,
-				CreatedAt = DateTime.UtcNow,
-				CreatedBy = createdBy,
-
-			};
-
-			await _unitOfWork.Bookings.AddAsync(booking);
-			await _unitOfWork.CommitAsync();
-
-			var bookingSlots = requestDto.SlotsIds.Select(slotId => new BookingSlot
-			{
-				SlotId = slotId,
-				BookingId = booking.Id,
-			}).ToList();
+            //Check for booking conflicts
+            if (await _conflictValidator.HasConflictAsync(requestDto.ResourceId, requestDto.Date, requestDto.SlotsIds))
+            {
+                return false;
+            }
 
 
-			await _unitOfWork.BookingSlotRepository.AddRangeAsync(bookingSlots);
-			await _unitOfWork.CommitAsync();
+            //Booking Logic
+            var booking = new Booking
+            {
+                UserId = userId,
+                ResourceId = requestDto.ResourceId,
+                Date = requestDto.Date,
+                StatusId = (int)BookingStatusEnum.Upcoming,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = createdBy,
 
-			await _unitOfWork.CommitTransactionAsync();
+            };
 
-			return true;
+            await _unitOfWork.Bookings.AddAsync(booking);
+            await _unitOfWork.CommitAsync();
+
+            var bookingSlots = requestDto.SlotsIds.Select(slotId => new BookingSlot
+            {
+                SlotId = slotId,
+                BookingId = booking.Id,
+            }).ToList();
+
+
+            await _unitOfWork.BookingSlotRepository.AddRangeAsync(bookingSlots);
+            await _unitOfWork.CommitAsync();
+
+            await _unitOfWork.CommitTransactionAsync();
+
+            return true;
 
 
 
@@ -157,10 +157,10 @@ namespace SBS.Application.Services
 
 			return query.Skip(viewBookingsParams.PageSize * (pageIndex - 1))
 						.Take(viewBookingsParams.PageSize);
-		}
+        }
 
 
-	}
+    }
 
 
 

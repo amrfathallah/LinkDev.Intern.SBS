@@ -33,8 +33,6 @@ namespace SBS.Infrastructure
 			});
 
 
-
-
             #region Register IDbInitializer
             services.AddScoped<IDbInitializer, DbInitializer>();
             #endregion
@@ -42,8 +40,6 @@ namespace SBS.Infrastructure
             #region Register Repositories
             services.AddScoped<IResourceRepository,ResourceRepository>();
             #endregion
-
-
 
 			#region Register Token and Refresh Token
 
@@ -72,7 +68,9 @@ namespace SBS.Infrastructure
             // Register the AuditableEntitySaveChangesInterceptor
             services.AddScoped(typeof(AuditableEntitySaveChangesInterceptor));
 
-			
+            services.AddScoped<IBookingService, BookingService>();
+            services.AddScoped<IResourceService, ResourceService>();
+
 
             return services;
 		}
