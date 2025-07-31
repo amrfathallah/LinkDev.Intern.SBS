@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using SBS.Application.DTOs.Auth;
+using SBS.Application.DTOs.Common;
 using SBS.Application.Interfaces.IRepositories;
 using SBS.Application.Interfaces.IServices;
 using SBS.Application.Settings;

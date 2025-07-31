@@ -56,16 +56,16 @@
     <mat-card
       *ngFor="let resource of filteredResources"
       class="resource-card"
-      [class.room-card]="resource.type === 'room'"
-      [class.desk-card]="resource.type === 'desk'"
+      [class.room-card]="resource.typeId === 1"
+      [class.desk-card]="resource.typeId === 2"
     >
       <!-- Resource Image/Icon -->
       <div class="resource-image">
         <mat-icon
           class="resource-type-icon"
-          [color]="resource.type === 'room' ? 'primary' : 'accent'"
+          [color]="resource.typeId === 1 ? 'primary' : 'accent'"
         >
-          {{ getResourceIcon(resource.type) }}
+          {{ getResourceIcon(resource.typeId === 1 ? 'room' : 'desk') }}
         </mat-icon>
       </div>
 
@@ -74,11 +74,11 @@
         <div class="resource-header" style="padding-top: 10px">
           <h3 class="resource-name">{{ resource.name }}</h3>
           <mat-chip
-            [color]="resource.type === 'room' ? 'primary' : 'accent'"
+            [color]="resource.typeId === 1 ? 'primary' : 'accent'"
             selected
             class="type-chip"
           >
-            {{ resource.type === "room" ? "Meeting Room" : "Desk" }}
+            {{ resource.typeId === 1 ? "Meeting Room" : "Desk" }}
           </mat-chip>
         </div>
 

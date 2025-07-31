@@ -28,14 +28,14 @@ namespace SBS.Infrastructure
 
 			var bookedSlots = await _appDbContext.Slots.Where(Slot => slotIds.Contains(Slot.Id)).ToListAsync();
 
-			foreach (var slot in bookedSlots)
-			{
-				//Assuming there are no update operations
-				if (existingSlots.Any(existing => existing.Slot != null && existing.Slot.StartTime < slot.EndTime && existing.Slot.EndTime > slot.StartTime))
-				{
-					return true;
-				}
-			}
+			// foreach (var slot in bookedSlots)
+			// {
+			// 	//Assuming there are no update operations
+			// 	if (existingSlots.Any(existing => existing.Slot != null && existing.Slot.StartTime < slot.EndTime && existing.Slot.EndTime > slot.StartTime))
+			// 	{
+			// 		return true;
+			// 	}
+			// }
 			return false;
 		}
 	}
