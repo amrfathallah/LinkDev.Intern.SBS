@@ -1,4 +1,4 @@
-using SBS.Application.Interfaces;
+﻿using SBS.Application.Interfaces;
 using SBS.Application.Interfaces.IServices;
 using SBS.Domain.Entities;
 using SBS.Domain.Enums;
@@ -8,6 +8,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SBS.Application.DTOs.BookingDto;
+using SBS.Application.DTOs.Common;
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using SBS.Application.DTOs.ResourceDto;
 
 namespace SBS.Application.Services
 {
@@ -15,11 +19,13 @@ namespace SBS.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IBookingConflictValidator _conflictValidator;
+		private readonly IMapper _mapper;
 
-        public BookingService(IUnitOfWork unitOfWork, IBookingConflictValidator bookingConflictValidator)
+		public BookingService(IUnitOfWork unitOfWork, IBookingConflictValidator bookingConflictValidator, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _conflictValidator = bookingConflictValidator;
+			_mapper = mapper;
         }
 
         public async Task<bool> BookAsync(BookingRequestDto requestDto, Guid userId, string createdBy)
@@ -50,6 +56,7 @@ namespace SBS.Application.Services
                 return false;
             }
 
+
             //Booking Logic
             var booking = new Booking
             {
@@ -71,6 +78,7 @@ namespace SBS.Application.Services
                 BookingId = booking.Id,
             }).ToList();
 
+
             await _unitOfWork.BookingSlotRepository.AddRangeAsync(bookingSlots);
             await _unitOfWork.CommitAsync();
 
@@ -81,6 +89,89 @@ namespace SBS.Application.Services
 
 
 
+		}
+
+		public async Task<Pagination<ViewAllBookingDto>> GetAllBookingsAsync(ViewBookingsParams viewBookingsParams)
+		{
+
+
+			try
+			{
+				var allBookings = _unitOfWork.Bookings.GetAllBookingWithIncludes();
+
+				allBookings = ApplyFilters(allBookings, viewBookingsParams);
+				var totalCount = await allBookings.CountAsync();
+				allBookings = ApplySorting(allBookings, viewBookingsParams);
+
+				var pagedData = await ApplyPagination(allBookings, viewBookingsParams)
+					.ToListAsync();
+
+				var bookingsDto = _mapper.Map<List<ViewAllBookingDto>>(pagedData);
+
+				return new Pagination<ViewAllBookingDto>(viewBookingsParams.PageIndex, viewBookingsParams.PageSize, totalCount) { Data = bookingsDto };
+
+			}
+			catch (Exception ex)
+			{
+
+				throw new ApplicationException("An error occurred while retrieving bookings.", ex);
+			}
+
+		}
+
+		public async Task<List<BookingStatusDto>> GetAllBookingStatusAsync()
+		{
+			var statuses = await _unitOfWork.BookingStatus.GetAllAsync();
+			return _mapper.Map<List<BookingStatusDto>>(statuses);
+		}
+
+		
+
+		// Helper methods for BookingService
+
+		private static IQueryable<Booking> ApplyFilters(IQueryable<Booking> query, ViewBookingsParams viewBookingsFilter)
+		{
+			if (viewBookingsFilter.UserId.HasValue)
+				query = query.Where(b => b.UserId == viewBookingsFilter.UserId);
+
+			if (viewBookingsFilter.ResourceTypeId.HasValue)
+				query = query.Where(b => b.Resource!.TypeId == viewBookingsFilter.ResourceTypeId);
+
+			if (viewBookingsFilter.BookingStatusId.HasValue)
+				query = query.Where(b => b.StatusId == viewBookingsFilter.BookingStatusId);
+
+			if (viewBookingsFilter.From.HasValue)
+				query = query.Where(b => b.Date >= viewBookingsFilter.From.Value);
+
+			if (viewBookingsFilter.To.HasValue)
+				query = query.Where(b => b.Date <= viewBookingsFilter.To.Value);
+
+			return query;
+		}
+
+		private static IQueryable<Booking> ApplySorting(IQueryable<Booking> query, ViewBookingsParams viewBookingsparams)
+		{
+			return viewBookingsparams.SortBy?.ToLower() switch
+			{
+				"date" => viewBookingsparams.IsDescending ? query.OrderByDescending(b => b.Date) : query.OrderBy(b => b.Date),
+				"user" => viewBookingsparams.IsDescending ? query.OrderByDescending(b => b.User!.FullName) : query.OrderBy(b => b.User!.FullName),
+				"resource" => viewBookingsparams.IsDescending ? query.OrderByDescending(b => b.Resource!.Name) : query.OrderBy(b => b.Resource!.Name),
+				_ => query.OrderByDescending(b => b.CreatedAt)
+			};
+		}
+
+		private static IQueryable<Booking> ApplyPagination(IQueryable<Booking> query, ViewBookingsParams viewBookingsParams)
+		{
+			var pageIndex = viewBookingsParams.PageIndex < 1 ? 1 : viewBookingsParams.PageIndex;
+
+			return query.Skip(viewBookingsParams.PageSize * (pageIndex - 1))
+						.Take(viewBookingsParams.PageSize);
         }
+
+
     }
+
+
+
+
 }
