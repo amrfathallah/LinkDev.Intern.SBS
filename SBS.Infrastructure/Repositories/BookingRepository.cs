@@ -40,6 +40,7 @@ namespace SBS.Infrastructure.Repositories
 			return await _appDbContext.Bookings
 				.Include(b => b.BookingSlots)
 					.ThenInclude(bs => bs.Slot)
+				.Include(b => b.Resource)
 				.Where(b => b.UserId == userId)
 				.Where(b => !b.IsDeleted)
 				.ToListAsync();

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SBS.Application.DTOs.BookingDto;
+using Microsoft.TeamFoundation;
 
 namespace SBS.Application.Services
 {
@@ -38,9 +39,10 @@ namespace SBS.Application.Services
                 throw new Exception("Invalid slots are selected");
             }
 
-            if (requestDto.Date < DateOnly.FromDateTime(DateTime.Today))
+
+            if(slots.Any(slot => slot.StartTime < DateTime.UtcNow.TimeOfDay) || requestDto.Date < DateOnly.FromDateTime(DateTime.UtcNow))
             {
-                throw new Exception("Can't book a resource in the past");
+                throw new Exception("Selected slots are in the past");
             }
 
 
@@ -104,7 +106,7 @@ namespace SBS.Application.Services
             var bookings = await _unitOfWork.Bookings.GetBookingsByUserAsync(userId);
             return bookings.Select(booking => new MyBookingDto(
                 booking.Id,
-                booking.ResourceId,
+                booking.Resource.Name,
                 booking.Date,
                 GetBookingStatus(booking),
                 GetSlotTimeRange(booking.BookingSlots).Item1,

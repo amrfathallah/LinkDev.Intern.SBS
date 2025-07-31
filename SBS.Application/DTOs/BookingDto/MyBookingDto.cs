@@ -6,7 +6,7 @@ namespace SBS.Application.DTOs.BookingDto
 {
 	public record MyBookingDto(
         Guid Id,
-        Guid ResourceId,
+        string ResourceName,
         DateOnly Date,
         BookingStatusEnum Status,
         TimeSpan StartTime,
