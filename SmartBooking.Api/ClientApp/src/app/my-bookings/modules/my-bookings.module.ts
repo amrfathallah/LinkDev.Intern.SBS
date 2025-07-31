@@ -16,12 +16,11 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 // Routing
 import { UserBookingsComponent } from '../components/user-bookings.component/user-bookings.component';
-import { UserBookingDetailsComponent } from '../components/user-booking-details.component/user-booking-details.component';
 import { BookingsService } from '../services/bookings-service';
 import { UserBookingsRoutingModule } from './my-bookings-routing.module';
 
 @NgModule({
-  declarations: [UserBookingsComponent, UserBookingDetailsComponent],
+  declarations: [UserBookingsComponent],
   imports: [
     CommonModule,
     FormsModule,
@@ -40,6 +39,6 @@ import { UserBookingsRoutingModule } from './my-bookings-routing.module';
     MatSnackBarModule,
   ],
   providers: [BookingsService],
-  exports: [UserBookingsComponent, UserBookingDetailsComponent],
+  exports: [UserBookingsComponent],
 })
 export class UserBookingsModule {}

@@ -16,8 +16,19 @@ export class BookingsService {
       'Content-Type': 'application/json',
     });
 
-    return this._httpClient.post<MyBookingDto[]>(
+    return this._httpClient.get<ApiResponse<MyBookingDto[]>>(
       `${environment.apiBaseUrl}/Booking/get-my-bookings`,
+      { headers }
+    );
+  }
+
+  deleteBooking(bookingId: string) {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+    });
+
+    return this._httpClient.delete<ApiResponse>(
+      `${environment.apiBaseUrl}/Booking/cancel-booking/${bookingId}`,
       { headers }
     );
   }
