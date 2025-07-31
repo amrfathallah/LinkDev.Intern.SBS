@@ -40,7 +40,7 @@ namespace SmartBooking.Api.Controllers
 				//Extract info from token
 				
 
-				var result = await _bookingService.BookAsync(bookingRequestDto,Guid.Parse("53e90a26-db53-4cbb-f7bb-08ddc9d0ee59"), "testUser"); //To be completed: Get userId and username from token
+				var result = await _bookingService.BookAsync(bookingRequestDto,Guid.Parse("3BECB38E-CC36-431D-EE02-08DDCE8742FC"), "testUser"); //To be completed: Get userId and username from token
 			
 				if (result)
 				{

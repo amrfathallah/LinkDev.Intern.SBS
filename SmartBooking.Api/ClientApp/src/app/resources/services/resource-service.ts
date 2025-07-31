@@ -39,11 +39,22 @@ export class ResourceService {
       })
     );
   }
-  getResources() {
+
+  getAvailableResources(date: Date): Observable<GetResourceDto[]> {
+    // Format date as YYYY-MM-DD
+    const formattedDate = date.toISOString().split('T')[0];
+    
     return this._httpClient.get<GetResourceDto[]>(
-      `${environment.apiBaseUrl}/Resource`
+      `${environment.apiBaseUrl}/Resource/available?date=${formattedDate}`
     );
   }
+
+  getResources() {
+    // Use today's date as default
+    const today = new Date();
+    return this.getAvailableResources(today);
+  }
+
   getResourceById(id: string) {
     return this._httpClient.get<GetResourceDto>(
       `${environment.apiBaseUrl}/Resource/${id}`
