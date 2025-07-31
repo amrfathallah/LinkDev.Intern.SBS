@@ -10,6 +10,7 @@ export class LoginGuard implements CanActivate {
   constructor(private authService: AuthService, private router: Router) { }
 
   canActivate(): boolean {
+    debugger;
     const isLoggedIn = this.authService.isLoggedIn;
     if(isLoggedIn){
       return false;

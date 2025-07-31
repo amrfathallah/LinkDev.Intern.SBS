@@ -10,6 +10,7 @@ export class AuthGuard implements CanActivate {
   constructor(private authService: AuthService, private router: Router) { }
 
   canActivate(): Observable<boolean> {
+    debugger;
     const isLoggedIn = this.authService.isLoggedIn;
     const isTokenExpired = this.authService.isTokenExpired();
 

@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { RegisterRequest } from '../../models/register-request.model';
+import { ApiResponse } from 'src/app/shared/models/api-response.model';
+import { AuthResponse } from '../../models/auth-response.model';
 
 @Component({
   selector: 'app-register',
@@ -10,7 +12,7 @@ import { RegisterRequest } from '../../models/register-request.model';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
-  registrationForm: FormGroup; 
+  registrationForm: FormGroup;
   isSubmitting = false;
   errorMessage = '';
 
@@ -34,11 +36,12 @@ export class RegisterComponent {
     return password === confirm ? null : { mismatch: true };
   }
 
-  goToLogin(){
+  goToLogin() {
     this.router.navigate(['/auth/login']);
   }
 
   onSubmit() {
+    debugger;
     if (this.registrationForm.invalid) {
       this.registrationForm.markAllAsTouched();
       return;
@@ -47,18 +50,26 @@ export class RegisterComponent {
     this.isSubmitting = true;
     this.errorMessage = '';
 
+
     const { fullName, userName, email, password } = this.registrationForm.value;
     const registerData: RegisterRequest = { fullName, userName, email, password };
 
     this.authService.register(registerData).subscribe({
-      next: () => {
-        alert('Registration successful!');
-        this.router.navigate(['/auth/login']);
+      next: (response: ApiResponse<AuthResponse>) => {
+        if (response.success) {
+          alert('Registration successful!');
+          this.router.navigate(['/auth/login']);
+          this.isSubmitting = false;
+          this.registrationForm.reset();
+        }else{
+          this.errorMessage = response.message;
         this.isSubmitting = false;
-        this.registrationForm.reset();
+        }
+        
+
       },
       error: err => {
-        this.errorMessage = 'Registration failed. Try again.';
+        this.errorMessage = "";
         this.isSubmitting = false;
       }
     });

@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SBS.Application.DTOs;
 using SBS.Application.DTOs.BookingDto;
 using SBS.Application.Interfaces.IServices;
+using System.Security.Claims;
 
 namespace SmartBooking.Api.Controllers
 {
@@ -19,6 +21,7 @@ namespace SmartBooking.Api.Controllers
 
 		[HttpPost]
 		[Route("book")]
+		[Authorize]
 		public async Task<IActionResult> BookResource([FromBody] BookingRequestDto bookingRequestDto)
 		{
 			try
@@ -33,12 +36,13 @@ namespace SmartBooking.Api.Controllers
 				}
 
 
-				//Extract info from token
-				
+                //Extract info from token
+				var userID = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+				var userName = User.FindFirst(ClaimTypes.Name)?.Value;
+				var result = await _bookingService.BookAsync(bookingRequestDto, Guid.Parse(userID), userName);
 
-				var result = await _bookingService.BookAsync(bookingRequestDto,Guid.Parse("53e90a26-db53-4cbb-f7bb-08ddc9d0ee59"), "testUser"); //To be completed: Get userId and username from token
 
-				if (!result)
+                if (!result)
 				{
 					return StatusCode(409);
 				}

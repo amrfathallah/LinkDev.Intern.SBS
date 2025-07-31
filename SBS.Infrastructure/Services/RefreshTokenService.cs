@@ -61,7 +61,7 @@ namespace SBS.Infrastructure.Services
             try
             {
                 // Step 1: Extract claims from exp. Access token
-                var principal = _httpContextAccessor.HttpContext?.User;
+                var principal = _tokenService.GetUserInfoFromExpiredToken(token.AccessToken);
                 if (principal == null)
                 {
                     return new ApiResponse<AuthResponseDto>

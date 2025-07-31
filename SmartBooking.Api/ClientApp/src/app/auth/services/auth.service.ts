@@ -9,6 +9,7 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { environment } from '../../../environments/environment';
 import { Router } from '@angular/router';
 import { observableToBeFn } from 'rxjs/internal/testing/TestScheduler';
+import { tokenDto } from '../models/refreshToken-request.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -71,10 +72,13 @@ export class AuthService {
   }
 
   refreshToken(): Observable<ApiResponse<AuthResponse>> {
-    const refreshToken = localStorage.getItem('refreshToken');
+    const accessToken : string = localStorage.getItem('token')?? '';
+    const refreshToken : string = localStorage.getItem('refreshToken')?? '';
+    var tokenDto : tokenDto = { accessToken, refreshToken };
+
     return this.http.post<ApiResponse<AuthResponse>>(
       `${this.baseUrl}/refresh`,
-      { refreshToken },
+      tokenDto,
       { withCredentials: true }
     ).pipe(
       tap(response => {
