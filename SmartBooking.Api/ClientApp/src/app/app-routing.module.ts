@@ -12,28 +12,34 @@ const routes: Routes = [
   },
   {
     path: 'admin-dashboard',
-    loadChildren: () => import('./admin-dashboard/modules/admin-dashboard.module').then((m) => m.AdminDashboardModule),
+    loadChildren: () =>
+      import('./admin-dashboard/modules/admin-dashboard.module').then(
+        (m) => m.AdminDashboardModule
+      ),
   },
   {
     path: 'resources',
-    loadChildren: () => import('./resources/modules/resource.module').then((m) => m.ResourceModule),
+    loadChildren: () =>
+      import('./resources/modules/resource.module').then(
+        (m) => m.ResourceModule
+      ),
   },
-   {
+  {
+    path: 'mybookings',
+    loadChildren: () =>
+      import('./my-bookings/modules/my-bookings.module').then(
+        (m) => m.UserBookingsModule
+      ),
+  },
+  {
     path: '',
     component: MainLayoutComponent,
-
   },
-
 
   // {
   //   path: '' , redirectTo: '/home', pathMatch: 'full',
 
   // },
-
-
-
-
-
 ];
 
 @NgModule({
