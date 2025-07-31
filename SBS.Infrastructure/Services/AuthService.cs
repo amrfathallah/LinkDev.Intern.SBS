@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using SBS.Application.DTOs.Auth;
+using SBS.Application.DTOs.Common;
 using SBS.Application.Exceptions;
 using SBS.Application.Interfaces.IServices;
 using SBS.Domain.Entities;
