@@ -15,5 +15,7 @@ namespace SBS.Application.Interfaces.IServices
 
 		public Task<Pagination<ViewAllBookingDto>> GetAllBookingsAsync( ViewBookingsParams viewBookingsParams );
 
+		Task<List<BookingStatusDto>> GetAllBookingStatusAsync();
+
 	}
 }

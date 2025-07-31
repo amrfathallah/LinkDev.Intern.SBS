@@ -11,6 +11,7 @@ using SBS.Application.DTOs.BookingDto;
 using SBS.Application.DTOs.Common;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using SBS.Application.DTOs.ResourceDto;
 
 namespace SBS.Application.Services
 {
@@ -117,6 +118,14 @@ namespace SBS.Application.Services
 			}
 
 		}
+
+		public async Task<List<BookingStatusDto>> GetAllBookingStatusAsync()
+		{
+			var statuses = await _unitOfWork.BookingStatus.GetAllAsync();
+			return _mapper.Map<List<BookingStatusDto>>(statuses);
+		}
+
+		
 
 		// Helper methods for BookingService
 

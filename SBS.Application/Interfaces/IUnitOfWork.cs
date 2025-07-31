@@ -1,4 +1,5 @@
 ﻿using SBS.Application.Interfaces.IRepositories;
+using SBS.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,9 @@ namespace SBS.Application.Interfaces
 		IBookingSlotRepository BookingSlotRepository { get; }
 		ISlotRepository SlotRepository { get; }
 		IResourceRepository Resources { get; }
+
+		IRepository<BookingStatus> BookingStatus { get; }
+		IRepository<ResourceType> ResourceType { get; }
 
 		Task<int> CommitAsync();
 		Task BeginTransactionAsync();

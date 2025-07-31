@@ -14,7 +14,7 @@ namespace SBS.Application.DTOs.BookingDto
 		public required string ResourceName { get; set; }
 		public required string ResourceType { get; set; }
 		public required string Status { get; set; }
-		public TimeOnly StartTime { get; set; }
-		public TimeOnly EndTime { get; set; }
+		public TimeSpan StartTime { get; set; }
+		public TimeSpan EndTime { get; set; }
 	}
 }

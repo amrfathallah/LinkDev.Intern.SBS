@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.TeamFoundation.TestManagement.WebApi;
 using SBS.Application.DTOs;
 using SBS.Application.DTOs.BookingDto;
 using SBS.Application.Interfaces.IServices;
@@ -37,7 +38,7 @@ namespace SmartBooking.Api.Controllers
 				//Extract info from token
 				
 
-				var result = await _bookingService.BookAsync(bookingRequestDto,Guid.Parse("53e90a26-db53-4cbb-f7bb-08ddc9d0ee59"), "testUser"); //To be completed: Get userId and username from token
+				var result = await _bookingService.BookAsync(bookingRequestDto,Guid.Parse("ab6e1afe-dba3-4da3-22a1-08ddd01fe143"), "ahmedali"); //To be completed: Get userId and username from token
 
 				if (!result)
 				{
@@ -54,9 +55,9 @@ namespace SmartBooking.Api.Controllers
 		}
 
 
-		[Authorize(Roles = "Admin")]
-		[HttpGet("allBooking")]
-		public async Task<IActionResult> GetAllBookings([FromQuery] ViewBookingsParams ViewBookingquery)
+		//[Authorize(Roles = "Admin")]
+		[HttpPost("allBooking")]
+		public async Task<IActionResult> GetAllBookings([FromBody] ViewBookingsParams ViewBookingquery)
 		{
 			try
 			{
@@ -69,6 +70,13 @@ namespace SmartBooking.Api.Controllers
 
 				return StatusCode(500, "An error occurred while fetching bookings.");
 			}
+		}
+
+		[HttpGet("allBookingStatus")]
+		public async Task<IActionResult> GetAllBookingStatus()
+		{
+			var result = await _bookingService.GetAllBookingStatusAsync();
+			return Ok(result);
 		}
 	}
 }

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SBS.Infrastructure.Repositories;
 using SBS.Application.Interfaces.IRepositories;
+using SBS.Domain.Entities;
 
 namespace SBS.Infrastructure
 {
@@ -16,6 +17,9 @@ namespace SBS.Infrastructure
 		private IBookingSlotRepository? _bookingSlots;
 		private ISlotRepository? _slotRepository;
 		private IResourceRepository? _resourceRepository;
+		private IRepository<BookingStatus>? _bookingstatus;
+		private IRepository<ResourceType>? _resourcetype;
+
 
 
 		public IBookingRepository Bookings => _bookings ??= new BookingRepository(appDbContext);
@@ -24,6 +28,10 @@ namespace SBS.Infrastructure
 		public IResourceRepository Resources => _resourceRepository ??= new ResourceRepository(appDbContext);
 
 		public ISlotRepository SlotRepository => _slotRepository ??= new SlotRepository(appDbContext);
+
+		public IRepository<BookingStatus> BookingStatus => _bookingstatus ??= new GenericRepository<BookingStatus>(appDbContext);
+		public IRepository<ResourceType> ResourceType => _resourcetype ??= new GenericRepository<ResourceType>(appDbContext);
+
 
 		public async Task BeginTransactionAsync()
 		{
