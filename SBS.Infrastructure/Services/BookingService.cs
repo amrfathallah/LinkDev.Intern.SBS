@@ -92,9 +92,10 @@ namespace SBS.Application.Services
             {
                 throw new Exception("You can only cancel your own bookings");
             }
-            if (booking.CreatedAt.AddMinutes(30) < DateTime.UtcNow)
+            var timeRange = GetSlotTimeRange(booking.BookingSlots);
+            if (timeRange.StartTime.Subtract(DateTime.Now.TimeOfDay).TotalMinutes < 30 && booking.Date == DateOnly.FromDateTime(DateTime.Now))
             {
-                throw new Exception("You can only cancel bookings within 30 minutes of creation");
+                throw new Exception("Cancellation is not allowed within 30 minutes before start time");
             }
             var result = await _unitOfWork.Bookings.CancelBookingAsync(bookingId);
             await _unitOfWork.CommitAsync();
@@ -109,8 +110,8 @@ namespace SBS.Application.Services
                 booking.Resource.Name,
                 booking.Date,
                 GetBookingStatus(booking),
-                GetSlotTimeRange(booking.BookingSlots).Item1,
-                GetSlotTimeRange(booking.BookingSlots).Item2
+                GetSlotTimeRange(booking.BookingSlots).StartTime,
+                GetSlotTimeRange(booking.BookingSlots).EndTime
             )).ToList();
         }
         private BookingStatusEnum GetBookingStatus(Booking booking)
@@ -120,11 +121,11 @@ namespace SBS.Application.Services
             {
                 var currentTime = DateTime.Now.TimeOfDay;
                 BookingStatusEnum status;
-                if (currentTime < TimeRange.Item1)
+                if (currentTime < TimeRange.StartTime)
                 {
                     status = BookingStatusEnum.Upcoming;
                 }
-                else if (currentTime >= TimeRange.Item1 && currentTime <= TimeRange.Item2)
+                else if (currentTime >= TimeRange.StartTime && currentTime <= TimeRange.EndTime)
                 {
                     status = BookingStatusEnum.Happening;
                 }
@@ -136,11 +137,11 @@ namespace SBS.Application.Services
             }
             return DateOnly.FromDateTime(DateTime.Now) > booking.Date? BookingStatusEnum.Finished : BookingStatusEnum.Upcoming;
         }
-        private Tuple<TimeSpan, TimeSpan> GetSlotTimeRange(IEnumerable<BookingSlot> bookingSlots)
+        private (TimeSpan StartTime, TimeSpan EndTime) GetSlotTimeRange(IEnumerable<BookingSlot> bookingSlots)
         {
             var startTime = bookingSlots.Min(bs => bs.Slot.StartTime);
             var endTime = bookingSlots.Max(bs => bs.Slot.EndTime);
-            return Tuple.Create(startTime, endTime);
+            return (startTime, endTime);
         }
     }
 }
