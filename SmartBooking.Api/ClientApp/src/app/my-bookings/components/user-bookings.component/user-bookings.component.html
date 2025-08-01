@@ -33,7 +33,7 @@
         </div>
         <div class="booking-detail">
           <mat-icon>info</mat-icon>
-          <span>Status: {{ booking.bookingStatus }}</span>
+          <span>Status: {{ getBookingStatusName(booking.status) }}</span>
         </div>
       </mat-card-content>
     </mat-card>

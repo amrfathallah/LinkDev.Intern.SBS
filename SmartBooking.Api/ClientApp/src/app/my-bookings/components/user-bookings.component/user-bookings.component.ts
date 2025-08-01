@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { BookingsService } from '../../services/bookings-service';
 import { MyBookingDto } from '../../models/mybooking.dto';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { BookingStatus } from '../../enums/BookingStatus.enum';
 
 @Component({
   selector: 'app-user-booings',
@@ -74,6 +75,10 @@ export class UserBookingsComponent implements OnInit {
         }
       );
     }
+  }
+
+  getBookingStatusName(status: number): string {
+    return BookingStatus[status];
   }
 
   private deleteBooking(bookingId: string): void {
