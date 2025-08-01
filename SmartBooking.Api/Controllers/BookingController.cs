@@ -1,6 +1,9 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.TeamFoundation.TestManagement.WebApi;
+using SBS.Application.DTOs;
 using SBS.Application.DTOs.BookingDto;
 using SBS.Application.DTOs.Common;
 using SBS.Application.Interfaces.IServices;
@@ -131,6 +134,30 @@ namespace SmartBooking.Api.Controllers
 					Message = $"An error occurred while cancelling the booking: {ex.Message}"
 				});
 			}
+		}
+
+		//[Authorize(Roles = "Admin")]
+		[HttpPost("allBooking")]
+		public async Task<IActionResult> GetAllBookings([FromBody] ViewBookingsParams ViewBookingquery)
+		{
+			try
+			{
+
+				var result = await _bookingService.GetAllBookingsAsync(ViewBookingquery);
+				return Ok(result);
+			}
+			catch (Exception)
+			{
+
+				return StatusCode(500, "An error occurred while fetching bookings.");
+			}
+		}
+
+		[HttpGet("allBookingStatus")]
+		public async Task<IActionResult> GetAllBookingStatus()
+		{
+			var result = await _bookingService.GetAllBookingStatusAsync();
+			return Ok(result);
 		}
 	}
 }

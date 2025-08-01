@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SBS.Infrastructure.Repositories
 {
-	public abstract class GenericRepository<T> : IRepository<T> where T : class
+	public class GenericRepository<T> : IRepository<T> where T : class
 	{
 		private readonly AppDbContext _appDbContext;
 

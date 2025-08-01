@@ -52,7 +52,12 @@ namespace SBS.Infrastructure
             services.AddScoped<IAuthService, AuthService>();
 
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-            #endregion
+			#endregion
+
+
+			// Register Application Services
+			services.AddScoped<IBookingService, BookingService>();
+
 
 			services.AddScoped<IUnitOfWork, UnitOfWork>();
 			services.AddScoped<IBookingConflictValidator, BookingConflictValidator>();

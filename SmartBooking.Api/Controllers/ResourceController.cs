@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.TeamFoundation.TestManagement.WebApi;
 using SBS.Application.DTOs.ResourceDto;
 using SBS.Application.Interfaces.IServices;
 using System;
@@ -89,5 +90,12 @@ namespace SmartBooking.Api.Controllers
                 return NotFound();
             return Ok(result);
         }
-    }
+
+        [HttpGet("ResourceTypes")]
+		public async Task<IActionResult> GetAllResourceTypeAsync()
+		{
+			var result = await _resourceService.GetAllResourceTypesAsync();
+			return Ok(result);
+		}
+	}
 } 

@@ -14,5 +14,7 @@ namespace SBS.Application.Interfaces.IServices
         Task<bool> SetActiveStatusAsync(Guid id, bool isActive);
         Task<bool> DeleteAsync(Guid id);
         Task<ResourceBookedSlotsDto> GetBookedSlotsAsync(GetBookedSlotsRequestDto request);
-    }
+
+		Task<List<ResourceTypeDto>> GetAllResourceTypesAsync();
+	}
 } 
