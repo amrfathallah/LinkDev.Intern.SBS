@@ -125,7 +125,12 @@ namespace SBS.Application.Services
 			return _mapper.Map<List<BookingStatusDto>>(statuses);
 		}
 
-		
+		public async Task<List<BookingsUsersDto>> GetUsersWithBookingsAsync()
+		{
+			var users = await _unitOfWork.Bookings.GetAllUsersWithBookingsAsync();
+			return _mapper.Map<List<BookingsUsersDto>>(users);
+		}
+
 
 		// Helper methods for BookingService
 

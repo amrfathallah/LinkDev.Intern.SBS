@@ -17,5 +17,7 @@ namespace SBS.Application.Interfaces.IServices
 
 		Task<List<BookingStatusDto>> GetAllBookingStatusAsync();
 
+		Task<List<BookingsUsersDto>> GetUsersWithBookingsAsync();
+
 	}
 }

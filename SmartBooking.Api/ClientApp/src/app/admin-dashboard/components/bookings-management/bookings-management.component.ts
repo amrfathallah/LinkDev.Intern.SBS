@@ -1,122 +1,134 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatDialog } from '@angular/material/dialog';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { BookingStatus } from '../../enums/BookingStatus.enum';
-import { Booking } from '../../models/Booking.model';
-
+import { Component, OnInit } from '@angular/core';
+import { Sort } from '@angular/material/sort';
+import { Booking } from './models/booking.model';
+import { BookingsManagementService } from './services/bookings-management.service';
+import { BookingService } from '../../../shared/services/booking.service';
+import { ViewBookingsParams } from './models/booking-dtos.model';
 
 @Component({
   selector: 'app-bookings-management',
   templateUrl: './bookings-management.component.html',
-  styleUrls: ['./bookings-management.component.css']
+  styleUrls: ['./bookings-management.component.css'],
 })
 export class BookingsManagementComponent implements OnInit {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
-  filterForm: FormGroup;
+  // Data properties
+  bookings: Booking[] = [];
+  totalCount = 0;
+  currentPageIndex = 0;
+  currentPageSize = 10;
+  isLoading = false;
+  errorMessage = '';
 
+  // Sorting properties
+  currentSortBy = 'date';
+  currentSortColumn = 'date'; // Original frontend column name
+  currentSortDirection: 'asc' | 'desc' | '' = 'asc';
 
-  // TODO: is this the best way to do it?
-  // angular material requires a list of displayed columns
-  bookingsDisplayedColumns: string[] = ['resourceName', 'resourceType', 'userName', 'startTime', 'endTime', 'status'];
-
-  bookingsDataSource = new MatTableDataSource<Booking>();
+  // Filter data sources
+  uniqueUsers: { id: string; name: string }[] = [];
+  allResourceTypes: { id: number; name: string }[] = [];
+  allBookingStatuses: { id: number; name: string }[] = [];
 
   constructor(
-    public dialog: MatDialog,
-    private fb: FormBuilder
-  ) {
-
-    // TODO: figure out what is the best practices for making forms
-    this.filterForm = this.fb.group({
-      startDate: [''],
-      endDate: [''],
-      resourceType: [''],
-      user: [''],
-      status: ['']
-    });
-  }
+    private bookingsService: BookingsManagementService,
+    private bookingService: BookingService
+  ) {}
 
   ngOnInit() {
+    this.loadStaticFilterData();
     this.loadBookingsData();
   }
 
-  ngAfterViewInit() {
-    this.bookingsDataSource.paginator = this.paginator;
-    this.bookingsDataSource.sort = this.sort;
+  private loadStaticFilterData() {
+    // Load resource types
+    this.bookingService.getResourceTypes().subscribe({
+      next: (resourceTypes: { id: number; name: string }[]) => {
+        this.allResourceTypes = resourceTypes;
+      },
+      error: (error: any) => {
+        console.error('Error loading resource types:', error);
+        this.allResourceTypes = [];
+      },
+    });
+
+    // Load booking statuses
+    this.bookingService.getBookingStatuses().subscribe({
+      next: (statuses: { id: number; name: string }[]) => {
+        this.allBookingStatuses = statuses;
+      },
+      error: (error: any) => {
+        console.error('Error loading booking statuses:', error);
+        this.allBookingStatuses = [];
+      },
+    });
+
+    // Load users with bookings
+    this.bookingService.getUsersWithBookings().subscribe({
+      next: (users: { id: string; name: string }[]) => {
+        this.uniqueUsers = users;
+      },
+      error: (error: any) => {
+        console.error('Error loading users with bookings:', error);
+        this.uniqueUsers = [];
+      },
+    });
   }
 
-  applyBookingsFilter() {
-    const filterValues = this.filterForm.value;
-    console.log('Applying filters:', filterValues);
+  onFiltersApplied(filterParams: any) {
+    this.currentPageIndex = 0;
+    this.loadBookingsData(filterParams);
   }
 
-  clearFilters() {
-    this.filterForm.reset();
-    this.bookingsDataSource.filter = '';
+  onFiltersCleared() {
+    this.currentPageIndex = 0;
+    this.loadBookingsData();
+  }
+
+  onSortChanged(sortState: Sort) {
+    this.currentPageIndex = 0;
+    this.currentSortColumn = sortState.active; // Store original column name
+    this.currentSortBy = this.bookingsService.mapSortField(sortState.active); // Store mapped field
+    this.currentSortDirection = sortState.direction;
+    this.loadBookingsData();
+  }
+
+  onPageChanged(pageEvent: { pageIndex: number; pageSize: number }) {
+    this.currentPageIndex = pageEvent.pageIndex;
+    this.currentPageSize = pageEvent.pageSize;
+    this.loadBookingsData();
   }
 
   refreshData() {
     this.loadBookingsData();
   }
 
-  // this function returns a css class so it should be a string
-  getStatusClass(status: BookingStatus): string {
-    switch (status) {
-      case BookingStatus.Upcoming: return 'status-upcoming';
-      case BookingStatus.Happening: return 'status-happening';
-      case BookingStatus.Finished: return 'status-finished';
-      case BookingStatus.Cancelled: return 'status-cancelled';
-      default: return '';
-    }
-  }
+  private loadBookingsData(filterParams?: any) {
+    this.isLoading = true;
+    this.errorMessage = '';
 
-  private loadBookingsData() {
-    const mockBookings: Booking[] = [
-      {
-        id: 1,
-        resourceName: 'Conference Room A',
-        resourceType: 'room',
-        userName: 'John Doe',
-        startTime: new Date('2025-07-15T09:00:00'),
-        endTime: new Date('2025-07-15T10:00:00'),
-        status: BookingStatus.Upcoming,
-        attendees: 5
+    const params: ViewBookingsParams = {
+      pageIndex: this.currentPageIndex,
+      pageSize: this.currentPageSize,
+      sortBy: this.currentSortBy,
+      isDescending: this.currentSortDirection === 'desc',
+      ...filterParams,
+    };
+
+    this.bookingsService.getBookings(params).subscribe({
+      next: (result) => {
+        this.bookings = result.data;
+        this.totalCount = result.count;
+        this.currentPageIndex = result.pageIndex;
+        this.currentPageSize = result.pageSize;
+        this.isLoading = false;
       },
-      {
-        id: 2,
-        resourceName: 'Desk 12',
-        resourceType: 'desk',
-        userName: 'Sarah Mitchell',
-        startTime: new Date('2025-07-15T08:00:00'),
-        endTime: new Date('2025-07-15T17:00:00'),
-        status: BookingStatus.Happening,
-        attendees: 1
+      error: (error) => {
+        console.error('Error loading bookings:', error);
+        this.isLoading = false;
+        this.errorMessage = 'Failed to load bookings. Please try again.';
+        this.bookings = [];
+        this.totalCount = 0;
       },
-      {
-        id: 3,
-        resourceName: 'Meeting Room B',
-        resourceType: 'room',
-        userName: 'Mike Johnson',
-        startTime: new Date('2025-07-14T14:00:00'),
-        endTime: new Date('2025-07-14T15:30:00'),
-        status: BookingStatus.Finished,
-        attendees: 3
-      },
-      {
-        id: 4,
-        resourceName: 'Conference Room C',
-        resourceType: 'room',
-        userName: 'Emily Davis',
-        startTime: new Date('2025-07-15T11:00:00'),
-        endTime: new Date('2025-07-15T12:00:00'),
-        status: BookingStatus.Cancelled,
-        attendees: 8
-      }
-    ];
-    this.bookingsDataSource.data = mockBookings;
+    });
   }
 }
