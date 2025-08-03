@@ -39,7 +39,7 @@ namespace SBS.Application.Services.Auth
                 issuer: _jWTSettings.Issuer,
                 audience: _jWTSettings.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(_jWTSettings.AccessTokenExpiry),
+                expires: DateTime.UtcNow.AddMinutes(_jWTSettings.AccessTokenExpiryInMin),
                 signingCredentials: creds
             );
 

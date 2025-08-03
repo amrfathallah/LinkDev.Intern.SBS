@@ -45,7 +45,6 @@ namespace SmartBooking.Api.Controllers
 				var userName = User.FindFirst(ClaimTypes.Name)?.Value;
 				var result = await _bookingService.BookAsync(bookingRequestDto, Guid.Parse(userID), userName);
 
-				var result = await _bookingService.BookAsync(bookingRequestDto,Guid.Parse("53e90a26-db53-4cbb-f7bb-08ddc9d0ee59"), "testUser"); //To be completed: Get userId and username from token
 			
 				if (result)
 				{
