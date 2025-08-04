@@ -55,7 +55,7 @@ namespace SmartBooking.Api.Controllers
 		}
 
 
-		//[Authorize(Roles = "Admin")]
+		[Authorize(Roles = "Admin")]
 		[HttpPost("allBooking")]
 		public async Task<IActionResult> GetAllBookings([FromBody] ViewBookingsParams ViewBookingquery)
 		{
