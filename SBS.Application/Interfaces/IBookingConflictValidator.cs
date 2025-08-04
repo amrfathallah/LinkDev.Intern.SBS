@@ -9,6 +9,6 @@ namespace SBS.Application.Interfaces
 {
 	public interface IBookingConflictValidator
 	{
-		Task<bool> HasConflictAsync(Guid ResourceId, DateOnly date, List<int> Slots);
+		Task<bool> HasConflictAsync(Guid ResourceId, DateOnly date, List<Slot> Slots);
 	}
 }

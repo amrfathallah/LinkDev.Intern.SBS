@@ -24,8 +24,6 @@ namespace SBS.Application.Services
 
         public async Task<bool> BookAsync(BookingRequestDto requestDto, Guid userId, string createdBy)
         {
-            await _unitOfWork.BeginTransactionAsync();
-
             //Input Validation
             if (await _unitOfWork.Resources.GetByIdAsync(requestDto.ResourceId) == null)
             {
@@ -45,7 +43,7 @@ namespace SBS.Application.Services
 
 
             //Check for booking conflicts
-            if (await _conflictValidator.HasConflictAsync(requestDto.ResourceId, requestDto.Date, requestDto.SlotsIds))
+            if (await _conflictValidator.HasConflictAsync(requestDto.ResourceId, requestDto.Date, slots))
             {
                 return false;
             }
@@ -59,22 +57,16 @@ namespace SBS.Application.Services
                 StatusId = (int)BookingStatusEnum.Upcoming,
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = createdBy,
+                BookingSlots = requestDto.SlotsIds.Select(slotId => new BookingSlot
+                {
+                    SlotId = slotId,
+                }).ToList(),
 
             };
 
             await _unitOfWork.Bookings.AddAsync(booking);
+
             await _unitOfWork.CommitAsync();
-
-            var bookingSlots = requestDto.SlotsIds.Select(slotId => new BookingSlot
-            {
-                SlotId = slotId,
-                BookingId = booking.Id,
-            }).ToList();
-
-            await _unitOfWork.BookingSlotRepository.AddRangeAsync(bookingSlots);
-            await _unitOfWork.CommitAsync();
-
-            await _unitOfWork.CommitTransactionAsync();
 
             return true;
         }
