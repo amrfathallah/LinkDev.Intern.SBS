@@ -19,12 +19,12 @@ namespace SBS.Infrastructure
 		public BookingConflictValidator(AppDbContext appDbContext)
 		{
 			_appDbContext = appDbContext;
-		}	
+		}
 
 		public async Task<bool> HasConflictAsync(Guid ResourceId, DateOnly date, List<int> slotIds)
 		{
 			//To be checked
-			var existingSlots = await _appDbContext.BookingSlots.Include(slot => slot.Booking).Where(slot => slot.Booking != null && slot.Booking.ResourceId == ResourceId && slot.Booking.StatusId != (int)BookingStatusEnum.Finished).ToListAsync();
+			var existingSlots = await _appDbContext.BookingSlots.Include(slot => slot.Booking).Where(slot => slot.Booking != null && slot.Booking.ResourceId == ResourceId && slot.Booking.Date == date && slot.Booking.StatusId != (int)BookingStatusEnum.Finished).ToListAsync();
 
 			var bookedSlots = await _appDbContext.Slots.Where(Slot => slotIds.Contains(Slot.Id)).ToListAsync();
 
