@@ -40,6 +40,7 @@ namespace SBS.Infrastructure.Repositories
 			return await _appDbContext.Bookings
 				.Include(b => b.BookingSlots)
 					.ThenInclude(bs => bs.Slot)
+				.Include(b => b.Resource)
 				.Where(b => b.UserId == userId)
 				.Where(b => !b.IsDeleted)
 				.ToListAsync();
@@ -49,6 +50,15 @@ namespace SBS.Infrastructure.Repositories
 		{
 			return await _appDbContext.Bookings.AnyAsync(b => b.ResourceId == resourceId);
 		}
+		public IQueryable<Booking> GetAllBookingWithIncludes()
+		{
+			return _appDbContext.Bookings
+				.Include(b => b.User)
+				.Include(b => b.Status)
+				.Include(b => b.Resource).ThenInclude(r => r!.Type)
+				.Include(b => b.BookingSlots).ThenInclude(b => b.Slot);
+		}
 
+		
 	}
 }

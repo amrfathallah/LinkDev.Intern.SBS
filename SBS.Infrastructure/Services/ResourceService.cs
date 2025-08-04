@@ -143,5 +143,12 @@ namespace SBS.Application.Services
                 BookedSlots = bookedSlots
             };
         }
-    }
+		public async Task<List<ResourceTypeDto>> GetAllResourceTypesAsync()
+		{
+			var types = await _unitOfWork.ResourceType.GetAllAsync();
+			return _mapper.Map<List<ResourceTypeDto>>(types);
+		}
+
+		
+	}
 }
