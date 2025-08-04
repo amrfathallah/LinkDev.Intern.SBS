@@ -1,4 +1,5 @@
 using SBS.Application.DTOs.Auth;
+using SBS.Application.DTOs.Common;
 using SBS.Application.DTOs.ResourceDto;
 using System;
 using System.Collections.Generic;
