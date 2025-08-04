@@ -50,9 +50,9 @@ export function getStatusDisplayName(status: BookingStatus): string {
     case BookingStatus.Upcoming:
       return 'Upcoming';
     case BookingStatus.Happening:
-      return 'In Progress';
+      return 'Happening';
     case BookingStatus.Finished:
-      return 'Completed';
+      return 'Finished';
     default:
       return 'Unknown';
   }
