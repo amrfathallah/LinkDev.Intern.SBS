@@ -71,6 +71,9 @@ namespace SBS.Infrastructure
             services.AddScoped<IBookingService, BookingService>();
             services.AddScoped<IResourceService, ResourceService>();
 
+			services.AddScoped<ISlotRepository, SlotRepository>();
+			services.AddScoped<ISlotService, SlotService>();
+
 
             return services;
 		}

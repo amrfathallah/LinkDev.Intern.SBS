@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.TeamFoundation.TestManagement.WebApi;
 using SBS.Application.DTOs;
 using SBS.Application.DTOs.BookingDto;
+using SBS.Application.DTOs.Common;
 using SBS.Application.Interfaces.IServices;
 
 namespace SmartBooking.Api.Controllers
@@ -31,25 +32,43 @@ namespace SmartBooking.Api.Controllers
 					//Get all errors of all properties
 					string errorList = string.Join("\n", ModelState.Values.SelectMany(value => value.Errors).Select(err => err.ErrorMessage));
 
-					return StatusCode(400, errorList);
+					return BadRequest(new ApiResponse
+					{
+						Success = false,
+						Message = errorList
+					});
 				}
 
 
 				//Extract info from token
 				
 
-				var result = await _bookingService.BookAsync(bookingRequestDto,Guid.Parse("ab6e1afe-dba3-4da3-22a1-08ddd01fe143"), "ahmedali"); //To be completed: Get userId and username from token
-
-				if (!result)
+				var result = await _bookingService.BookAsync(bookingRequestDto,Guid.Parse("53e90a26-db53-4cbb-f7bb-08ddc9d0ee59"), "testUser"); //To be completed: Get userId and username from token
+			
+				if (result)
 				{
-					return StatusCode(409);
+					return Ok(new ApiResponse
+					{
+						Success = true,
+						Message = "Booking completed successfully."
+					});
 				}
-
-				return StatusCode(201);
+				else
+				{
+					return BadRequest(new ApiResponse
+					{
+						Success = false,
+						Message = "Booking failed due to slot conflict or unavailability."
+					});
+				}
 			}
 			catch(Exception)
 			{
-				return StatusCode(500, "Unexpected error occurred");
+				return BadRequest(new ApiResponse
+				{
+					Success = false,
+					Message = "An error occurred while processing your request."
+				});
 			}
 			
 		}
