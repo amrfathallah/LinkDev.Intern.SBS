@@ -156,12 +156,8 @@ export class BookingTableComponent implements OnInit, AfterViewInit, OnChanges {
     this.sortChanged.emit(sortState);
   }
 
-  getStatusClass(status: BookingStatus): string {
+  getStatusClass(status: string): string {
     return BookingHelpers.getStatusClass(status);
-  }
-
-  getStatusDisplayName(status: BookingStatus): string {
-    return BookingHelpers.getStatusDisplayName(status);
   }
 
   onPageEvent(event: any) {

@@ -67,8 +67,18 @@
         </mat-form-field>
       </div>
 
+      <!-- Date Range Error Message -->
+      <div *ngIf="hasDateRangeError" class="date-error-message">
+        <mat-error>{{ dateRangeErrorMessage }}</mat-error>
+      </div>
+
       <div class="filter-actions">
-        <button mat-raised-button color="primary" (click)="onApplyFilters()">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="onApplyFilters()"
+          [disabled]="filterForm.invalid"
+        >
           {{ UI_MESSAGES.applyFilters }}
         </button>
         <button mat-stroked-button (click)="onClearFilters()">

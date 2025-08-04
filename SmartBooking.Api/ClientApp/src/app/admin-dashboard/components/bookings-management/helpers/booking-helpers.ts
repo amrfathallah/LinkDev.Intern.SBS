@@ -1,6 +1,6 @@
-import { BookingStatus } from '../../../enums/BookingStatus.enum';
 import { Booking } from '../models/booking.model';
 import { ViewAllBookingDto } from '../models/booking-dtos.model';
+import { BookingStatus } from '../../../enums/BookingStatus.enum';
 
 // Core mapping functions that can be reused across the app
 export function parseTimeSpan(date: string, timeSpan: string): Date {
@@ -10,19 +10,6 @@ export function parseTimeSpan(date: string, timeSpan: string): Date {
     .map((num) => parseInt(num));
   dateObj.setHours(hours, minutes, seconds || 0, 0);
   return dateObj;
-}
-
-export function parseStatus(status: string): BookingStatus {
-  switch (status.toLowerCase()) {
-    case 'upcoming':
-      return BookingStatus.Upcoming;
-    case 'happening':
-      return BookingStatus.Happening;
-    case 'finished':
-      return BookingStatus.Finished;
-    default:
-      return BookingStatus.Upcoming;
-  }
 }
 
 export function formatDateForApi(date: Date): string {
@@ -39,27 +26,14 @@ export function mapDtoToBooking(dto: ViewAllBookingDto): Booking {
     userName: dto.user,
     startTime: parseTimeSpan(dto.date, dto.startTime),
     endTime: parseTimeSpan(dto.date, dto.endTime),
-    status: parseStatus(dto.status),
+    status: dto.status,
     date: new Date(dto.date),
   };
 }
 
-// Status display utilities
-export function getStatusDisplayName(status: BookingStatus): string {
-  switch (status) {
-    case BookingStatus.Upcoming:
-      return 'Upcoming';
-    case BookingStatus.Happening:
-      return 'Happening';
-    case BookingStatus.Finished:
-      return 'Finished';
-    default:
-      return 'Unknown';
-  }
-}
-
-export function getStatusClass(status: BookingStatus): string {
-  switch (status) {
+// Status styling utility - maps status string to CSS class
+export function getStatusClass(status: string): string {
+  switch (status.toLowerCase()) {
     case BookingStatus.Upcoming:
       return 'status-upcoming';
     case BookingStatus.Happening:

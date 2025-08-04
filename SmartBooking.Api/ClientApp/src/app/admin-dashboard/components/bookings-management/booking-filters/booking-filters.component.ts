@@ -1,5 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  AbstractControl,
+} from '@angular/forms';
 import * as BookingHelpers from '../helpers/booking-helpers';
 
 @Component({
@@ -33,18 +38,50 @@ export class BookingFiltersComponent implements OnInit {
   };
 
   constructor(private fb: FormBuilder) {
-    this.filterForm = this.fb.group({
-      startDate: [''],
-      endDate: [''],
-      resourceType: [''],
-      user: [''],
-      status: [''],
-    });
+    this.filterForm = this.fb.group(
+      {
+        startDate: [''],
+        endDate: [''],
+        resourceType: [''],
+        user: [''],
+        status: [''],
+      },
+      { validators: this.dateRangeValidator }
+    );
+  }
+
+  // Custom validator to ensure end date is not before start date
+  dateRangeValidator(control: AbstractControl): { [key: string]: any } | null {
+    const startDate = control.get('startDate')?.value;
+    const endDate = control.get('endDate')?.value;
+
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+
+      if (end < start) {
+        return { dateRange: true };
+      }
+    }
+    return null;
   }
 
   ngOnInit() {}
 
+  get hasDateRangeError(): boolean {
+    return this.filterForm.hasError('dateRange');
+  }
+
+  get dateRangeErrorMessage(): string {
+    return 'End date cannot be before start date';
+  }
+
   onApplyFilters() {
+    // Check if form is valid before applying filters
+    if (this.filterForm.invalid) {
+      return;
+    }
+
     const filterValues = this.filterForm.value;
     const params: any = {};
 

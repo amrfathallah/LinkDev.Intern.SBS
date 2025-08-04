@@ -78,8 +78,8 @@
           {{ columnHeaders.status }}
         </mat-header-cell>
         <mat-cell *matCellDef="let booking">
-          <span [class]="getStatusClass(booking.status)">
-            {{ getStatusDisplayName(booking.status) }}
+          <span [class]="getStatusClass(booking.statusDisplayName)">
+            {{ booking.statusDisplayName }}
           </span>
         </mat-cell>
       </ng-container>

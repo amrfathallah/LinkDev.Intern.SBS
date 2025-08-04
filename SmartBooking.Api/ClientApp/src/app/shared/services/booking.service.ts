@@ -4,6 +4,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Pagination } from '../models/pagination.model';
+import { ApiResponse } from '../models/api-response.model';
 import {
   ViewAllBookingDto,
   ViewBookingsParams,
@@ -39,42 +40,50 @@ export class BookingService {
   // Get all resource types for filtering
   getResourceTypes(): Observable<{ id: number; name: string }[]> {
     return this.http
-      .get<{ id: number; name: string }[]>(
+      .get<ApiResponse<{ id: number; name: string }[]>>(
         `${environment.apiBaseUrl}/resource/ResourceTypes`,
         {
           headers: this.getAuthHeaders(),
         }
       )
-      .pipe(catchError(this.handleError));
+      .pipe(
+        map((response) => response.data || []),
+        catchError(this.handleError)
+      );
   }
 
   // Get all booking statuses for filtering
   getBookingStatuses(): Observable<{ id: number; name: string }[]> {
     return this.http
-      .get<{ id: number; name: string }[]>(
+      .get<ApiResponse<{ id: number; name: string }[]>>(
         `${environment.apiBaseUrl}/booking/allBookingStatus`,
         {
           headers: this.getAuthHeaders(),
         }
       )
-      .pipe(catchError(this.handleError));
+      .pipe(
+        map((response) => response.data || []),
+        catchError(this.handleError)
+      );
   }
 
   // Get all users with bookings for filtering
   getUsersWithBookings(): Observable<{ id: string; name: string }[]> {
     return this.http
-      .get<{ id: string; fullName: string }[]>(
+      .get<ApiResponse<{ id: string; fullName: string }[]>>(
         `${environment.apiBaseUrl}/booking/users-with-bookings`,
         {
           headers: this.getAuthHeaders(),
         }
       )
       .pipe(
-        map((users: { id: string; fullName: string }[]) =>
-          users.map((user: { id: string; fullName: string }) => ({
-            id: user.id,
-            name: user.fullName,
-          }))
+        map((response: ApiResponse<{ id: string; fullName: string }[]>) =>
+          (response.data || []).map(
+            (user: { id: string; fullName: string }) => ({
+              id: user.id,
+              name: user.fullName,
+            })
+          )
         ),
         catchError(this.handleError)
       );

@@ -7,6 +7,6 @@ export interface Booking {
   userName: string;
   startTime: Date;
   endTime: Date;
-  status: BookingStatus;
+  status: string;
   date: Date;
 }
