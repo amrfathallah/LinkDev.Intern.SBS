@@ -29,12 +29,15 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 
 // Admin Dashboard Components
 import { AdminDashboardComponent } from '../admin-dashboard.component';
 import { BookingsManagementComponent } from '../components/bookings-management/bookings-management.component';
+import { BookingFiltersComponent } from '../components/bookings-management/booking-filters/booking-filters.component';
+import { BookingTableComponent } from '../components/bookings-management/booking-table/booking-table.component';
 import { ResourcesManagementComponent } from '../components/resources-management/resources-management.component';
 import { ReportsManagementComponent } from '../components/reports-management/reports-management.component';
 import { ConfirmationDialogComponent } from '../components/confirmation-dialog/confirmation-dialog.component';
@@ -44,10 +47,12 @@ import { ResourceDialogComponent } from '../components/resource-dialog/resource-
   declarations: [
     AdminDashboardComponent,
     BookingsManagementComponent,
+    BookingFiltersComponent,
+    BookingTableComponent,
     ResourcesManagementComponent,
     ReportsManagementComponent,
     ConfirmationDialogComponent,
-    ResourceDialogComponent
+    ResourceDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -79,11 +84,12 @@ import { ResourceDialogComponent } from '../components/resource-dialog/resource-
     MatTooltipModule,
     MatButtonToggleModule,
     MatProgressBarModule,
+    MatProgressSpinnerModule,
     MatSidenavModule,
-    MatListModule
+    MatListModule,
   ],
   providers: [
     // Global admin services
-  ]
+  ],
 })
-export class AdminDashboardModule { }
+export class AdminDashboardModule {}

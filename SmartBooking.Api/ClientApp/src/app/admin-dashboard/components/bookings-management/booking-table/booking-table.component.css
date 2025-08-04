@@ -1,0 +1,60 @@
+.table-container {
+  margin-top: 20px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.loading-container p {
+  margin-top: 16px;
+  color: #666;
+}
+
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #666;
+}
+
+.no-data mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+}
+
+.status-upcoming {
+  color: #2196f3;
+  font-weight: 500;
+}
+
+.status-happening {
+  color: #4caf50;
+  font-weight: 500;
+}
+
+.status-finished {
+  color: #757575;
+  font-weight: 500;
+}
+
+.status-unknown {
+  color: #ff9800;
+  font-weight: 500;
+}
+
+.mat-table {
+  width: 100%;
+}
+
+.mat-paginator {
+  background: transparent;
+}
