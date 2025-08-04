@@ -18,6 +18,7 @@ import { JwtModule } from '@auth0/angular-jwt';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { environment } from '../environments/environment';
+import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
 
 export function tokenGetter() {
   return localStorage.getItem('token');
