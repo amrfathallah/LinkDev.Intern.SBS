@@ -26,6 +26,10 @@ export class LoginComponent {
     });
   }
 
+  goToRegister(){
+    this.router.navigate(['/auth/register']);
+  }
+
   onSubmit() {
     if (this.loginForm.invalid) return;
     this.isSubmitting = true;

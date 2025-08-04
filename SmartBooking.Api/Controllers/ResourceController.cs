@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.TeamFoundation.TestManagement.WebApi;
 using SBS.Application.DTOs.ResourceDto;
@@ -10,6 +11,7 @@ namespace SmartBooking.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ResourceController : ControllerBase
     {
         private readonly IResourceService _resourceService;
