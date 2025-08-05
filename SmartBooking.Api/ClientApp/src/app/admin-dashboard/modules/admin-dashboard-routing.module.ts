@@ -5,12 +5,12 @@ import { AdminDashboardComponent } from '../admin-dashboard.component';
 const routes: Routes = [
   {
     path: '',
-    component: AdminDashboardComponent
-  }
+    component: AdminDashboardComponent,
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AdminDashboardRoutingModule { }
+export class AdminDashboardRoutingModule {}

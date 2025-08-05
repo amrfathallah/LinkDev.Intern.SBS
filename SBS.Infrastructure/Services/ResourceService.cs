@@ -1,4 +1,5 @@
 using AutoMapper;
+using SBS.Application.DTOs.Auth;
 using SBS.Application.DTOs.ResourceDto;
 using SBS.Application.Interfaces;
 using SBS.Application.Interfaces.IServices;
@@ -7,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using SBS.Application.DTOs.Common;
 
 
 
@@ -142,6 +144,34 @@ namespace SBS.Application.Services
                 ResourceName = resource.Name,
                 BookedSlots = bookedSlots
             };
+        }
+		public async Task<ApiResponse<List<ResourceTypeDto>>> GetAllResourceTypesAsync()
+		{
+			try
+			{
+				var types = await _unitOfWork.ResourceType.GetAllAsync();
+				var result = _mapper.Map<List<ResourceTypeDto>>(types);
+				
+				return new ApiResponse<List<ResourceTypeDto>>
+				{
+					Success = true,
+					Message = "Resource types retrieved successfully",
+					Data = result
+				};
+			}
+			catch (Exception)
+			{
+				return new ApiResponse<List<ResourceTypeDto>>
+				{
+					Success = false,
+					Message = "An error occurred while fetching resource types",
+					Data = null
+				};
+			}
+		}
+
+		
+	}
         }
 
         public async Task<List<ResourceDto>> GetAvailableResourcesAsync(DateOnly date)

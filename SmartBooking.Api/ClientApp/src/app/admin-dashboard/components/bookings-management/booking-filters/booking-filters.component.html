@@ -1,0 +1,90 @@
+<div class="filters-section" [formGroup]="filterForm">
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <div class="filters-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ FORM_LABELS.startDate }}</mat-label>
+          <input
+            matInput
+            [matDatepicker]="startPicker"
+            formControlName="startDate"
+          />
+          <mat-datepicker-toggle
+            matSuffix
+            [for]="startPicker"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #startPicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ FORM_LABELS.endDate }}</mat-label>
+          <input
+            matInput
+            [matDatepicker]="endPicker"
+            formControlName="endDate"
+          />
+          <mat-datepicker-toggle
+            matSuffix
+            [for]="endPicker"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #endPicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ FORM_LABELS.resourceType }}</mat-label>
+          <mat-select formControlName="resourceType">
+            <mat-option value="">{{ UI_MESSAGES.allTypes }}</mat-option>
+            <mat-option
+              *ngFor="let resourceType of allResourceTypes"
+              [value]="resourceType.id"
+            >
+              {{ resourceType.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ FORM_LABELS.user }}</mat-label>
+          <mat-select formControlName="user">
+            <mat-option value="">{{ UI_MESSAGES.allUsers }}</mat-option>
+            <mat-option *ngFor="let user of uniqueUsers" [value]="user.id">
+              {{ user.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ FORM_LABELS.status }}</mat-label>
+          <mat-select formControlName="status">
+            <mat-option value="">{{ UI_MESSAGES.allStatuses }}</mat-option>
+            <mat-option
+              *ngFor="let status of allBookingStatuses"
+              [value]="status.id"
+            >
+              {{ status.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Date Range Error Message -->
+      <div *ngIf="hasDateRangeError" class="date-error-message">
+        <mat-error>{{ dateRangeErrorMessage }}</mat-error>
+      </div>
+
+      <div class="filter-actions">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="onApplyFilters()"
+          [disabled]="filterForm.invalid"
+        >
+          {{ UI_MESSAGES.applyFilters }}
+        </button>
+        <button mat-stroked-button (click)="onClearFilters()">
+          {{ UI_MESSAGES.clear }}
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.TeamFoundation.TestManagement.WebApi;
+using SBS.Application.DTOs;
 using SBS.Application.DTOs.BookingDto;
 using SBS.Application.DTOs.Common;
 using SBS.Application.Interfaces.IServices;
+using System.Security.Claims;
 
 namespace SmartBooking.Api.Controllers
 {
@@ -19,6 +23,7 @@ namespace SmartBooking.Api.Controllers
 
 		[HttpPost]
 		[Route("book")]
+		[Authorize]
 		public async Task<IActionResult> BookResource([FromBody] BookingRequestDto bookingRequestDto)
 		{
 			try
@@ -37,10 +42,11 @@ namespace SmartBooking.Api.Controllers
 				}
 
 
-				//Extract info from token
-				
+                //Extract info from token
+				var userID = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+				var userName = User.FindFirst(ClaimTypes.Name)?.Value;
+				var result = await _bookingService.BookAsync(bookingRequestDto, Guid.Parse(userID), userName);
 
-				var result = await _bookingService.BookAsync(bookingRequestDto,Guid.Parse("3BECB38E-CC36-431D-EE02-08DDCE8742FC"), "testUser"); //To be completed: Get userId and username from token
 			
 				if (result)
 				{
@@ -70,5 +76,36 @@ namespace SmartBooking.Api.Controllers
 			
 		}
 
+
+		//[Authorize(Roles = "Admin")]
+		[HttpPost("allBooking")]
+		public async Task<IActionResult> GetAllBookings([FromBody] ViewBookingsParams ViewBookingquery)
+		{
+			try
+			{
+
+				var result = await _bookingService.GetAllBookingsAsync(ViewBookingquery);
+				return Ok(result);
+			}
+			catch (Exception)
+			{
+
+				return StatusCode(500, "An error occurred while fetching bookings.");
+			}
+		}
+
+		[HttpGet("allBookingStatus")]
+		public async Task<IActionResult> GetAllBookingStatus()
+		{
+			var result = await _bookingService.GetAllBookingStatusAsync();
+			return Ok(result);
+		}
+
+		[HttpGet("users-with-bookings")]
+		public async Task<IActionResult> GetUsersWithBookings()
+		{
+			var users = await _bookingService.GetUsersWithBookingsAsync();
+			return Ok(users);
+		}
 	}
 }

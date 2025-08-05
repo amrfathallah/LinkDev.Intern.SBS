@@ -11,7 +11,7 @@ namespace SBS.Application.Settings
         public string? Secret { get; set; }
         public string? Issuer { get; set; }
         public string? Audience { get; set; }
-        public int AccessTokenExpiry { get; set; }
-        public int RefreshTokenExpiry { get; set; }
+        public int AccessTokenExpiryInMin { get; set; }
+        public int RefreshTokenExpiryInDay { get; set; }
     }
 }
