@@ -170,34 +170,28 @@ namespace SBS.Application.Services
 			}
 		}
 
-		
-	}
-        }
-
-        public async Task<List<ResourceDto>> GetAvailableResourcesAsync(DateOnly date)
+        public async Task<ApiResponse<List<ResourceDto>>> GetAvailableResourcesAsync(DateOnly date)
         {
-            var resources = await _unitOfWork.Resources.GetAllAsync();
-            var filteredResources = resources.Where(r => r.IsActive && !r.IsDeleted).ToList();
-
-            var allSlots = await _unitOfWork.SlotRepository.GetAllAsync();
-            var availableResources = new List<ResourceDto>();
-
-            foreach (var resource in filteredResources)
+            try
             {
-                var resourceWithBookings = await _unitOfWork.Resources.GetResourceWithBookedSlotsAsync(resource.Id, date);
-                var bookedSlotIds = resourceWithBookings?.Bookings
-                    .SelectMany(b => b.BookingSlots)
-                    .Where(bs => bs.Slot != null)
-                    .Select(bs => bs.SlotId)
-                    .ToHashSet() ?? new HashSet<int>();
+                var availableResources = await _unitOfWork.Resources.GetResourcesWithAvailableSlotsAsync(date);
 
-                if (allSlots.Any(slot => !bookedSlotIds.Contains(slot.Id)))
+                return new ApiResponse<List<ResourceDto>>
                 {
-                    availableResources.Add(_mapper.Map<ResourceDto>(resource));
-                }
+                    Success = true,
+                    Message = "Available resources retrieved successfully",
+                    Data = availableResources.Select(r => _mapper.Map<ResourceDto>(r)).ToList()
+                };
             }
-
-            return availableResources;
+            catch (Exception ex)
+            {
+                return new ApiResponse<List<ResourceDto>>
+                {
+                    Success = false,
+                    Message = "An error occurred while fetching available resources",
+                    Data = null
+                };
+            }
         }
     }
 }

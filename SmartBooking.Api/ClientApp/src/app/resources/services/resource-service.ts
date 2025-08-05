@@ -44,8 +44,16 @@ export class ResourceService {
     // Format date as YYYY-MM-DD
     const formattedDate = date.toISOString().split('T')[0];
     
-    return this._httpClient.get<GetResourceDto[]>(
+    return this._httpClient.get<ApiResponse<GetResourceDto[]>>(
       `${environment.apiBaseUrl}/Resource/available?date=${formattedDate}`
+    ).pipe(
+      map(response => {
+        if (response.success && response.data) {
+          return response.data;
+        } else {
+          throw new Error(response.message || 'Failed to fetch available resources');
+        }
+      })
     );
   }
 
