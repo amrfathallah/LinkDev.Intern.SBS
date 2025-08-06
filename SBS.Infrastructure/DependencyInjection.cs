@@ -5,18 +5,12 @@ using SBS.Application.Interfaces;
 using SBS.Application.Interfaces.Initializers;
 using SBS.Application.Interfaces.IRepositories;
 using SBS.Application.Interfaces.IServices;
-using SBS.Application.Interfaces.IRepositories;
 using SBS.Application.Services.Auth;
 using SBS.Infrastructure.Persistence._Data;
 using SBS.Infrastructure.Persistence._Data.Interceptors;
 using SBS.Infrastructure.Persistence.Initializers;
 using SBS.Infrastructure.Repositories;
 using SBS.Infrastructure.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SBS.Application.Services;
 
 namespace SBS.Infrastructure
@@ -73,6 +67,11 @@ namespace SBS.Infrastructure
 
 			services.AddScoped<ISlotRepository, SlotRepository>();
 			services.AddScoped<ISlotService, SlotService>();
+
+            services.AddScoped<IPdfReportExporter, PdfReportExporter>();
+            services.AddScoped<IExcelReportExporter, ExcelReportExporter>();
+
+            services.AddScoped<IReportRepository, ReportRepository>();
 
 
             return services;

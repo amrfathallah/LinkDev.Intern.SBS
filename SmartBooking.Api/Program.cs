@@ -11,11 +11,15 @@ using SBS.Infrastructure.CurrentUserService;
 using SBS.Infrastructure.Persistence._Data;
 using SmartBooking.Api.Extensions;
 using System.Text;
+using SBS.Application.Queries;
 
 var webApplicationBuilder = WebApplication.CreateBuilder(args);
 
 // Get allowed origins from configuration
 var allowedOrigins = webApplicationBuilder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+
+// Registring the Mediator
+webApplicationBuilder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetReportQueryHandler).Assembly));
 
 //Add CORS
 webApplicationBuilder.Services.AddCors(options =>
@@ -68,7 +72,7 @@ webApplicationBuilder.Services
             ValidIssuer = jwtSettings!.Issuer,
             ValidAudience = jwtSettings.Audience,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret!))
         };
     });
 webApplicationBuilder.Services.AddAuthorization();
