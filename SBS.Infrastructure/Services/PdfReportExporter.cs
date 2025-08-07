@@ -49,12 +49,12 @@ namespace SBS.Infrastructure.Services
 
             doc.Add(new Paragraph(report.Name, titleFont));
             doc.Add(new Paragraph($"Generated on: {DateTime.Now:yyyy-MM-dd HH:mm:ss}", contentFont));
-            doc.Add(new Paragraph($"Type: {report.reportType}", contentFont));
+            doc.Add(new Paragraph($"Type: {report.ReportType}", contentFont));
             doc.Add(new Paragraph("\n"));
 
-            foreach (var entry in report.Data)
+            for (int i = 0; i < report.Labels.Count; i++)
             {
-                doc.Add(new Paragraph($"{entry.Key}: {entry.Value}", contentFont));
+                doc.Add(new Paragraph($"{report.Labels[i]}: {report.Values[i]}", contentFont));
             }
 
             doc.Close();

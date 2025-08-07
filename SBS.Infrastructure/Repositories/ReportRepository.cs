@@ -23,23 +23,26 @@ namespace SBS.Infrastructure.Repositories
             var query = _appDbContext.Bookings
                 .Where(b => !b.IsDeleted &&
                     (from.HasValue && b.Date >= from.Value) &&
-                    (to.HasValue && b.Date <= to.Value));
+                    (to.HasValue && b.Date <= to.Value))
+                .AsEnumerable();
 
             // Groups the bookings per day
-            var data = await query
+            var data = query
                 .GroupBy(b => b.Date)
-                .Select(g => new {
-                    Date = g.Key,
+                .Select(g => new
+                {
+                    Date = g.Key.ToString("yyyy-MM-dd"),
                     Count = g.Count()
                 })
                 .OrderByDescending(g => g.Date)
-                .ToDictionaryAsync(g => g.Date.ToString("yyyy-MM-dd"), g => (object)g.Count);
+                .ToList();
 
             return new ReportDto
             {
                 Name = "Booking Trends",
-                reportType = ReportTypeEnum.BookingTrends,
-                Data = data
+                ReportType = ReportTypeEnum.BookingTrends,
+                Labels = data.Select(g => g.Date).ToList(),
+                Values = data.Select(g => (double)g.Count).ToList(),
             };
         }
 
@@ -48,24 +51,26 @@ namespace SBS.Infrastructure.Repositories
             var query = _appDbContext.Bookings
                 .Where(b => b.IsDeleted &&
                     (from.HasValue && b.Date >= from.Value) &&
-                    (to.HasValue && b.Date <= to.Value));
+                    (to.HasValue && b.Date <= to.Value))
+                .AsEnumerable();
 
             // Groups the cancellations per day
-            var data = await query
+            var data = query
                 .GroupBy(b => b.Date)
                 .Select(g => new
                 {
-                    Date = g.Key,
+                    Date = g.Key.ToString("yyyy-MM-dd"),
                     Count = g.Count()
                 })
                 .OrderByDescending(g => g.Date)
-                .ToDictionaryAsync(g => g.Date.ToString("yyyy-MM-dd"), g => (object)g.Count);
+                .ToList();
 
             return new ReportDto
             {
                 Name = "Cancellation Stats",
-                reportType = ReportTypeEnum.CancellationStats,
-                Data = data
+                ReportType = ReportTypeEnum.CancellationStats,
+                Labels = data.Select(g => g.Date).ToList(),
+                Values = data.Select(g => (double)g.Count).ToList() 
             };
         }
 
@@ -81,21 +86,22 @@ namespace SBS.Infrastructure.Repositories
                     (to.HasValue && bs.Booking.Date <= to.Value));
 
             // Groups the booking slots by hour of the day
-            var data = await query
+            var data = query
+                .AsEnumerable()
                 .GroupBy(bs => bs.Slot!.StartTime.Hours)
                 .Select(g => new
                 {
-                    Hour = g.Key,
+                    Hour = $"{g.Key}:00",
                     Count = g.Count()
                 })
-                .OrderBy(g => g.Hour)
-                .ToDictionaryAsync(g => $"{g.Hour}:00", g => (object)g.Count);
+                .OrderBy(g => g.Hour);
 
             return new ReportDto
             {
                 Name = "Peak Booking Hours",
-                reportType = ReportTypeEnum.PeakHours,
-                Data = data
+                ReportType = ReportTypeEnum.PeakHours,
+                Labels = data.Select(g => g.Hour).ToList(),
+                Values = data.Select(g => (double)g.Count).ToList()
 
             };
         }
@@ -117,14 +123,16 @@ namespace SBS.Infrastructure.Repositories
                 .GroupBy(b => b.Resource!.Name)
                 .Select(g => new {
                     Resource = g.Key,
-                    Count = g.SelectMany(b => b.BookingSlots).Count()
+                    Count = g.Count()
                 })
-                .ToDictionaryAsync(g => g.Resource, g => (object)g.Count);
+                .OrderByDescending(g => g.Count)
+                .ToListAsync();
 
             return new ReportDto { 
                 Name = "Resource Usage",
-                reportType = ReportTypeEnum.ResourceUsage,
-                Data = data
+                ReportType = ReportTypeEnum.ResourceUsage,
+                Labels = data.Select(g => g.Resource!).ToList(),
+                Values = data.Select(g => (double)g.Count).ToList()
             };
 
         }
@@ -141,17 +149,19 @@ namespace SBS.Infrastructure.Repositories
 
             var data = await query
                 .GroupBy(b => b.User!.UserName)
-                .Select(g => new {
+                .Select(g => new
+                {
                     UserName = g.Key,
                     Count = g.SelectMany(b => b.BookingSlots).Count()
                 })
-                .ToDictionaryAsync(g => g.UserName!.ToString() , g => (object)g.Count);
+                .ToListAsync();
 
             return new ReportDto
             {
                 Name = "User Activity",
-                reportType = ReportTypeEnum.UserActivity,
-                Data = data
+                ReportType = ReportTypeEnum.UserActivity,
+                Labels = data.Select(g => g.UserName!).ToList(),
+                Values = data.Select(g => (double)g.Count).ToList()
             };
         }
 
@@ -212,30 +222,19 @@ namespace SBS.Infrastructure.Repositories
                     Resource = g.Key.Resource,
                     WorkingHoursPerDay = g.Key.workingHoursPerDay,
                     TotalBookedTime = g.Sum(x => x.SlotDuration)
-                });
+                }).ToList();
 
-
-            var result = CalculatedData.ToDictionary(
-                g => g.Resource,
-                h =>
-                {
-                    double totalAvailableTime = h.WorkingHoursPerDay * totalWorkingDays;
-                    double utilizationRate = totalAvailableTime > 0 ? (h.TotalBookedTime / totalAvailableTime) * 100 : 0;
-                    return (object)new
-                    {
-                        totalWorkingDays,
-                        totalAvailableTime = Math.Round(totalAvailableTime, 2),
-                        TotalBookedTime = Math.Round(h.TotalBookedTime, 2),
-                        UtilizationRate1 = Math.Round(utilizationRate, 2),
-                    };
-                }
-            );
 
             return new ReportDto
             {
                 Name = "Utilization Rates",
-                reportType = ReportTypeEnum.UtilizationRates,
-                Data = result
+                ReportType = ReportTypeEnum.UtilizationRates,
+                Labels = CalculatedData.Select(g => g.Resource).ToList(),
+                Values = CalculatedData.Select(g =>
+                {
+                    double totalAvailableTime = g.WorkingHoursPerDay * totalWorkingDays; // Total Available Time in Hours
+                    return totalAvailableTime > 0 ? Math.Round((g.TotalBookedTime / totalAvailableTime) * 100, 2): 0;
+                }).ToList()
             };
         }
     }

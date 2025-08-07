@@ -36,16 +36,21 @@ namespace SBS.Infrastructure.Services
             worksheet.Cell(1, 1).Value = "Report Name";
             worksheet.Cell(1, 2).Value = report.Name;
             worksheet.Cell(2, 1).Value = "Report Type";
-            worksheet.Cell(2, 2).Value = report.reportType.ToString();
+            worksheet.Cell(2, 2).Value = report.ReportType.ToString();
 
             worksheet.Cell(4, 1).Value = "Key";
             worksheet.Cell(4, 2).Value = "Value";
 
             int row = 5;
-            foreach (var entry in report.Data)
+            foreach (var label in report.Labels)
             {
-                worksheet.Cell(row, 1).Value = entry.Key;
-                worksheet.Cell(row, 2).Value = entry.Value?.ToString();
+                worksheet.Cell(row, 1).Value = label;
+                row++;
+            }
+            row = 5;
+            foreach (var entry in report.Values)
+            {
+                worksheet.Cell(row, 2).Value = entry;
                 row++;
             }
 

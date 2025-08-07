@@ -10,7 +10,8 @@ namespace SBS.Application.DTOs.ReportDto
     public class ReportDto
     {
         public string Name { get; set; } = string.Empty;
-        public ReportTypeEnum reportType { get; set; }
-        public Dictionary<string, object> Data { get; set; } = new Dictionary<string, object>();
+        public ReportTypeEnum ReportType { get; set; }
+        public List<string> Labels { get; set; } = new List<string>();
+        public List<double> Values { get; set; } = new List<double>();  
     }
 }
