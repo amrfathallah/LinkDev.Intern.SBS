@@ -12,20 +12,21 @@ namespace SBS.Infrastructure.Services
     public class ExcelReportExporter : IExcelReportExporter
     {
         private readonly IMediator _mediator;
-        
+
         public ExcelReportExporter(IMediator mediator)
         {
             _mediator = mediator;
         }
-        public async Task<FileContentResult> Export(ReportTypeEnum reportType, DateOnly? from, DateOnly? to)
+        public async Task<ExportReportDto> Export(ReportTypeEnum reportType, DateOnly? from, DateOnly? to)
         {
             var report = await _mediator.Send(new GetReportQuery(reportType, from, to));
-            byte[] excel = GenerateExcel(report);
+            var excel = GenerateExcel(report);
             var fileName = $"{reportType}_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
-            return new FileContentResult(excel, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-            {
-                FileDownloadName = fileName
-            };
+            return ExportReportDto.FromBinary(
+                excel,
+                fileName,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            );
         }
 
         public byte[] GenerateExcel(ReportDto report)

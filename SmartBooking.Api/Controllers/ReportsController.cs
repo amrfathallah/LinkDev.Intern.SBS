@@ -45,8 +45,8 @@ namespace SmartBooking.Api.Controllers
         {
             return exportType switch
             {
-                ExportTypeEnum.Pdf => await _pdfReportExporter.Export(reportType, from, to),
-                ExportTypeEnum.Excel => await _excelReportExporter.Export(reportType, from, to),
+                ExportTypeEnum.Pdf => Ok(await _pdfReportExporter.Export(reportType, from, to)),
+                ExportTypeEnum.Excel => Ok(await _excelReportExporter.Export(reportType, from, to)),
                 _ => BadRequest("Unsupported export type.")
             };
         }

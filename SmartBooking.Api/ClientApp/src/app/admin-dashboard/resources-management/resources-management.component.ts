@@ -5,7 +5,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmationDialogComponent, ResourceDialogComponent } from '../shared';
-import { AdminService } from '../../services/admin-service';
+import { AdminService } from '../../report/services/admin-service';
 import { CreateResourceDto } from 'src/app/models/resource/create-resource.dto';
 import { UpdateResourceDto } from 'src/app/models/resource/update-resource.dto';
 export interface Resource {

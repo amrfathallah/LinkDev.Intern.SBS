@@ -25,15 +25,16 @@ namespace SBS.Infrastructure.Services
         {
             _mediator = mediator;
         }
-        public async Task<FileContentResult> Export(ReportTypeEnum reportType, DateOnly? from, DateOnly? to)
+        public async Task<ExportReportDto> Export(ReportTypeEnum reportType, DateOnly? from, DateOnly? to)
         {
             var report = _mediator.Send(new GetReportQuery(reportType, from, to));
-            byte[] pdf = GeneratePdf(report.Result);
+            var pdf = GeneratePdf(report.Result);
             var fileName = $"{report.Result.Name}_{DateTime.Now:yyyyMMddHHmmss}.pdf";
-            return new FileContentResult(pdf, "application/pdf")
-            {
-                FileDownloadName = fileName
-            };
+            return ExportReportDto.FromBinary(
+                pdf,
+                fileName,
+                "application/pdf"
+            );
         }
 
         public byte[] GeneratePdf(ReportDto report)

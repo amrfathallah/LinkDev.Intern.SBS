@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SBS.Application.DTOs.ReportDto;
 using SBS.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,6 @@ namespace SBS.Application.Interfaces.IServices
 {
     public interface IExcelReportExporter
     {
-        Task<FileContentResult> Export(ReportTypeEnum reportType, DateOnly? from, DateOnly? to);
+        Task<ExportReportDto> Export(ReportTypeEnum reportType, DateOnly? from, DateOnly? to);
     }
 }

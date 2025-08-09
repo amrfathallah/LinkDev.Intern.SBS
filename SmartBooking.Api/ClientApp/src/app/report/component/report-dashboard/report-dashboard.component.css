@@ -1,0 +1,39 @@
+.report-dashboard {
+  padding: 16px;
+}
+
+.dashboard-title {
+  margin-bottom: 16px;
+}
+
+.filter-card, .export-card, .chart-card {
+  margin-bottom: 16px;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.control-item {
+  min-width: 200px;
+  flex: 1;
+}
+
+.export-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.status-section {
+  margin: 16px 0;
+  text-align: center;
+}
+
+.no-data-msg {
+  text-align: center;
+  color: gray;
+  margin-top: 10px;
+}
