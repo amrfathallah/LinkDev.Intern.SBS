@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SBS.Application.DTOs.ReportDto;
 using SBS.Application.Interfaces.IServices;
@@ -27,26 +28,28 @@ namespace SmartBooking.Api.Controllers
             _excelReportExporter = excelReportExporter;
         }
 
-        [HttpGet("report")]
-        public async Task<ActionResult<ReportDto>> GetReport([FromQuery] ReportTypeEnum reportType,
-            [FromQuery] DateOnly? from,
-            [FromQuery] DateOnly? to)
+        [HttpPost("report")]
+        [Authorize]
+        public async Task<ActionResult<ReportDto>> GetReport(ReportRequestDto reportRequest)
         {
-            var report = await _mediator.Send(new GetReportQuery(reportType, from, to));
+            if (reportRequest == null)
+            {
+                return BadRequest("Invalid Report Request");
+            }
+
+            var report = await _mediator.Send(new GetReportQuery(reportRequest));
             return Ok(report);
         }
 
-        [HttpGet("export")]
-        public async Task<IActionResult> ExportReport(
-            [FromQuery] ReportTypeEnum reportType,
-            [FromQuery] ExportTypeEnum exportType,
-            [FromQuery] DateOnly? from,
-            [FromQuery] DateOnly? to)
+        [HttpPost("export")]
+        [Authorize]
+
+        public async Task<IActionResult> ExportReport(ReportRequestDto reportRequest)
         {
-            return exportType switch
+            return reportRequest.ExportType switch
             {
-                ExportTypeEnum.Pdf => Ok(await _pdfReportExporter.Export(reportType, from, to)),
-                ExportTypeEnum.Excel => Ok(await _excelReportExporter.Export(reportType, from, to)),
+                ExportTypeEnum.Pdf => Ok(await _pdfReportExporter.Export(reportRequest)),
+                ExportTypeEnum.Excel => Ok(await _excelReportExporter.Export(reportRequest)),
                 _ => BadRequest("Unsupported export type.")
             };
         }

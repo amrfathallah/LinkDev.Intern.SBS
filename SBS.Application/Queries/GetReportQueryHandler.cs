@@ -20,14 +20,14 @@ namespace SBS.Application.Queries
 
         public async Task<ReportDto> Handle(GetReportQuery request, CancellationToken cancellationToken)
         {
-            return request.ReportType switch
+            return request.ReportRequest.ReportType switch
             {
-                ReportTypeEnum.ResourceUsage => await _reportRepository.GetResourceUsageAsync(request.From, request.To),
-                ReportTypeEnum.UserActivity => await _reportRepository.GetUserActivityAsync(request.From, request.To),
-                ReportTypeEnum.PeakHours => await _reportRepository.GetPeakHoursAsync(request.From, request.To),
-                ReportTypeEnum.BookingTrends => await _reportRepository.GetBookingTrendsAsync(request.From, request.To),
-                ReportTypeEnum.CancellationStats => await _reportRepository.GetCancellationStatsAsync(request.From, request.To),
-                ReportTypeEnum.UtilizationRates => await _reportRepository.GetUtilizationRatesAsync(request.From, request.To),
+                ReportTypeEnum.ResourceUsage => await _reportRepository.GetResourceUsageAsync(request.ReportRequest.From, request.ReportRequest.To),
+                ReportTypeEnum.UserActivity => await _reportRepository.GetUserActivityAsync(request.ReportRequest.From, request.ReportRequest.To),
+                ReportTypeEnum.PeakHours => await _reportRepository.GetPeakHoursAsync(request.ReportRequest.From, request.ReportRequest.To),
+                ReportTypeEnum.BookingTrends => await _reportRepository.GetBookingTrendsAsync(request.ReportRequest.From, request.ReportRequest.To),
+                ReportTypeEnum.CancellationStats => await _reportRepository.GetCancellationStatsAsync(request.ReportRequest.From, request.ReportRequest.To),
+                ReportTypeEnum.UtilizationRates => await _reportRepository.GetUtilizationRatesAsync(request.ReportRequest.From, request.ReportRequest.To),
                 _ => throw new ArgumentException("Invalid report type")
             };
         }

@@ -3,7 +3,8 @@ import { ChartOptions, ChartType } from 'chart.js';
 import { ReportService } from '../../service/report.service'; 
 import { ReportDto } from '../../models/report.Dto';
 import { ReportTypeEnum } from '../../models/report-type.enum'; 
-import { ExportType } from '../../models/export-type.enum';
+import { ExportTypeEnum } from '../../models/export-type.enum';
+import { ReportRequestDto } from '../../models/report-request-dto';
 
 @Component({
   selector: 'app-report-dashboard',
@@ -15,11 +16,13 @@ export class ReportDashboardComponent implements OnInit {
       .filter(k => isNaN(Number(k))) as (keyof typeof ReportTypeEnum)[];
   selectedReportType: ReportTypeEnum = ReportTypeEnum.ResourceUsage;
 
+  reportRequest: ReportRequestDto = new ReportRequestDto();
+
   fromDate?: Date;
   toDate?: Date;
   reportData?: ReportDto;
   ReportTypeEnum = ReportTypeEnum;
-  ExportType = ExportType;
+  ExportType = ExportTypeEnum;
 
   chartLabels: string[] = [];
   chartData: number[] = [];
@@ -58,8 +61,14 @@ export class ReportDashboardComponent implements OnInit {
 
   this.loading = true;
   this.error = '';
+  
+  if(this.reportRequest){
+    this.reportRequest.reportType = this.selectedReportType;
+    this.reportRequest.from = this.fromDate?.toISOString().split('T')[0];
+    this.reportRequest.to = this.toDate?.toISOString().split('T')[0];
+  }
 
-  this.reportService.getReport(this.selectedReportType, this.fromDate, this.toDate)
+  this.reportService.getReport(this.reportRequest)
     .subscribe({
       next: (data) => {
         this.reportData = data;
@@ -74,8 +83,11 @@ export class ReportDashboardComponent implements OnInit {
     });
 }
 
-  export(type: ExportType): void {
-    this.reportService.exportReport(this.selectedReportType, type, this.fromDate, this.toDate)
+  export(type: ExportTypeEnum): void {
+    if(this.reportRequest){
+      this.reportRequest.exportType = type;
+    }
+    this.reportService.exportReport(this.reportRequest)
       .subscribe({
         next: (response) => {
           const a = document.createElement('a');

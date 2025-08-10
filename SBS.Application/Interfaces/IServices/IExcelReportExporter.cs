@@ -11,6 +11,6 @@ namespace SBS.Application.Interfaces.IServices
 {
     public interface IExcelReportExporter
     {
-        Task<ExportReportDto> Export(ReportTypeEnum reportType, DateOnly? from, DateOnly? to);
+        Task<ExportReportDto> Export(ReportRequestDto reportRequest);
     }
 }

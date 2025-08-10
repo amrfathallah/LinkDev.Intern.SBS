@@ -173,18 +173,16 @@ namespace SBS.Infrastructure.Repositories
             Assuming that if (from , to) is not provided, we consider 30 days.
              */
             // Step 1: Set the date range
-            var fromDate = from ?? DateOnly.FromDateTime(DateTime.Now.AddDays(-30));
-            var toDate = to ?? DateOnly.FromDateTime(DateTime.Now);
-            var currentDate = fromDate;
+            var currentDate = from;
             var totalWorkingDays = 0;
-            while (currentDate < toDate)
+            while (currentDate!.Value < to!.Value)
             {
-                if (currentDate.DayOfWeek != DayOfWeek.Friday 
-                    && currentDate.DayOfWeek != DayOfWeek.Saturday)
+                if (currentDate.Value.DayOfWeek != DayOfWeek.Friday
+                    && currentDate.Value.DayOfWeek != DayOfWeek.Saturday)
                 {
                     totalWorkingDays++;
                 }
-                currentDate = currentDate.AddDays(1);
+                currentDate = currentDate.Value.AddDays(1);
             }
 
            // var totalDays = toDate.DayNumber - fromDate.DayNumber + 1; // Total Number of Days "INCLUSIVE"
@@ -195,8 +193,8 @@ namespace SBS.Infrastructure.Repositories
                     .ThenInclude(b => b!.Resource)
                 .Include(bs => bs.Slot)
                  .Where(bs => !bs.IsDeleted && !bs.Booking!.IsDeleted &&
-                    (bs.Booking.Date >= fromDate) &&
-                    (bs.Booking.Date <= toDate));
+                    (bs.Booking.Date >= from) &&
+                    (bs.Booking.Date <= to));
 
             var date = await query
                 .GroupBy(bs => new

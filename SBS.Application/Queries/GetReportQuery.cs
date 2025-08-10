@@ -9,5 +9,5 @@ using System.Threading.Tasks;
 
 namespace SBS.Application.Queries
 {
-    public record GetReportQuery(ReportTypeEnum ReportType, DateOnly? From, DateOnly? To) : IRequest<ReportDto>;
+    public record GetReportQuery(ReportRequestDto ReportRequest) : IRequest<ReportDto>;
 }

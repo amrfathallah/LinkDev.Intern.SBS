@@ -17,11 +17,11 @@ namespace SBS.Infrastructure.Services
         {
             _mediator = mediator;
         }
-        public async Task<ExportReportDto> Export(ReportTypeEnum reportType, DateOnly? from, DateOnly? to)
+        public async Task<ExportReportDto> Export(ReportRequestDto reportRequest)
         {
-            var report = await _mediator.Send(new GetReportQuery(reportType, from, to));
+            var report = await _mediator.Send(new GetReportQuery(reportRequest));
             var excel = GenerateExcel(report);
-            var fileName = $"{reportType}_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+            var fileName = $"{reportRequest.ReportType}_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
             return ExportReportDto.FromBinary(
                 excel,
                 fileName,

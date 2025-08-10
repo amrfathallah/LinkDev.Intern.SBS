@@ -25,9 +25,9 @@ namespace SBS.Infrastructure.Services
         {
             _mediator = mediator;
         }
-        public async Task<ExportReportDto> Export(ReportTypeEnum reportType, DateOnly? from, DateOnly? to)
+        public async Task<ExportReportDto> Export(ReportRequestDto reportRequest)
         {
-            var report = _mediator.Send(new GetReportQuery(reportType, from, to));
+            var report = _mediator.Send(new GetReportQuery(reportRequest));
             var pdf = GeneratePdf(report.Result);
             var fileName = $"{report.Result.Name}_{DateTime.Now:yyyyMMddHHmmss}.pdf";
             return ExportReportDto.FromBinary(
