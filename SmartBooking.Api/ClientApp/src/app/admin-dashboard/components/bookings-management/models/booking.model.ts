@@ -1,12 +1,12 @@
-import { BookingStatus } from "../enums/BookingStatus.enum";
+import { BookingStatus } from '../../../enums/BookingStatus.enum';
 
 export interface Booking {
-  id: number;
+  id: string;
   resourceName: string;
   resourceType: string;
   userName: string;
   startTime: Date;
   endTime: Date;
-  status: BookingStatus;
-  attendees: number;
+  status: string;
+  date: Date;
 }

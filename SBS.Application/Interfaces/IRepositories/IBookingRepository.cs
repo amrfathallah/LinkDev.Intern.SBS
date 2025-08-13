@@ -12,5 +12,7 @@ namespace SBS.Application.Interfaces.IRepositories
         Task<bool> HasBookingsForResourceAsync(Guid resourceId);
 
          IQueryable<Booking> GetAllBookingWithIncludes();
-    }
+
+		Task<List<ApplicationUser>> GetAllUsersWithBookingsAsync();
+	}
 }

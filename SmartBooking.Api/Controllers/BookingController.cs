@@ -100,5 +100,12 @@ namespace SmartBooking.Api.Controllers
 			var result = await _bookingService.GetAllBookingStatusAsync();
 			return Ok(result);
 		}
+
+		[HttpGet("users-with-bookings")]
+		public async Task<IActionResult> GetUsersWithBookings()
+		{
+			var users = await _bookingService.GetUsersWithBookingsAsync();
+			return Ok(users);
+		}
 	}
 }

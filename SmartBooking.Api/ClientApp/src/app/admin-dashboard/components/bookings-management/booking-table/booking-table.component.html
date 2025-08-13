@@ -1,0 +1,112 @@
+<div class="table-container">
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Loading bookings...</p>
+  </div>
+
+  <!-- Bookings Table -->
+  <div *ngIf="!isLoading">
+    <mat-table
+      [dataSource]="bookingsDataSource"
+      matSort
+      (matSortChange)="onSortChange($event)"
+      matSortDisableClear
+      class="mat-elevation-z8"
+    >
+      <!-- Resource Name Column -->
+      <ng-container matColumnDef="resourceName">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ columnHeaders.resourceName }}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let booking">{{
+          booking.resourceName
+        }}</mat-cell>
+      </ng-container>
+
+      <!-- Resource Type Column -->
+      <ng-container matColumnDef="resourceType">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ columnHeaders.resourceType }}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let booking">{{
+          booking.resourceType
+        }}</mat-cell>
+      </ng-container>
+
+      <!-- User Name Column -->
+      <ng-container matColumnDef="userName">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ columnHeaders.userName }}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let booking">{{ booking.userName }}</mat-cell>
+      </ng-container>
+
+      <!-- Date Column -->
+      <ng-container matColumnDef="date">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ columnHeaders.date }}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let booking">
+          {{ booking.date | date : "dd/MM/yyyy" }}
+        </mat-cell>
+      </ng-container>
+
+      <!-- Start Time Column -->
+      <ng-container matColumnDef="startTime">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ columnHeaders.startTime }}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let booking">
+          {{ booking.startTime | date : "HH:mm" }}
+        </mat-cell>
+      </ng-container>
+
+      <!-- End Time Column -->
+      <ng-container matColumnDef="endTime">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ columnHeaders.endTime }}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let booking">
+          {{ booking.endTime | date : "HH:mm" }}
+        </mat-cell>
+      </ng-container>
+
+      <!-- Status Column -->
+      <ng-container matColumnDef="status">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ columnHeaders.status }}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let booking">
+          <span [class]="getStatusClass(booking.statusDisplayName)">
+            {{ booking.statusDisplayName }}
+          </span>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row
+        *matHeaderRowDef="bookingsDisplayedColumns"
+      ></mat-header-row>
+      <mat-row
+        *matRowDef="let row; columns: bookingsDisplayedColumns"
+      ></mat-row>
+    </mat-table>
+
+    <!-- Paginator -->
+    <mat-paginator
+      #paginator
+      [length]="totalCount"
+      [pageSize]="currentPageSize"
+      [pageIndex]="currentPageIndex"
+      [pageSizeOptions]="paginationConfig.pageSizeOptions"
+      (page)="onPageEvent($event)"
+      showFirstLastButtons
+    ></mat-paginator>
+  </div>
+
+  <!-- No Data Message -->
+  <div *ngIf="!isLoading && bookings.length === 0" class="no-data">
+    <mat-icon>inbox</mat-icon>
+    <p>No bookings found</p>
+  </div>
+</div>

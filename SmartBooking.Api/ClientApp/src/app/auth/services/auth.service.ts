@@ -100,20 +100,20 @@ export class AuthService {
     const token = localStorage.getItem('token');
     if (token && !this.jwtHelper.isTokenExpired(token)) {
       const decodedToken = this.jwtHelper.decodeToken(token);
-      return decodedToken.role === 'Admin';
-    } else {
-      return false;
+      return (
+        decodedToken[
+          'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
+        ] ||
+        decodedToken.role ||
+        null
+      );
     }
+    return null;
   }
 
-  getRole() {
-    const token = localStorage.getItem('token');
-    if (token && !this.jwtHelper.isTokenExpired(token)) {
-      const decodedToken = this.jwtHelper.decodeToken(token);
-      return decodedToken.role;
-    } else {
-      return null;
-    }
+  isAdmin(): boolean {
+    const role = this.getRole();
+    return role === 'Admin';
   }
 
   logout() {
