@@ -97,3 +97,6 @@ StyleCopReport.xml
 node_modules/
 dist/
 tmp/
+
+
+__pycache__/

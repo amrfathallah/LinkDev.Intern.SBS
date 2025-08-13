@@ -1,29 +1,45 @@
 <!-- Dashboard Header with Tabs Only -->
 <div class="dashboard-tabs-header">
   <div class="tabs-container">
-    <button mat-flat-button
-            [color]="currentView === AdminView.Resources ? 'primary' : ''"
-            (click)="switchView(AdminView.Resources)"
-            class="tab-button"
-            [class.active]="currentView === AdminView.Resources">
+    <button
+      mat-flat-button
+      [color]="currentView === AdminView.Resources ? 'primary' : ''"
+      (click)="switchView(AdminView.Resources)"
+      class="tab-button"
+      [class.active]="currentView === AdminView.Resources"
+    >
       <mat-icon>meeting_room</mat-icon>
       Manage Resources
     </button>
-    <button mat-flat-button
-            [color]="currentView === AdminView.Bookings ? 'primary' : ''"
-            (click)="switchView(AdminView.Bookings)"
-            class="tab-button"
-            [class.active]="currentView === AdminView.Bookings">
+    <button
+      mat-flat-button
+      [color]="currentView === AdminView.Bookings ? 'primary' : ''"
+      (click)="switchView(AdminView.Bookings)"
+      class="tab-button"
+      [class.active]="currentView === AdminView.Bookings"
+    >
       <mat-icon>meeting_room</mat-icon>
       Bookings
     </button>
-    <button mat-flat-button
-            [color]="currentView === AdminView.Reports ? 'primary' : ''"
-            (click)="switchView(AdminView.Reports)"
-            class="tab-button"
-            [class.active]="currentView === AdminView.Reports">
+    <button
+      mat-flat-button
+      [color]="currentView === AdminView.Reports ? 'primary' : ''"
+      (click)="switchView(AdminView.Reports)"
+      class="tab-button"
+      [class.active]="currentView === AdminView.Reports"
+    >
       <mat-icon>assessment</mat-icon>
       Reports
+    </button>
+    <button
+      mat-flat-button
+      [color]="currentView === AdminView.ReportAgent ? 'primary' : ''"
+      (click)="switchView(AdminView.ReportAgent)"
+      class="tab-button"
+      [class.active]="currentView === AdminView.ReportAgent"
+    >
+      <mat-icon>psychology</mat-icon>
+      Report Agent
     </button>
   </div>
 </div>
@@ -44,4 +60,8 @@
     <app-reports-management></app-reports-management>
   </div>
 
+  <!-- Report Agent View -->
+  <div *ngIf="currentView === AdminView.ReportAgent" class="view-section">
+    <app-report-agent></app-report-agent>
+  </div>
 </div>

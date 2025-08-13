@@ -1,0 +1,154 @@
+<div class="report-agent-container">
+  <div class="header-section">
+    <h2>
+      <mat-icon>psychology</mat-icon>
+      AI Report Agent
+    </h2>
+    <p>Generate intelligent reports using natural language prompts</p>
+
+    <!-- Error Alert -->
+    <div *ngIf="errorMessage" class="error-alert">
+      <mat-icon>error</mat-icon>
+      <span>{{errorMessage}}</span>
+      <button mat-icon-button (click)="errorMessage = ''">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="content-wrapper">
+    <!-- Form Section -->
+    <div class="form-section">
+      <mat-card class="form-card">
+        <mat-card-header>
+          <mat-card-title>Report Configuration</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <form [formGroup]="reportForm" (ngSubmit)="onSubmit()">
+            <!-- Prompt Input -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Describe your report</mat-label>
+              <textarea
+                matInput
+                formControlName="prompt"
+                placeholder="e.g., Show me the most booked resources last month"
+                rows="3"
+                maxlength="500">
+              </textarea>
+              <mat-hint>Tell the AI what kind of report you want to generate</mat-hint>
+              <mat-error *ngIf="f['prompt'].hasError('required') && f['prompt'].touched">
+                Prompt is required
+              </mat-error>
+              <mat-error *ngIf="f['prompt'].hasError('minlength') && f['prompt'].touched">
+                Prompt must be at least 5 characters
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Chart Type Selection -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Chart Type</mat-label>
+              <mat-select formControlName="chartType">
+                <mat-option *ngFor="let type of chartTypes" [value]="type.value">
+                  {{type.display}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <!-- Advanced Options -->
+            <div class="advanced-options">
+              <h4>Advanced Options (Optional)</h4>
+
+              <div class="row">
+                <mat-form-field appearance="outline" class="half-width">
+                  <mat-label>X-Axis Column Hint</mat-label>
+                  <input matInput formControlName="xColumnHint"
+                         placeholder="e.g., resource_name">
+                  <mat-hint>Suggest which column to use for X-axis</mat-hint>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="half-width">
+                  <mat-label>Y-Axis Column Hint</mat-label>
+                  <input matInput formControlName="yColumnHint"
+                         placeholder="e.g., booking_count">
+                  <mat-hint>Suggest which column to use for Y-axis</mat-hint>
+                </mat-form-field>
+              </div>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Maximum Results</mat-label>
+                <input matInput type="number" formControlName="topK"
+                       min="1" max="1000">
+                <mat-hint>Limit the number of results (1-1000)</mat-hint>
+                <mat-error *ngIf="f['topK'].hasError('min') && f['topK'].touched">
+                  Minimum value is 1
+                </mat-error>
+                <mat-error *ngIf="f['topK'].hasError('max') && f['topK'].touched">
+                  Maximum value is 1000
+                </mat-error>
+                <mat-error *ngIf="f['topK'].hasError('required') && f['topK'].touched">
+                  This field is required
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+              <button mat-raised-button
+                      color="primary"
+                      type="submit"
+                      [disabled]="reportForm.invalid || isLoading">
+                <mat-icon *ngIf="!isLoading">auto_graph</mat-icon>
+                <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+                {{isLoading ? 'Generating...' : 'Generate Report'}}
+              </button>
+
+              <button mat-button
+                      type="button"
+                      (click)="clearForm()"
+                      [disabled]="isLoading">
+                <mat-icon>clear</mat-icon>
+                Clear
+              </button>
+            </div>
+          </form>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Chart Section -->
+    <div class="chart-section">
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Generated Chart</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="chart-container">
+            <canvas id="reportChart" width="400" height="300"></canvas>
+            <div class="no-chart-message" *ngIf="!chart && !isLoading">
+              <mat-icon>bar_chart</mat-icon>
+              <p>Your generated chart will appear here</p>
+              <p class="hint">Fill out the form and click "Generate Report" to see your data visualization</p>
+            </div>
+            <div class="loading-message" *ngIf="isLoading">
+              <mat-spinner diameter="50"></mat-spinner>
+              <p>AI is analyzing your request and generating the chart...</p>
+            </div>
+          </div>
+
+          <!-- Results Summary -->
+          <div *ngIf="lastGeneratedData && !isLoading" class="results-summary">
+            <mat-divider></mat-divider>
+            <div class="summary-content">
+              <h4>Generation Summary</h4>
+              <p><strong>Records Found:</strong> {{lastGeneratedData.rows_count}}</p>
+              <p><strong>Chart Type:</strong> {{reportForm.get('chartType')?.value | titlecase}}</p>
+              <p><strong>Last Generated:</strong> {{currentDate | date:'medium'}}</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

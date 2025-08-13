@@ -6,6 +6,7 @@ export const environment = {
   production: false,
   apiBaseUrl: 'https://localhost:7191/api',
   apiDomain: 'localhost:7191',
+  reportAgentUrl: 'http://localhost:5000/api/reports',
 };
 
 /*
