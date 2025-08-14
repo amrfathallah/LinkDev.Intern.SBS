@@ -12,7 +12,7 @@
           Invalid email
         </mat-error>
       </mat-form-field>
-
+ 
       <mat-form-field appearance="fill" class="full-width">
         <mat-label>Password</mat-label>
         <input
@@ -36,9 +36,9 @@
           Password is required
         </mat-error>
       </mat-form-field>
-
+ 
       <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
-
+ 
       <button
         mat-flat-button
         color="primary"
@@ -47,6 +47,10 @@
       >
         Login
       </button>
+      <p class="text-center mt-4">
+      Doesn't have an account?
+      <button class="btn btn-outline-primary" (click)="goToRegister()">Register</button>
+    </p>
     </form>
   </mat-card>
 </div>

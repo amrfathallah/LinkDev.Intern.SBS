@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.TeamFoundation.TestManagement.WebApi;
 using SBS.Application.DTOs.ResourceDto;
@@ -10,6 +11,7 @@ namespace SmartBooking.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ResourceController : ControllerBase
     {
         private readonly IResourceService _resourceService;
@@ -97,5 +99,16 @@ namespace SmartBooking.Api.Controllers
 			var result = await _resourceService.GetAllResourceTypesAsync();
 			return Ok(result);
 		}
-	}
+	
+        [HttpGet("available")]
+        public async Task<IActionResult> GetAvailable([FromQuery] DateOnly date)
+        {
+            var result = await _resourceService.GetAvailableResourcesAsync(date);
+            if (!result.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+    }
 } 

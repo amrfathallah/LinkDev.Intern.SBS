@@ -7,6 +7,7 @@ using SBS.Application.DTOs;
 using SBS.Application.DTOs.BookingDto;
 using SBS.Application.DTOs.Common;
 using SBS.Application.Interfaces.IServices;
+using System.Security.Claims;
 
 namespace SmartBooking.Api.Controllers
 {
@@ -25,6 +26,7 @@ namespace SmartBooking.Api.Controllers
 		[Authorize]
 		[HttpPost]
 		[Route("book")]
+		[Authorize]
 		public async Task<IActionResult> BookResource([FromBody] BookingRequestDto bookingRequestDto)
 		{
 			try
@@ -43,12 +45,12 @@ namespace SmartBooking.Api.Controllers
 				}
 
 
-				//Extract info from token
+                //Extract info from token
 				var userID = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 				var userName = User.FindFirst(ClaimTypes.Name)?.Value;
-
 				var result = await _bookingService.BookAsync(bookingRequestDto, Guid.Parse(userID), userName);
 
+			
 				if (result)
 				{
 					return Ok(new ApiResponse
@@ -158,6 +160,13 @@ namespace SmartBooking.Api.Controllers
 		{
 			var result = await _bookingService.GetAllBookingStatusAsync();
 			return Ok(result);
+		}
+
+		[HttpGet("users-with-bookings")]
+		public async Task<IActionResult> GetUsersWithBookings()
+		{
+			var users = await _bookingService.GetUsersWithBookingsAsync();
+			return Ok(users);
 		}
 	}
 }

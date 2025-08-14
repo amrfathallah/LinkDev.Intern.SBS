@@ -1,4 +1,5 @@
 using AutoMapper;
+using SBS.Application.DTOs.Auth;
 using SBS.Application.DTOs.ResourceDto;
 using SBS.Application.Interfaces;
 using SBS.Application.Interfaces.IServices;
@@ -7,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using SBS.Application.DTOs.Common;
 
 
 
@@ -143,12 +145,53 @@ namespace SBS.Application.Services
                 BookedSlots = bookedSlots
             };
         }
-		public async Task<List<ResourceTypeDto>> GetAllResourceTypesAsync()
+		public async Task<ApiResponse<List<ResourceTypeDto>>> GetAllResourceTypesAsync()
 		{
-			var types = await _unitOfWork.ResourceType.GetAllAsync();
-			return _mapper.Map<List<ResourceTypeDto>>(types);
+			try
+			{
+				var types = await _unitOfWork.ResourceType.GetAllAsync();
+				var result = _mapper.Map<List<ResourceTypeDto>>(types);
+				
+				return new ApiResponse<List<ResourceTypeDto>>
+				{
+					Success = true,
+					Message = "Resource types retrieved successfully",
+					Data = result
+				};
+			}
+			catch (Exception)
+			{
+				return new ApiResponse<List<ResourceTypeDto>>
+				{
+					Success = false,
+					Message = "An error occurred while fetching resource types",
+					Data = null
+				};
+			}
 		}
 
-		
-	}
+        public async Task<ApiResponse<List<ResourceDto>>> GetAvailableResourcesAsync(DateOnly date)
+        {
+            try
+            {
+                var availableResources = await _unitOfWork.Resources.GetResourcesWithAvailableSlotsAsync(date);
+
+                return new ApiResponse<List<ResourceDto>>
+                {
+                    Success = true,
+                    Message = "Available resources retrieved successfully",
+                    Data = availableResources.Select(r => _mapper.Map<ResourceDto>(r)).ToList()
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<List<ResourceDto>>
+                {
+                    Success = false,
+                    Message = "An error occurred while fetching available resources",
+                    Data = null
+                };
+            }
+        }
+    }
 }

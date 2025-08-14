@@ -39,11 +39,30 @@ export class ResourceService {
       })
     );
   }
-  getResources() {
-    return this._httpClient.get<GetResourceDto[]>(
-      `${environment.apiBaseUrl}/Resource`
+
+  getAvailableResources(date: Date): Observable<GetResourceDto[]> {
+    // Format date as YYYY-MM-DD
+    const formattedDate = date.toISOString().split('T')[0];
+    
+    return this._httpClient.get<ApiResponse<GetResourceDto[]>>(
+      `${environment.apiBaseUrl}/Resource/available?date=${formattedDate}`
+    ).pipe(
+      map(response => {
+        if (response.success && response.data) {
+          return response.data;
+        } else {
+          throw new Error(response.message || 'Failed to fetch available resources');
+        }
+      })
     );
   }
+
+  getResources() {
+    // Use today's date as default
+    const today = new Date();
+    return this.getAvailableResources(today);
+  }
+
   getResourceById(id: string) {
     return this._httpClient.get<GetResourceDto>(
       `${environment.apiBaseUrl}/Resource/${id}`

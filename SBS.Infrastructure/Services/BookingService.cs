@@ -13,6 +13,7 @@ using SBS.Application.DTOs.Common;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SBS.Application.DTOs.ResourceDto;
+using SBS.Application.DTOs.Auth;
 
 namespace SBS.Application.Services
 {
@@ -171,13 +172,56 @@ namespace SBS.Application.Services
 
 		}
 
-		public async Task<List<BookingStatusDto>> GetAllBookingStatusAsync()
+		public async Task<ApiResponse<List<BookingStatusDto>>> GetAllBookingStatusAsync()
 		{
-			var statuses = await _unitOfWork.BookingStatus.GetAllAsync();
-			return _mapper.Map<List<BookingStatusDto>>(statuses);
+			try
+			{
+				var statuses = await _unitOfWork.BookingStatus.GetAllAsync();
+				var result = _mapper.Map<List<BookingStatusDto>>(statuses);
+				
+				return new ApiResponse<List<BookingStatusDto>>
+				{
+					Success = true,
+					Message = "Booking statuses retrieved successfully",
+					Data = result
+				};
+			}
+			catch (Exception)
+			{
+				return new ApiResponse<List<BookingStatusDto>>
+				{
+					Success = false,
+					Message = "An error occurred while fetching booking statuses",
+					Data = null
+				};
+			}
 		}
 
-		
+		public async Task<ApiResponse<List<BookingsUsersDto>>> GetUsersWithBookingsAsync()
+		{
+			try
+			{
+				var users = await _unitOfWork.Bookings.GetAllUsersWithBookingsAsync();
+				var result = _mapper.Map<List<BookingsUsersDto>>(users);
+				
+				return new ApiResponse<List<BookingsUsersDto>>
+				{
+					Success = true,
+					Message = "Users with bookings retrieved successfully",
+					Data = result
+				};
+			}
+			catch (Exception)
+			{
+				return new ApiResponse<List<BookingsUsersDto>>
+				{
+					Success = false,
+					Message = "An error occurred while fetching users with bookings",
+					Data = null
+				};
+			}
+		}
+
 
 		// Helper methods for BookingService
 

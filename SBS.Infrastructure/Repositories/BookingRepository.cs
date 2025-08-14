@@ -59,6 +59,16 @@ namespace SBS.Infrastructure.Repositories
 				.Include(b => b.BookingSlots).ThenInclude(b => b.Slot);
 		}
 
-		
+		public async Task<List<ApplicationUser>> GetAllUsersWithBookingsAsync()
+		{
+			return await _appDbContext.Bookings
+				.Include(b => b.User)
+				.Where(b => b.User != null)
+				.Select(b => b.User!)
+				.Distinct()
+				.ToListAsync();
+		}
+
+
 	}
 }

@@ -15,5 +15,7 @@ namespace SBS.Application.Interfaces.IRepositories
         Task<bool> CancelBookingAsync(Guid bookingId);
 
          IQueryable<Booking> GetAllBookingWithIncludes();
-    }
+
+		Task<List<ApplicationUser>> GetAllUsersWithBookingsAsync();
+	}
 }

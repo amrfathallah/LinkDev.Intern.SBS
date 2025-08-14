@@ -49,12 +49,12 @@ namespace SBS.Infrastructure.Services
 
         public Task StoreRefreshTokenAsync(Guid UserId, string RefreshToken)
         {
-            return _refreshTokenRepository.StoreRefreshTokenAsync(UserId, RefreshToken, _jwtSettings.RefreshTokenExpiry);
+            return _refreshTokenRepository.StoreRefreshTokenAsync(UserId, RefreshToken, _jwtSettings.RefreshTokenExpiryInDay);
         }
 
         public async Task UpdateRefreshTokenAsync(Guid UserId, string NewRefreshToken)
         {
-            await _refreshTokenRepository.UpdateRefreshTokenAsync(UserId, NewRefreshToken, _jwtSettings.RefreshTokenExpiry);
+            await _refreshTokenRepository.UpdateRefreshTokenAsync(UserId, NewRefreshToken, _jwtSettings.RefreshTokenExpiryInDay);
         }
 
         public async Task<ApiResponse<AuthResponseDto>> RefreshExpiredToken(TokenDTO token)
@@ -62,7 +62,7 @@ namespace SBS.Infrastructure.Services
             try
             {
                 // Step 1: Extract claims from exp. Access token
-                var principal = _httpContextAccessor.HttpContext?.User;
+                var principal = _tokenService.GetUserInfoFromExpiredToken(token.AccessToken);
                 if (principal == null)
                 {
                     return new ApiResponse<AuthResponseDto>
