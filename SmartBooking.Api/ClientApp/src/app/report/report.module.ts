@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgChartsModule } from 'ng2-charts';
-import { ReportDashboardComponent } from './component/report-dashboard/report-dashboard.component'; 
+import { ReportDashboardComponent } from './component/report-dashboard/report-dashboard.component';
 import { ReportRoutingModule } from './report-routing.module';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
