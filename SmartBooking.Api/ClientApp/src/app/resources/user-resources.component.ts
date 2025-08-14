@@ -39,7 +39,7 @@ export class UserResourcesComponent implements OnInit {
   }
 
   private loadResources() {
-    this.resourceService.getResources().subscribe({
+    this.resourceService.getAvailableResources(this.selectedDate).subscribe({
       next: (data: GetResourceDto[]) => {
         this.resources = data;
         this.resources = this.resources.filter((resource) => resource.isActive);
@@ -53,6 +53,10 @@ export class UserResourcesComponent implements OnInit {
         });
       },
     });
+  }
+
+  onDateChange() {
+    this.loadResources();
   }
 
   filterByType(type: 'all' | 1 | 2) {

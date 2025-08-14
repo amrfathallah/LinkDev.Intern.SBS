@@ -170,6 +170,28 @@ namespace SBS.Application.Services
 			}
 		}
 
-		
-	}
+        public async Task<ApiResponse<List<ResourceDto>>> GetAvailableResourcesAsync(DateOnly date)
+        {
+            try
+            {
+                var availableResources = await _unitOfWork.Resources.GetResourcesWithAvailableSlotsAsync(date);
+
+                return new ApiResponse<List<ResourceDto>>
+                {
+                    Success = true,
+                    Message = "Available resources retrieved successfully",
+                    Data = availableResources.Select(r => _mapper.Map<ResourceDto>(r)).ToList()
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<List<ResourceDto>>
+                {
+                    Success = false,
+                    Message = "An error occurred while fetching available resources",
+                    Data = null
+                };
+            }
+        }
+    }
 }

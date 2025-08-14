@@ -115,10 +115,10 @@ export class AuthService {
     return null;
   }
 
-  isAdmin(): boolean {
-    const role = this.getRole();
-    return role === 'Admin';
-  }
+  //isAdmin(): boolean {
+  //  const role = this.getRole();
+  //  return role === 'Admin';
+  //}
 
   logout() {
     localStorage.removeItem('token');
