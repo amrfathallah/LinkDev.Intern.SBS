@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 // Routing
 import { AdminDashboardRoutingModule } from './admin-dashboard-routing.module';
@@ -40,6 +41,7 @@ import { BookingFiltersComponent } from '../components/bookings-management/booki
 import { BookingTableComponent } from '../components/bookings-management/booking-table/booking-table.component';
 import { ResourcesManagementComponent } from '../components/resources-management/resources-management.component';
 import { ReportsManagementComponent } from '../components/reports-management/reports-management.component';
+import { ReportAgentComponent } from '../components/report-agent/report-agent.component';
 import { ConfirmationDialogComponent } from '../components/confirmation-dialog/confirmation-dialog.component';
 import { ResourceDialogComponent } from '../components/resource-dialog/resource-dialog.component';
 
@@ -51,6 +53,7 @@ import { ResourceDialogComponent } from '../components/resource-dialog/resource-
     BookingTableComponent,
     ResourcesManagementComponent,
     ReportsManagementComponent,
+    ReportAgentComponent,
     ConfirmationDialogComponent,
     ResourceDialogComponent,
   ],
@@ -59,6 +62,7 @@ import { ResourceDialogComponent } from '../components/resource-dialog/resource-
     AdminDashboardRoutingModule,
     ReactiveFormsModule,
     FormsModule,
+    HttpClientModule,
 
     // Material modules
     MatButtonModule,

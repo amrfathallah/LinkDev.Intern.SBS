@@ -18,14 +18,19 @@ export class AuthService {
   private isLoggedInSubject = new BehaviorSubject<boolean>(false);
 
   public isLoggedIn$ = this.isLoggedInSubject.asObservable();
-  public get isLoggedIn() { return this.isLoggedInSubject.value }
+  public get isLoggedIn() {
+    return this.isLoggedInSubject.value;
+  }
 
-  constructor(private http: HttpClient, private jwtHelper: JwtHelperService, private router: Router) {
+  constructor(
+    private http: HttpClient,
+    private jwtHelper: JwtHelperService,
+    private router: Router
+  ) {
     const token = localStorage.getItem('token');
     if (token && !this.jwtHelper.isTokenExpired(token)) {
       this.isLoggedInSubject.next(true);
-    } 
-    else {
+    } else {
       this.isLoggedInSubject.next(false);
     }
   }
@@ -39,7 +44,7 @@ export class AuthService {
         map((response: ApiResponse<AuthResponse>) => {
           if (response.success && response.data && response.data.token) {
             localStorage.setItem('token', response.data.token);
-            localStorage.setItem('refreshToken', response.data.refreshToken)
+            localStorage.setItem('refreshToken', response.data.refreshToken);
             this.isLoggedInSubject.next(true);
           } else {
             this.isLoggedInSubject.next(false);
@@ -72,31 +77,30 @@ export class AuthService {
   }
 
   refreshToken(): Observable<ApiResponse<AuthResponse>> {
-    const accessToken : string = localStorage.getItem('token')?? '';
-    const refreshToken : string = localStorage.getItem('refreshToken')?? '';
-    var tokenDto : tokenDto = { accessToken, refreshToken };
+    const accessToken: string = localStorage.getItem('token') ?? '';
+    const refreshToken: string = localStorage.getItem('refreshToken') ?? '';
+    var tokenDto: tokenDto = { accessToken, refreshToken };
 
-    return this.http.post<ApiResponse<AuthResponse>>(
-      `${this.baseUrl}/refresh`,
-      tokenDto,
-      { withCredentials: true }
-    ).pipe(
-      tap(response => {
-        if (response.success) {
-          this.setAccessToken(response.data.token);
-          this.isLoggedInSubject.next(true);
-        }
+    return this.http
+      .post<ApiResponse<AuthResponse>>(`${this.baseUrl}/refresh`, tokenDto, {
+        withCredentials: true,
       })
-    );
+      .pipe(
+        tap((response) => {
+          if (response.success) {
+            this.setAccessToken(response.data.token);
+            this.isLoggedInSubject.next(true);
+          }
+        })
+      );
   }
 
   isTokenExpired() {
     let token = localStorage.getItem('token');
-    return this.jwtHelper.isTokenExpired(token)
+    return this.jwtHelper.isTokenExpired(token);
   }
 
-
-  isAdmin() {
+  getRole() {
     const token = localStorage.getItem('token');
     if (token && !this.jwtHelper.isTokenExpired(token)) {
       const decodedToken = this.jwtHelper.decodeToken(token);

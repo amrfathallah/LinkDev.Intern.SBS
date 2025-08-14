@@ -1,5 +1,6 @@
 export enum AdminView {
   Resources = 'resources',
   Reports = 'reports',
-  Bookings = 'bookings'
+  Bookings = 'bookings',
+  ReportAgent = 'report-agent',
 }
