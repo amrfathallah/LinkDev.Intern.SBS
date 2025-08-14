@@ -1,3 +1,5 @@
+using SBS.Application.DTOs.Auth;
+using SBS.Application.DTOs.Common;
 using SBS.Application.DTOs.ResourceDto;
 using System;
 using System.Collections.Generic;
@@ -15,6 +17,6 @@ namespace SBS.Application.Interfaces.IServices
         Task<bool> DeleteAsync(Guid id);
         Task<ResourceBookedSlotsDto> GetBookedSlotsAsync(GetBookedSlotsRequestDto request);
 
-		Task<List<ResourceTypeDto>> GetAllResourceTypesAsync();
+		Task<ApiResponse<List<ResourceTypeDto>>> GetAllResourceTypesAsync();
 	}
 } 

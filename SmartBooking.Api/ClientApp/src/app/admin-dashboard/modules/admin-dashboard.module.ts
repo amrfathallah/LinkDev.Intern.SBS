@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 // Routing
 import { AdminDashboardRoutingModule } from './admin-dashboard-routing.module';
@@ -29,14 +30,18 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 
 // Admin Dashboard Components
 import { AdminDashboardComponent } from '../admin-dashboard.component';
 import { BookingsManagementComponent } from '../components/bookings-management/bookings-management.component';
+import { BookingFiltersComponent } from '../components/bookings-management/booking-filters/booking-filters.component';
+import { BookingTableComponent } from '../components/bookings-management/booking-table/booking-table.component';
 import { ResourcesManagementComponent } from '../components/resources-management/resources-management.component';
 import { ReportsManagementComponent } from '../components/reports-management/reports-management.component';
+import { ReportAgentComponent } from '../components/report-agent/report-agent.component';
 import { ConfirmationDialogComponent } from '../components/confirmation-dialog/confirmation-dialog.component';
 import { ResourceDialogComponent } from '../components/resource-dialog/resource-dialog.component';
 
@@ -44,16 +49,20 @@ import { ResourceDialogComponent } from '../components/resource-dialog/resource-
   declarations: [
     AdminDashboardComponent,
     BookingsManagementComponent,
+    BookingFiltersComponent,
+    BookingTableComponent,
     ResourcesManagementComponent,
     ReportsManagementComponent,
+    ReportAgentComponent,
     ConfirmationDialogComponent,
-    ResourceDialogComponent
+    ResourceDialogComponent,
   ],
   imports: [
     CommonModule,
     AdminDashboardRoutingModule,
     ReactiveFormsModule,
     FormsModule,
+    HttpClientModule,
 
     // Material modules
     MatButtonModule,
@@ -79,11 +88,12 @@ import { ResourceDialogComponent } from '../components/resource-dialog/resource-
     MatTooltipModule,
     MatButtonToggleModule,
     MatProgressBarModule,
+    MatProgressSpinnerModule,
     MatSidenavModule,
-    MatListModule
+    MatListModule,
   ],
   providers: [
     // Global admin services
-  ]
+  ],
 })
-export class AdminDashboardModule { }
+export class AdminDashboardModule {}

@@ -33,6 +33,7 @@ namespace SBS.Application.Mapping
 
 			CreateMap<BookingStatus, BookingStatusDto>();
 			CreateMap<ResourceType, ResourceTypeDto>();
+			CreateMap<ApplicationUser, BookingsUsersDto>();
 		}
 	}
 }
