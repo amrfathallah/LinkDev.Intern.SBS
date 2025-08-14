@@ -1,0 +1,84 @@
+<div class="report-dashboard mat-typography">
+  <h2 class="dashboard-title">  Report Dashboard</h2>
+
+  <!-- Filter Section -->
+  <mat-card class="filter-card">
+    <mat-card-content>
+      <div class="controls">
+
+        <!-- Report Type -->
+        <mat-form-field appearance="fill" class="control-item">
+          <mat-label>Report Type</mat-label>
+          <mat-select [(value)]="selectedReportType">
+            <mat-option *ngFor="let type of reportTypes" [value]="ReportTypeEnum[type]">
+              {{ type }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Date Range Picker (Read-only) -->
+        <mat-form-field appearance="fill" class="control-item">
+          <mat-label>Date Range</mat-label>
+          <mat-date-range-input [rangePicker]="picker" [disabled]="loading">
+            <input matStartDate placeholder="From" [(ngModel)]="fromDate" readonly>
+            <input matEndDate placeholder="To" [(ngModel)]="toDate" readonly>
+          </mat-date-range-input>
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+        </mat-form-field>
+
+        <!-- Load Button -->
+        <button mat-raised-button color="primary"
+                class="control-item"
+                (click)="loadReport()"
+                [disabled]="!fromDate || !toDate || loading">
+          Load Report
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Export Buttons -->
+  <mat-card *ngIf="reportData && chartData.length > 0" class="export-card">
+    <mat-card-content>
+      <div class="export-buttons">
+        <button mat-raised-button color="primary"
+                (click)="export(ExportType.pdf)"
+                [disabled]="loading">
+           Export PDF
+        </button>
+        <button mat-raised-button color="accent"
+                (click)="export(ExportType.excel)"
+                [disabled]="loading">
+           Export Excel
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading / Error -->
+  <div class="status-section">
+    <mat-progress-spinner *ngIf="loading" mode="indeterminate"></mat-progress-spinner>
+    <mat-error *ngIf="error">{{ error }}</mat-error>
+  </div>
+
+  <!-- Chart Display -->
+  <mat-card *ngIf="reportData" class="chart-card">
+    <mat-card-header>
+      <mat-card-title>{{ reportData.name }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <canvas baseChart
+        [data]="{
+          labels: chartLabels,
+          datasets: [{ data: chartData, label: reportData.name }]
+        }"
+        [type]="chartType"
+        [options]="chartOptions">
+      </canvas>
+      <p *ngIf="chartData.length === 0" class="no-data-msg">
+        No data available for the selected date range.
+      </p>
+    </mat-card-content>
+  </mat-card>
+</div>

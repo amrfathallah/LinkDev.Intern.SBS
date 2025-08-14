@@ -24,6 +24,10 @@ const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
+   path: 'reports',
+    loadChildren: () => import('./report/report.module').then(m => m.ReportModule)
+  },
+  {
     path: 'main',
     component: MainLayoutComponent,
   },
