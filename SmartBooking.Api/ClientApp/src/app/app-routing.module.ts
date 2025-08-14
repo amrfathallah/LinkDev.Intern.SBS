@@ -40,16 +40,10 @@ const routes: Routes = [
     redirectTo: '/'
   },
 
-
   // {
   //   path: '' , redirectTo: '/home', pathMatch: 'full',
 
   // },
-
-
-
-
-
 ];
 
 @NgModule({

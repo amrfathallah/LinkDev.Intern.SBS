@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.TeamFoundation.TestManagement.WebApi;
 using SBS.Application.DTOs;
@@ -21,6 +23,7 @@ namespace SmartBooking.Api.Controllers
 			_bookingService = bookingService;
 		}
 
+		[Authorize]
 		[HttpPost]
 		[Route("book")]
 		[Authorize]
@@ -65,7 +68,7 @@ namespace SmartBooking.Api.Controllers
 					});
 				}
 			}
-			catch(Exception)
+			catch (Exception)
 			{
 				return BadRequest(new ApiResponse
 				{
@@ -73,9 +76,67 @@ namespace SmartBooking.Api.Controllers
 					Message = "An error occurred while processing your request."
 				});
 			}
-			
+		}
+		[Authorize]
+		[HttpGet]
+		[Route("get-my-bookings")]
+		public async Task<IActionResult> GetBookingsByUser()
+		{
+			try
+			{
+				var userID = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+				var bookings = await _bookingService.GetBookingsByUserAsync(Guid.Parse(userID));
+				return Ok(new ApiResponse<List<MyBookingDto>>
+				{
+					Success = true,
+					Data = bookings
+				});
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(new ApiResponse
+				{
+					Success = false,
+					Message = $"An error occurred while retrieving bookings: {ex.Message}"
+				});
+			}
 		}
 
+		[Authorize]
+		[HttpDelete]
+		[Route("cancel-booking/{bookingId}")]
+		public async Task<IActionResult> CancelBooking(Guid bookingId)
+		{
+			try
+			{
+				var userID = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+				var result = await _bookingService.CancelBookingAsync(bookingId, Guid.Parse(userID));
+				if (result)
+				{
+					return Ok(new ApiResponse
+					{
+						Success = true,
+						Message = "Booking cancelled successfully."
+					});
+				}
+				else
+				{
+					return BadRequest(new ApiResponse
+					{
+						Success = false,
+						Message = "Failed to cancel booking."
+					});
+				}
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(new ApiResponse
+				{
+					Success = false,
+					Message = $"An error occurred while cancelling the booking: {ex.Message}"
+				});
+			}
+		}
 
 		//[Authorize(Roles = "Admin")]
 		[HttpPost("allBooking")]

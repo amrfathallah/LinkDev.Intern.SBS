@@ -1,0 +1,77 @@
+.bookings-container {
+  padding: 1rem;
+}
+
+.page-title {
+  font-size: 24px;
+  margin-bottom: 1rem;
+}
+
+.bookings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.booking-detail {
+  display: flex;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.booking-detail mat-icon {
+  margin-right: 0.5rem;
+}
+
+.no-bookings {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.empty-icon {
+  font-size: 48px;
+  color: #aaa;
+}
+
+.booking-card {
+  position: relative;
+  padding: 0.5rem;
+}
+.booking-card {
+  position: relative;
+  padding-top: 24px;
+}
+
+.delete-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+}
+
+.booking-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  word-break: break-word;
+  padding-right: 36px;
+}
+
+.booking-id {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  vertical-align: bottom;
+}
+
+.error-snackbar {
+  background-color: #e53935;
+  color: white;
+}
+
+.confirm-snackbar {
+  background-color: #ffa000;
+  color: black;
+}

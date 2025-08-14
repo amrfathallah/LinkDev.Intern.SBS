@@ -1,0 +1,48 @@
+<div class="bookings-container">
+  <h2 class="page-title">My Bookings</h2>
+
+  <div
+    *ngIf="(myBookings?.length || 0) > 0; else noBookings"
+    class="bookings-grid"
+  >
+    <mat-card *ngFor="let booking of myBookings" class="booking-card">
+      <button
+        mat-icon-button
+        class="delete-btn"
+        (click)="onDeleteClicked(booking)"
+        aria-label="Delete booking"
+      >
+        <mat-icon color="warn">close</mat-icon>
+      </button>
+
+      <mat-card-title class="booking-title">
+        Booking #<span class="booking-id">{{ booking.id }}</span>
+      </mat-card-title>
+      <mat-card-content>
+        <div class="booking-detail">
+          <mat-icon>event</mat-icon>
+          <span>Date: {{ booking.date | date : "mediumDate" }}</span>
+        </div>
+        <div class="booking-detail">
+          <mat-icon>access_time</mat-icon>
+          <span>Time: {{ booking.startTime }} - {{ booking.endTime }}</span>
+        </div>
+        <div class="booking-detail">
+          <mat-icon>room</mat-icon>
+          <span>Resource: {{ booking.resourceId }}</span>
+        </div>
+        <div class="booking-detail">
+          <mat-icon>info</mat-icon>
+          <span>Status: {{ getBookingStatusName(booking.status) }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <ng-template #noBookings>
+    <div class="no-bookings">
+      <mat-icon class="empty-icon">event_busy</mat-icon>
+      <p>No bookings found.</p>
+    </div>
+  </ng-template>
+</div>

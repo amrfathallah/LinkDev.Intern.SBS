@@ -21,21 +21,21 @@ namespace SBS.Infrastructure
 			_appDbContext = appDbContext;
 		}
 
-		public async Task<bool> HasConflictAsync(Guid ResourceId, DateOnly date, List<int> slotIds)
+		public async Task<bool> HasConflictAsync(Guid ResourceId, DateOnly date, List<Slot> slotIds)
 		{
 			//To be checked
 			var existingSlots = await _appDbContext.BookingSlots.Include(slot => slot.Booking).Where(slot => slot.Booking != null && slot.Booking.ResourceId == ResourceId && slot.Booking.Date == date && slot.Booking.StatusId != (int)BookingStatusEnum.Finished).ToListAsync();
 
-			var bookedSlots = await _appDbContext.Slots.Where(Slot => slotIds.Contains(Slot.Id)).ToListAsync();
+			var bookedSlots = slotIds;
 
-			// foreach (var slot in bookedSlots)
-			// {
-			// 	//Assuming there are no update operations
-			// 	if (existingSlots.Any(existing => existing.Slot != null && existing.Slot.StartTime < slot.EndTime && existing.Slot.EndTime > slot.StartTime))
-			// 	{
-			// 		return true;
-			// 	}
-			// }
+			foreach (var slot in bookedSlots)
+			{
+				//Assuming there are no update operations
+				if (existingSlots.Any(existing => existing.Slot != null && existing.Slot.StartTime < slot.EndTime && existing.Slot.EndTime > slot.StartTime))
+				{
+					return true;
+				}
+			}
 			return false;
 		}
 	}
