@@ -100,7 +100,7 @@ export class AuthService {
     return this.jwtHelper.isTokenExpired(token);
   }
 
-  isAdmin() {
+  getRole() {
     const token = localStorage.getItem('token');
     if (token && !this.jwtHelper.isTokenExpired(token)) {
       const decodedToken = this.jwtHelper.decodeToken(token);
@@ -113,6 +113,11 @@ export class AuthService {
       );
     }
     return null;
+  }
+
+  isAdmin(): boolean {
+    const role = this.getRole();
+    return role === 'Admin';
   }
 
   logout() {
