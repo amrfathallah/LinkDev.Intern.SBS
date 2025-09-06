@@ -25,7 +25,7 @@ Frontend: Angular 16, Angular Material, Chart.js
 
 Architecture: Clean Architecture with Repository & Unit of Work pattern
 
-Other Tools: SignalR, Identity, AI-powered query generation
+Other Tools: Identity, AI-powered query generation
 
 ## 📂 Project Modules
 
